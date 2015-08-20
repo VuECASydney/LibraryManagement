@@ -42,41 +42,46 @@ CREATE TABLE book_copies
 (
 	Instance_id		INT NOT NULL AUTO_INCREMENT,
 	Book_id			INT NOT NULL,
+	Section			VARCHAR(20) DEFAULT NULL,
 	PRIMARY KEY (Instance_id),
 	CONSTRAINT fk_book_copies_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
 		ON UPDATE CASCADE,
 	INDEX idx_book_id (Book_id)
 );
 
-----------
 
 CREATE TABLE student
 (
 	Student_id	VARCHAR(10) NOT NULL,
 	Name		VARCHAR(20) NOT NULL,
-	Address		VARCHAR(50),
-	Phone		VARCHAR(20),
-	Email		VARCHAR(50),
-	PRIMARY KEY (student_id)
+	Address		VARCHAR(50) NOT NULL,
+	Phone		VARCHAR(20) NOT NULL,
+	Email		VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Student_id),
+	INDEX idx_student_name (Name)
 );
 
 CREATE TABLE staff
 (
 	Staff_id	VARCHAR(10) NOT NULL,
 	Name		VARCHAR(20) NOT NULL,
-	Address		VARCHAR(50),
-	Phone		VARCHAR(20),
-	Email		VARCHAR(50),
-	PRIMARY KEY (student_id)
+	Address		VARCHAR(50) NOT NULL,
+	Phone		VARCHAR(20) NOT NULL,
+	Email		VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Staff_id),
+	INDEX idx_staff_name (Name)
 );
 
 CREATE TABLE book_loans
 (
 	Instance_id		INT NOT NULL,
 	Book_id			INT NOT NULL,
+	Borrower_type	ENUM('Staff', 'Student')	NOT NULL,
 	Borrower_id		VARCHAR(10) NOT NULL,
 	Date_out		DATETIME NOT NULL,
 	Due_date		DATETIME NOT NULL,
-	PRIMARY KEY (Instance_id, Date_out)
-);
 
+	PRIMARY KEY (Instance_id, Book_id, Date_out),
+	CONSTRAINT fk_book_loans_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
+		ON UPDATE CASCADE
+);
