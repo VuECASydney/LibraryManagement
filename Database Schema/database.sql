@@ -43,12 +43,11 @@ CREATE TABLE book_copies
 	Instance_id		INT NOT NULL AUTO_INCREMENT,
 	Book_id			INT NOT NULL,
 	Section			VARCHAR(20) DEFAULT NULL,
-	PRIMARY KEY (Instance_id),
+	PRIMARY KEY (Instance_id, Book_id),
 	CONSTRAINT fk_book_copies_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
 		ON UPDATE CASCADE,
 	INDEX idx_book_id (Book_id)
 );
-
 
 CREATE TABLE student
 (
