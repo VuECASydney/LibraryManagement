@@ -80,8 +80,9 @@ CREATE TABLE book_loans
 	Borrower_id		VARCHAR(10) NOT NULL,
 	Date_out		DATETIME NOT NULL,
 	Due_date		DATETIME NOT NULL,
-
 	PRIMARY KEY (Instance_id, Book_id, Date_out),
 	CONSTRAINT fk_book_loans_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
-		ON UPDATE CASCADE
+		ON UPDATE CASCADE,
+	INDEX idx_borrower_id (Borrower_id),
+	CHECK (Date_out < Due_date)
 );
