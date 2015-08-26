@@ -1,28 +1,136 @@
+-- database account : admin/librarian/user
+-- admin : 
+
+CREATE DATABASE IF NOT EXISTS auth;
+USE auth;
+
+CREATE TABLE student
+(
+	Student_id	VARCHAR(10) NOT NULL,
+	Passwd		VARCHAR(50) NOT NULL,
+	Enroll_year	INT NOT NULL,
+	PRIMARY KEY (Student_id),
+	INDEX idx_year (Year)
+);
+
+CREATE TABLE staff
+(
+	Staff_id	VARCHAR(10) NOT NULL,
+	Passwd		VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Staff_id)
+);
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_check_account
+
+CREATE FUNCTION sf_check_account(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50)) RETURNS TINYINT
+BEGIN
+	DECLARE cnt TINYINT;
+
+	IF user_type = 0 THEN
+		SELECT COUNT(*) INTO cnt FROM staff WHERE Staff_id = account AND Passwd = enc_passwd;
+	ELSEIF user_type = 1 THEN
+		SELECT COUNT(*) INTO cnt FROM student WHERE Student_id = account AND Passwd = enc_passwd;
+	ELSE
+		SET cnt = 0;
+	END IF;
+
+	RETURN cnt;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_check_account
+
+CREATE FUNCTION sf_check_account(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50)) RETURNS TINYINT
+BEGIN
+	DECLARE cnt TINYINT;
+
+	IF user_type = 0 THEN
+		SELECT COUNT(*) INTO cnt FROM staff WHERE Staff_id = account AND Passwd = enc_passwd;
+	ELSEIF user_type = 1 THEN
+		SELECT COUNT(*) INTO cnt FROM student WHERE Student_id = account AND Passwd = enc_passwd;
+	ELSE
+		SET cnt = 0;
+	END IF;
+
+	RETURN cnt;
+END$$
+DELIMITER ;
+
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin1';
+GRANT USAGE ON *.* TO 'admin'@'localhost';
+FLUSH PRIVILEGES;
+-- SHOW GRANTS FOR 'admin'@'localhost';
+
+CREATE USER 'librarian'@'localhost' IDENTIFIED BY 'librarian1';
+GRANT USAGE ON *.* TO 'librarian'@'localhost';
+FLUSH PRIVILEGES;
+-- SHOW GRANTS FOR 'librarian'@'localhost';
+
+CREATE USER 'library_user'@'localhost' IDENTIFIED BY 'user1';
+GRANT USAGE ON *.* TO 'library_user'@'localhost';
+FLUSH PRIVILEGES;
+-- SHOW GRANTS FOR 'library_user'@'localhost';
+
+
+-- GRANT SELECT, SHOW VIEW, ALTER, CREATE, CREATE VIEW, DELETE, DROP, INDEX, INSERT, REFERENCES, UPDATE ON TABLE library.publisher TO 'admin'@'localhost' WITH GRANT OPTION;
+-- FLUSH PRIVILEGES;
+
+GRANT EXECUTE ON FUNCTION sf_check_account TO 'library_user'@'localhost';
+FLUSH PRIVILEGES;
+
+GRANT EXECUTE ON FUNCTION sf_check_account TO 'admin'@'localhost';
+FLUSH PRIVILEGES;
+
 CREATE DATABASE IF NOT EXISTS library;
 USE library;
 
 DROP TABLE IF EXISTS publisher CASCADE;
 
+CREATE TABLE publisher_sequence (
+	Publisher_id	INT NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (Publisher_id)
+);
+
 CREATE TABLE publisher
 (
-	Publisher_id	INT NOT NULL AUTO_INCREMENT,
+	Publisher_id	INT NOT NULL,
 	Name			VARCHAR(25) NOT NULL,
 	Address			VARCHAR(50) DEFAULT NULL,
 	Phone			VARCHAR(20) DEFAULT NULL,
 	PRIMARY KEY (Publisher_id),
+	CONSTRAINT fk_publisher_id FOREIGN KEY (Publisher_id) REFERENCES publisher_sequence (Publisher_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
 	UNIQUE INDEX idx_publisher_name (Name)
+);
+
+CREATE TABLE Category (
+	Code_no			INT NOT NULL,
+	Subject			VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Code_no),
+);
+
+CREATE TABLE book_sequence (
+	Book_id			INT NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (Book_id)
 );
 
 CREATE TABLE book
 (
-	Book_id			INT NOT NULL AUTO_INCREMENT,
+	Book_id			INT NOT NULL,
 	Title			VARCHAR(40) NOT NULL,
 	Publisher_id	INT NOT NULL,
 	Isbn			BIGINT DEFAULT NULL,
-	Classfication	VARCHAR(20) DEFAULT NULL,
+	Code_no			INT NOT NULL,
+	Section			VARCHAR(20) DEFAULT NULL,
 	PRIMARY KEY (Book_id),
+	CONSTRAINT fk_book_id FOREIGN KEY (Book_id) REFERENCES book_sequence (Book_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_book_publisher_id FOREIGN KEY (Publisher_id) REFERENCES publisher (Publisher_id)
-		ON UPDATE CASCADE,
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_book_category_id FOREIGN KEY (Code_no) REFERENCES Category (Code_no)
+		ON DELETE CASCADE ON UPDATE CASCADE,
 	INDEX idx_book_title (Title),
 	INDEX idx_isbn (Isbn),
 	INDEX idx_class (Classfication)
@@ -34,19 +142,25 @@ CREATE TABLE book_authors
 	Author_name		VARCHAR(15) NOT NULL,
 	PRIMARY KEY (Book_id, Author_name),
 	CONSTRAINT fk_book_authors_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
-		ON UPDATE CASCADE,
+		ON DELETE CASCADE ON UPDATE CASCADE,
 	INDEX idx_book_author (Author_name)
+);
+
+CREATE TABLE copy_sequence (
+	Instance_id		INT NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (Instance_id)
 );
 
 CREATE TABLE book_copies
 (
-	Instance_id		INT NOT NULL AUTO_INCREMENT,
+	Instance_id		INT NOT NULL,
 	Book_id			INT NOT NULL,
-	Section			VARCHAR(20) DEFAULT NULL,
+	Stock_date		DATETIME DEFAULT NULL,
 	PRIMARY KEY (Instance_id, Book_id),
+	CONSTRAINT fk_book_copies_instance_id FOREIGN KEY (Instance_id) REFERENCES copy_sequence (Instance_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_book_copies_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
-		ON UPDATE CASCADE,
-	INDEX idx_book_id (Book_id)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE student
@@ -56,8 +170,10 @@ CREATE TABLE student
 	Address		VARCHAR(50) NOT NULL,
 	Phone		VARCHAR(20) NOT NULL,
 	Email		VARCHAR(50) NOT NULL,
+	Enroll_year	INT NOT NULL,
 	PRIMARY KEY (Student_id),
-	INDEX idx_student_name (Name)
+	INDEX idx_student_name (Name),
+	INDEX idx_year (Year)
 );
 
 CREATE TABLE staff
@@ -71,17 +187,74 @@ CREATE TABLE staff
 	INDEX idx_staff_name (Name)
 );
 
-CREATE TABLE book_loans
+CREATE TABLE log_sequence (
+	Log_id	BIGINT NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY (Log_id)
+);
+
+CREATE TABLE book_loans_log
 (
+	Log_id			BIGINT NOT NULL,
+	Borrow_year		INT NOT NULL,
 	Instance_id		INT NOT NULL,
 	Book_id			INT NOT NULL,
 	Borrower_type	ENUM('Staff', 'Student')	NOT NULL,
 	Borrower_id		VARCHAR(10) NOT NULL,
 	Date_out		DATETIME NOT NULL,
 	Due_date		DATETIME NOT NULL,
-	PRIMARY KEY (Instance_id, Book_id, Date_out),
-	CONSTRAINT fk_book_loans_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
+	Return_date		DATETIME DEFAULT NULL,
+	PRIMARY KEY (Log_id),
+	CONSTRAINT fk_log_id FOREIGN KEY (Log_id) REFERENCES log_sequence (Log_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_book_loans_log_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
 		ON UPDATE CASCADE,
 	INDEX idx_borrower_id (Borrower_id),
 	CHECK (Date_out < Due_date)
+) PARTITION BY RANGE (Borrow_year) (
+PARTITION p0 VALUES LESS THAN (2025),
+PARTITION p0 VALUES LESS THAN (2035),
+PARTITION p0 VALUES LESS THAN (2045),
+PARTITION p0 VALUES LESS THAN (2055),
+PARTITION p0 VALUES LESS THAN (2065)
 );
+
+CREATE TABLE book_loans
+(
+	Instance_id		INT NOT NULL,
+	Book_id			INT NOT NULL,
+	Log_id			BIGINT DEFAULT NULL,
+	PRIMARY KEY (Instance_id, Book_id),
+	CONSTRAINT fk_book_loans_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_book_loans_log_id FOREIGN KEY (Log_id) REFERENCES book_loans_log (Log_id)
+		ON UPDATE CASCADE,	
+	INDEX idx_book_loans_book_id (Book_id),
+);
+
+DELIMITER $$
+CREATE TRIGGER tr_publisher_info_before_insert BEFORE INSERT ON publisher FOR EACH ROW BEGIN
+	INSERT INTO publisher_sequence() VALUES();
+	SET NEW.Publisher_id = (SELECT LAST_INSERT_ID());
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER tr_book_info_before_insert BEFORE INSERT ON book FOR EACH ROW BEGIN
+	INSERT INTO book_sequence() VALUES();
+	SET NEW.Book_id = (SELECT LAST_INSERT_ID());
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER tr_book_copies_info_before_insert BEFORE INSERT ON book_copies FOR EACH ROW BEGIN
+	INSERT INTO book_copies() VALUES();
+	SET NEW.Instance_id = (SELECT LAST_INSERT_ID());
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER tr_book_loans_log_info_before_insert BEFORE INSERT ON book_loans_log FOR EACH ROW BEGIN
+	INSERT INTO log_sequence() VALUES();
+	SET NEW.Log_id = (SELECT LAST_INSERT_ID());
+END$$
+DELIMITER ;
