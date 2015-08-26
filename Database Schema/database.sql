@@ -83,7 +83,6 @@ GRANT USAGE ON *.* TO 'library_user'@'localhost';
 -- FLUSH PRIVILEGES;
 
 GRANT EXECUTE ON FUNCTION sf_check_account TO 'library_user'@'localhost';
-GRANT EXECUTE ON FUNCTION sf_check_account TO 'admin'@'localhost';
 GRANT EXECUTE ON PROCEDURE sp_create_account TO 'admin'@'localhost';
 GRANT EXECUTE ON PROCEDURE sp_reset_password TO 'admin'@'localhost';
 
@@ -94,7 +93,8 @@ USE library;
 
 DROP TABLE IF EXISTS publisher CASCADE;
 
-CREATE TABLE publisher_sequence (
+CREATE TABLE publisher_sequence
+(
 	Publisher_id	INT NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (Publisher_id)
 );
@@ -111,15 +111,28 @@ CREATE TABLE publisher
 	UNIQUE INDEX idx_publisher_name (Name)
 );
 
-CREATE TABLE Category (
+CREATE TABLE category
+(
 	Code_no			INT NOT NULL,
 	Subject			VARCHAR(50) NOT NULL,
+	Parent_code		INT DEFAULT NULL,
 	PRIMARY KEY (Code_no),
+	UNIQUE INDEX idx_category_subject (Subject),
+	CONSTRAINT fk_parent_code FOREIGN KEY (Parent_code) REFERENCES category (Code_no)
+		ON UPDATE CASCADE
 );
 
-CREATE TABLE book_sequence (
+CREATE TABLE book_sequence
+(
 	Book_id			INT NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (Book_id)
+);
+
+CREATE TABLE section
+(
+	Section_id		INT NOT NULL AUTO_INCREMENT,
+	Section_name	VARCHAR(20) NOT NULL,
+	PRIMARY KEY (Section_id)
 );
 
 CREATE TABLE book
@@ -129,17 +142,19 @@ CREATE TABLE book
 	Publisher_id	INT NOT NULL,
 	Isbn			BIGINT DEFAULT NULL,
 	Code_no			INT NOT NULL,
-	Section			VARCHAR(20) DEFAULT NULL,
+	Section_id		INT DEFAULT NULL,
 	PRIMARY KEY (Book_id),
 	CONSTRAINT fk_book_id FOREIGN KEY (Book_id) REFERENCES book_sequence (Book_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_book_publisher_id FOREIGN KEY (Publisher_id) REFERENCES publisher (Publisher_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_book_category_id FOREIGN KEY (Code_no) REFERENCES Category (Code_no)
-		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_book_category_id FOREIGN KEY (Code_no) REFERENCES category (Code_no)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_book_section_id FOREIGN KEY (Section_id) REFERENCES section (Section_id)
+		ON UPDATE CASCADE,
 	INDEX idx_book_title (Title),
 	INDEX idx_isbn (Isbn),
-	INDEX idx_class (Classfication)
+	INDEX idx_class (Code_no)
 );
 
 CREATE TABLE book_authors
@@ -152,7 +167,8 @@ CREATE TABLE book_authors
 	INDEX idx_book_author (Author_name)
 );
 
-CREATE TABLE copy_sequence (
+CREATE TABLE copy_sequence
+(
 	Instance_id		INT NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (Instance_id)
 );
