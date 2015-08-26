@@ -6,17 +6,17 @@ USE auth;
 
 CREATE TABLE student
 (
-	Student_id	VARCHAR(10) NOT NULL,
-	Passwd		VARCHAR(50) NOT NULL,
-	Enroll_year	INT NOT NULL,
+	Student_id		VARCHAR(10) NOT NULL,
+	Passwd			VARCHAR(50) NOT NULL,
+	Enroll_year		INT NOT NULL,
 	PRIMARY KEY (Student_id),
 	INDEX idx_year (Enroll_year)
 );
 
 CREATE TABLE staff
 (
-	Staff_id	VARCHAR(10) NOT NULL,
-	Passwd		VARCHAR(50) NOT NULL,
+	Staff_id		VARCHAR(10) NOT NULL,
+	Passwd			VARCHAR(50) NOT NULL,
 	PRIMARY KEY (Staff_id)
 );
 
@@ -187,30 +187,31 @@ CREATE TABLE book_copies
 
 CREATE TABLE student
 (
-	Student_id	VARCHAR(10) NOT NULL,
-	Name		VARCHAR(20) NOT NULL,
-	Address		VARCHAR(50) NOT NULL,
-	Phone		VARCHAR(20) NOT NULL,
-	Email		VARCHAR(50) NOT NULL,
-	Enroll_year	INT NOT NULL,
+	Student_id		VARCHAR(10) NOT NULL,
+	Name			VARCHAR(20) NOT NULL,
+	Address			VARCHAR(50) NOT NULL,
+	Phone			VARCHAR(20) NOT NULL,
+	Email			VARCHAR(50) NOT NULL,
+	Enroll_year		INT NOT NULL,
 	PRIMARY KEY (Student_id),
 	INDEX idx_student_name (Name),
-	INDEX idx_year (Year)
+	INDEX idx_year (Enroll_year)
 );
 
 CREATE TABLE staff
 (
-	Staff_id	VARCHAR(10) NOT NULL,
-	Name		VARCHAR(20) NOT NULL,
-	Address		VARCHAR(50) NOT NULL,
-	Phone		VARCHAR(20) NOT NULL,
-	Email		VARCHAR(50) NOT NULL,
+	Staff_id		VARCHAR(10) NOT NULL,
+	Name			VARCHAR(20) NOT NULL,
+	Address			VARCHAR(50) NOT NULL,
+	Phone			VARCHAR(20) NOT NULL,
+	Email			VARCHAR(50) NOT NULL,
 	PRIMARY KEY (Staff_id),
 	INDEX idx_staff_name (Name)
 );
 
-CREATE TABLE log_sequence (
-	Log_id	BIGINT NOT NULL AUTO_INCREMENT,
+CREATE TABLE log_sequence
+(
+	Log_id			BIGINT NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (Log_id)
 );
 
@@ -232,12 +233,6 @@ CREATE TABLE book_loans_log
 		ON UPDATE CASCADE,
 	INDEX idx_borrower_id (Borrower_id),
 	CHECK (Date_out < Due_date)
-) PARTITION BY RANGE (Borrow_year) (
-PARTITION p0 VALUES LESS THAN (2025),
-PARTITION p0 VALUES LESS THAN (2035),
-PARTITION p0 VALUES LESS THAN (2045),
-PARTITION p0 VALUES LESS THAN (2055),
-PARTITION p0 VALUES LESS THAN (2065)
 );
 
 CREATE TABLE book_loans
@@ -250,7 +245,7 @@ CREATE TABLE book_loans
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_book_loans_log_id FOREIGN KEY (Log_id) REFERENCES book_loans_log (Log_id)
 		ON UPDATE CASCADE,	
-	INDEX idx_book_loans_book_id (Book_id),
+	INDEX idx_book_loans_book_id (Book_id)
 );
 
 DELIMITER $$
