@@ -35,8 +35,8 @@ function testFunc2()
 	if (!$result) {
 		die('Could not query:' . mysql_error());
 	}
-	
-	$row = $result->fetch_assoc(); // array(1) { ["sf_check_account(0, 'e25558', '0000')"]=> string(1) "1" }
+
+	$row = $result->fetch_assoc();
 
 	//var_dump($row['ret']);
 	if ($row['ret'] == '0') {
@@ -45,6 +45,7 @@ function testFunc2()
 		echo '<br />Login Success<br />';
 	}
 
+	$result->mysqli_free_result();
 	$conn->close();
 }
 
