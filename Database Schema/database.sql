@@ -10,7 +10,7 @@ CREATE TABLE student
 	Passwd		VARCHAR(50) NOT NULL,
 	Enroll_year	INT NOT NULL,
 	PRIMARY KEY (Student_id),
-	INDEX idx_year (Year)
+	INDEX idx_year (Enroll_year)
 );
 
 CREATE TABLE staff
@@ -21,7 +21,7 @@ CREATE TABLE staff
 );
 
 DELIMITER $$
-DROP FUNCTION IF EXISTS sf_check_account
+DROP FUNCTION IF EXISTS sf_check_account$$
 
 CREATE FUNCTION sf_check_account(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50)) RETURNS TINYINT
 BEGIN
@@ -40,37 +40,42 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP FUNCTION IF EXISTS sf_check_account
+DROP PROCEDURE IF EXISTS sp_create_account$$
 
-CREATE FUNCTION sf_check_account(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50)) RETURNS TINYINT
+CREATE PROCEDURE sp_create_account(user_type TINYINT, enroll_year INT, account VARCHAR(10), enc_passwd VARCHAR(50))
 BEGIN
-	DECLARE cnt TINYINT;
-
 	IF user_type = 0 THEN
-		SELECT COUNT(*) INTO cnt FROM staff WHERE Staff_id = account AND Passwd = enc_passwd;
+		INSERT INTO staff VALUES (account, enc_passwd);
 	ELSEIF user_type = 1 THEN
-		SELECT COUNT(*) INTO cnt FROM student WHERE Student_id = account AND Passwd = enc_passwd;
-	ELSE
-		SET cnt = 0;
+		INSERT INTO student VALUES (account, enc_passwd, enroll_year);
 	END IF;
+END$$
+DELIMITER ;
 
-	RETURN cnt;
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_reset_password$$
+
+CREATE PROCEDURE sp_reset_password(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50))
+BEGIN
+	IF user_type = 0 THEN
+		UPDATE staff SET Passwd = enc_passwd WHERE Staff_id = account;
+	ELSEIF user_type = 1 THEN
+		UPDATE student SET Passwd = enc_passwd WHERE Student_id = account;
+	END IF;
 END$$
 DELIMITER ;
 
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin1';
 GRANT USAGE ON *.* TO 'admin'@'localhost';
-FLUSH PRIVILEGES;
 -- SHOW GRANTS FOR 'admin'@'localhost';
 
 CREATE USER 'librarian'@'localhost' IDENTIFIED BY 'librarian1';
 GRANT USAGE ON *.* TO 'librarian'@'localhost';
-FLUSH PRIVILEGES;
 -- SHOW GRANTS FOR 'librarian'@'localhost';
 
 CREATE USER 'library_user'@'localhost' IDENTIFIED BY 'user1';
 GRANT USAGE ON *.* TO 'library_user'@'localhost';
-FLUSH PRIVILEGES;
+
 -- SHOW GRANTS FOR 'library_user'@'localhost';
 
 
@@ -78,9 +83,10 @@ FLUSH PRIVILEGES;
 -- FLUSH PRIVILEGES;
 
 GRANT EXECUTE ON FUNCTION sf_check_account TO 'library_user'@'localhost';
-FLUSH PRIVILEGES;
-
 GRANT EXECUTE ON FUNCTION sf_check_account TO 'admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE sp_create_account TO 'admin'@'localhost';
+GRANT EXECUTE ON PROCEDURE sp_reset_password TO 'admin'@'localhost';
+
 FLUSH PRIVILEGES;
 
 CREATE DATABASE IF NOT EXISTS library;
