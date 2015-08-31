@@ -45,7 +45,7 @@ function testFunc2()
 		echo '<br />Login Success<br />';
 	}
 
-	$result->mysqli_free_result();
+	//$result->mysqli_free_result();
 	$conn->close();
 }
 

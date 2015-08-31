@@ -1,277 +1,240 @@
 -- database account : admin/librarian/user
 -- admin : 
 
-CREATE DATABASE IF NOT EXISTS auth;
-USE auth;
-
-CREATE TABLE student
-(
-	Student_id		VARCHAR(10) NOT NULL,
-	Passwd			VARCHAR(50) NOT NULL,
-	Enroll_year		INT NOT NULL,
-	PRIMARY KEY (Student_id),
-	INDEX idx_year (Enroll_year)
-);
-
-CREATE TABLE staff
-(
-	Staff_id		VARCHAR(10) NOT NULL,
-	Passwd			VARCHAR(50) NOT NULL,
-	PRIMARY KEY (Staff_id)
-);
-
-DELIMITER $$
-DROP FUNCTION IF EXISTS sf_check_account$$
-
-CREATE FUNCTION sf_check_account(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50)) RETURNS TINYINT
-BEGIN
-	DECLARE cnt TINYINT;
-
-	IF user_type = 0 THEN
-		SELECT COUNT(*) INTO cnt FROM staff WHERE Staff_id = account AND Passwd = enc_passwd;
-	ELSEIF user_type = 1 THEN
-		SELECT COUNT(*) INTO cnt FROM student WHERE Student_id = account AND Passwd = enc_passwd;
-	ELSE
-		SET cnt = 0;
-	END IF;
-
-	RETURN cnt;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_create_account$$
-
-CREATE PROCEDURE sp_create_account(user_type TINYINT, enroll_year INT, account VARCHAR(10), enc_passwd VARCHAR(50))
-BEGIN
-	IF user_type = 0 THEN
-		INSERT INTO staff VALUES (account, enc_passwd);
-	ELSEIF user_type = 1 THEN
-		INSERT INTO student VALUES (account, enc_passwd, enroll_year);
-	END IF;
-END$$
-DELIMITER ;
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_reset_password$$
-
-CREATE PROCEDURE sp_reset_password(user_type TINYINT, account VARCHAR(10), enc_passwd VARCHAR(50))
-BEGIN
-	IF user_type = 0 THEN
-		UPDATE staff SET Passwd = enc_passwd WHERE Staff_id = account;
-	ELSEIF user_type = 1 THEN
-		UPDATE student SET Passwd = enc_passwd WHERE Student_id = account;
-	END IF;
-END$$
-DELIMITER ;
-
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin1';
-GRANT USAGE ON *.* TO 'admin'@'localhost';
--- SHOW GRANTS FOR 'admin'@'localhost';
-
-CREATE USER 'librarian'@'localhost' IDENTIFIED BY 'librarian1';
-GRANT USAGE ON *.* TO 'librarian'@'localhost';
--- SHOW GRANTS FOR 'librarian'@'localhost';
-
-CREATE USER 'library_user'@'localhost' IDENTIFIED BY 'user1';
-GRANT USAGE ON *.* TO 'library_user'@'localhost';
-
--- SHOW GRANTS FOR 'library_user'@'localhost';
-
-
--- GRANT SELECT, SHOW VIEW, ALTER, CREATE, CREATE VIEW, DELETE, DROP, INDEX, INSERT, REFERENCES, UPDATE ON TABLE library.publisher TO 'admin'@'localhost' WITH GRANT OPTION;
--- FLUSH PRIVILEGES;
-
-GRANT EXECUTE ON FUNCTION sf_check_account TO 'library_user'@'localhost';
-GRANT EXECUTE ON PROCEDURE sp_create_account TO 'admin'@'localhost';
-GRANT EXECUTE ON PROCEDURE sp_reset_password TO 'admin'@'localhost';
-
-FLUSH PRIVILEGES;
-
 CREATE DATABASE IF NOT EXISTS library;
 USE library;
 
 DROP TABLE IF EXISTS publisher CASCADE;
 
-CREATE TABLE publisher_sequence
-(
-	Publisher_id	INT NOT NULL AUTO_INCREMENT,
-	PRIMARY KEY (Publisher_id)
-);
-
 CREATE TABLE publisher
 (
-	Publisher_id	INT NOT NULL,
+	Publisher_id	INT NOT NULL AUTO_INCREMENT,
 	Name			VARCHAR(25) NOT NULL,
 	Address			VARCHAR(50) DEFAULT NULL,
 	Phone			VARCHAR(20) DEFAULT NULL,
 	PRIMARY KEY (Publisher_id),
-	CONSTRAINT fk_publisher_id FOREIGN KEY (Publisher_id) REFERENCES publisher_sequence (Publisher_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
 	UNIQUE INDEX idx_publisher_name (Name)
-);
-
-CREATE TABLE category
-(
-	Code_no			INT NOT NULL,
-	Subject			VARCHAR(50) NOT NULL,
-	Parent_code		INT DEFAULT NULL,
-	PRIMARY KEY (Code_no),
-	UNIQUE INDEX idx_category_subject (Subject),
-	CONSTRAINT fk_parent_code FOREIGN KEY (Parent_code) REFERENCES category (Code_no)
-		ON UPDATE CASCADE
-);
-
-CREATE TABLE book_sequence
-(
-	Book_id			INT NOT NULL AUTO_INCREMENT,
-	PRIMARY KEY (Book_id)
 );
 
 CREATE TABLE section
 (
 	Section_id		INT NOT NULL AUTO_INCREMENT,
 	Section_name	VARCHAR(20) NOT NULL,
-	PRIMARY KEY (Section_id)
+	PRIMARY KEY (Section_id),
+	UNIQUE INDEX idx_section_name (Section_name)
+);
+
+CREATE TABLE category
+(
+	Category_id		INT NOT NULL AUTO_INCREMENT,
+	Subject			VARCHAR(50) NOT NULL,
+	Parent_id		INT DEFAULT NULL,
+	Section_id		INT NOT NULL,
+	PRIMARY KEY (Category_id),
+	UNIQUE INDEX idx_category_subject (Subject),
+	CONSTRAINT fk_parent_category_id FOREIGN KEY (Parent_id) REFERENCES category (Category_id)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_section_id FOREIGN KEY (Section_id) REFERENCES section (Section_id)
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE book
 (
-	Book_id			INT NOT NULL,
+	Book_id			INT NOT NULL AUTO_INCREMENT,
 	Title			VARCHAR(40) NOT NULL,
 	Publisher_id	INT NOT NULL,
 	Isbn			BIGINT DEFAULT NULL,
-	Code_no			INT NOT NULL,
-	Section_id		INT DEFAULT NULL,
+	Category_id		INT NOT NULL,
 	PRIMARY KEY (Book_id),
-	CONSTRAINT fk_book_id FOREIGN KEY (Book_id) REFERENCES book_sequence (Book_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT fk_book_publisher_id FOREIGN KEY (Publisher_id) REFERENCES publisher (Publisher_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_book_category_id FOREIGN KEY (Code_no) REFERENCES category (Code_no)
 		ON UPDATE CASCADE,
-	CONSTRAINT fk_book_section_id FOREIGN KEY (Section_id) REFERENCES section (Section_id)
+	CONSTRAINT fk_book_category_id FOREIGN KEY (Category_id) REFERENCES category (Category_id)
 		ON UPDATE CASCADE,
 	INDEX idx_book_title (Title),
-	INDEX idx_isbn (Isbn),
-	INDEX idx_class (Code_no)
+	UNIQUE INDEX idx_isbn (Isbn)
 );
 
 CREATE TABLE book_authors
 (
 	Book_id			INT NOT NULL,
-	Author_name		VARCHAR(15) NOT NULL,
+	Author_name		VARCHAR(30) NOT NULL,
 	PRIMARY KEY (Book_id, Author_name),
 	CONSTRAINT fk_book_authors_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	INDEX idx_book_author (Author_name)
 );
 
-CREATE TABLE copy_sequence
-(
-	Instance_id		INT NOT NULL AUTO_INCREMENT,
-	PRIMARY KEY (Instance_id)
-);
-
 CREATE TABLE book_copies
 (
-	Instance_id		INT NOT NULL,
+	Barcode_id		INT NOT NULL AUTO_INCREMENT,
 	Book_id			INT NOT NULL,
 	Stock_date		DATETIME DEFAULT NULL,
-	PRIMARY KEY (Instance_id, Book_id),
-	CONSTRAINT fk_book_copies_instance_id FOREIGN KEY (Instance_id) REFERENCES copy_sequence (Instance_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
+	Log_id			BIGINT DEFAULT NULL,
+	PRIMARY KEY (Barcode_id),
 	CONSTRAINT fk_book_copies_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
-		ON DELETE CASCADE ON UPDATE CASCADE
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	INDEX idx_book_copies_book_id (Book_id),
+	INDEX idx_book_copies_log_id (Log_id)
 );
+
+CREATE TABLE account
+(
+	Account_id		INT NOT NULL,
+	Passwd			VARCHAR(50) NOT NULL,
+	Account_type	Enum('Staff', 'Student', 'Administrator') NOT NULL,
+	PRIMARY KEY (Account_id)
+);
+
+CREATE TABLE staff
+(
+	Staff_id		INT NOT NULL AUTO_INCREMENT,
+	Barcode_id		BIGINT NOT NULL DEFAULT 0,
+	Name			VARCHAR(30) NOT NULL,
+	Address			VARCHAR(50) NOT NULL,
+	Phone			VARCHAR(20) NOT NULL,
+	Email			VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Staff_id),
+	UNIQUE INDEX idx_staff_barcode_id (Barcode_id),
+	INDEX idx_staff_name (Name)
+) AUTO_INCREMENT=5000000;
 
 CREATE TABLE student
 (
-	Student_id		VARCHAR(10) NOT NULL,
-	Name			VARCHAR(20) NOT NULL,
+	Student_id		INT NOT NULL AUTO_INCREMENT,
+	Barcode_id		BIGINT NOT NULL DEFAULT 0,
+	Name			VARCHAR(30) NOT NULL,
 	Address			VARCHAR(50) NOT NULL,
 	Phone			VARCHAR(20) NOT NULL,
 	Email			VARCHAR(50) NOT NULL,
 	Enroll_year		INT NOT NULL,
 	PRIMARY KEY (Student_id),
+	UNIQUE INDEX idx_student_barcode_id (Barcode_id),
 	INDEX idx_student_name (Name),
 	INDEX idx_year (Enroll_year)
-);
+) AUTO_INCREMENT=3000000;
 
-CREATE TABLE staff
-(
-	Staff_id		VARCHAR(10) NOT NULL,
-	Name			VARCHAR(20) NOT NULL,
-	Address			VARCHAR(50) NOT NULL,
-	Phone			VARCHAR(20) NOT NULL,
-	Email			VARCHAR(50) NOT NULL,
-	PRIMARY KEY (Staff_id),
-	INDEX idx_staff_name (Name)
-);
-
-CREATE TABLE log_sequence
-(
-	Log_id			BIGINT NOT NULL AUTO_INCREMENT,
-	PRIMARY KEY (Log_id)
-);
-
+-- CHECK (Date_out < Due_date)
 CREATE TABLE book_loans_log
 (
-	Log_id			BIGINT NOT NULL,
-	Borrow_year		INT NOT NULL,
-	Instance_id		INT NOT NULL,
-	Book_id			INT NOT NULL,
-	Borrower_type	ENUM('Staff', 'Student')	NOT NULL,
-	Borrower_id		VARCHAR(10) NOT NULL,
+	Log_id			BIGINT NOT NULL AUTO_INCREMENT,
+	Barcode_id		INT NOT NULL,
+	Borrower_id		INT NOT NULL,
 	Date_out		DATETIME NOT NULL,
 	Due_date		DATETIME NOT NULL,
 	Return_date		DATETIME DEFAULT NULL,
 	PRIMARY KEY (Log_id),
-	CONSTRAINT fk_log_id FOREIGN KEY (Log_id) REFERENCES log_sequence (Log_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_book_loans_log_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
+	CONSTRAINT fk_book_loans_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copies (Barcode_id)
 		ON UPDATE CASCADE,
-	INDEX idx_borrower_id (Borrower_id),
-	CHECK (Date_out < Due_date)
+	CONSTRAINT fk_book_loans_borrower_id FOREIGN KEY (Borrower_id) REFERENCES account (Account_id)
+		ON UPDATE CASCADE,
+	INDEX idx_barcode_id (Barcode_id),
+	INDEX idx_borrower_id (Borrower_id)
 );
 
-CREATE TABLE book_loans
-(
-	Instance_id		INT NOT NULL,
-	Book_id			INT NOT NULL,
-	Log_id			BIGINT DEFAULT NULL,
-	PRIMARY KEY (Instance_id, Book_id),
-	CONSTRAINT fk_book_loans_book_id FOREIGN KEY (Instance_id, Book_id) REFERENCES book_copies (Instance_id, Book_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	CONSTRAINT fk_book_loans_log_id FOREIGN KEY (Log_id) REFERENCES book_loans_log (Log_id)
-		ON UPDATE CASCADE,	
-	INDEX idx_book_loans_book_id (Book_id)
-);
+ALTER TABLE book_copies ADD CONSTRAINT fk_book_copies_log_id FOREIGN KEY (Log_id) REFERENCES book_loans_log (Log_id) ON UPDATE CASCADE;
 
 DELIMITER $$
-CREATE TRIGGER tr_publisher_info_before_insert BEFORE INSERT ON publisher FOR EACH ROW BEGIN
-	INSERT INTO publisher_sequence() VALUES();
-	SET NEW.Publisher_id = (SELECT LAST_INSERT_ID());
+DROP PROCEDURE IF EXISTS sp_create_account$$
+
+CREATE PROCEDURE sp_create_account(account_type Enum('Staff', 'Student'), user_name VARCHAR(30), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(50), enroll_year INT, OUT result INT)
+BEGIN
+	DECLARE user_id INT;
+	DECLARE db_error INT DEFAULT 0;
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+		BEGIN
+			ROLLBACK;
+			SET AUTOCOMMIT=1;
+		END;
+
+	SET result = 0;
+
+	IF account_type = 'Staff' THEN
+		SET AUTOCOMMIT=0;
+		START TRANSACTION;
+		INSERT INTO staff (Name, Address, Phone, Email) VALUES(user_name, user_address, user_phone, user_email);
+
+		SET user_id = (SELECT LAST_INSERT_ID());
+		UPDATE staff SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Staff_id = user_id;
+		INSERT INTO account VALUES (user_id, enc_password, 'Staff');
+		COMMIT;
+		SET AUTOCOMMIT=1, result = 1;
+	ELSEIF account_type = 'Student' THEN
+		SET AUTOCOMMIT=0;
+		START TRANSACTION;
+
+		INSERT INTO student (Name, Address, Phone, Email, Enroll_year) VALUES(user_name, user_address, user_phone, user_email, enroll_year);
+
+		SET user_id = (SELECT LAST_INSERT_ID());
+		UPDATE student SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Student_id = user_id;
+		INSERT INTO account VALUES (user_id, enc_password, 'Student');
+		COMMIT;
+		SET AUTOCOMMIT=1, result = 1;
+	END IF;
 END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE TRIGGER tr_book_info_before_insert BEFORE INSERT ON book FOR EACH ROW BEGIN
-	INSERT INTO book_sequence() VALUES();
-	SET NEW.Book_id = (SELECT LAST_INSERT_ID());
+DROP FUNCTION IF EXISTS sf_reset_password$$
+
+CREATE FUNCTION sf_reset_password(user_id INT, enc_password VARCHAR(50)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0;
+
+	UPDATE account SET Passwd = enc_password WHERE Account_id = user_id AND Account_type <> 'Administrator';
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = enc_password AND Account_type <> 'Administrator';
+
+	RETURN result;
 END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE TRIGGER tr_book_copies_info_before_insert BEFORE INSERT ON book_copies FOR EACH ROW BEGIN
-	INSERT INTO book_copies() VALUES();
-	SET NEW.Instance_id = (SELECT LAST_INSERT_ID());
+DROP FUNCTION IF EXISTS sf_change_password$$
+
+CREATE FUNCTION sf_change_password(user_id INT, old_password VARCHAR(50), new_password VARCHAR(50)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0;
+
+	UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Administrator';
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = new_password AND Account_type <> 'Administrator';
+
+	RETURN result;
 END$$
 DELIMITER ;
 
 DELIMITER $$
-CREATE TRIGGER tr_book_loans_log_info_before_insert BEFORE INSERT ON book_loans_log FOR EACH ROW BEGIN
-	INSERT INTO log_sequence() VALUES();
-	SET NEW.Log_id = (SELECT LAST_INSERT_ID());
+DROP PROCEDURE IF EXISTS sp_check_account$$
+
+CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(50), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(30), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
+BEGIN
+	DECLARE user_type_enum ENUM('Staff', 'Student', 'Administrator');
+	DECLARE EXIT HANDLER FOR NOT FOUND
+	BEGIN
+		SET result = '0', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+	END;
+
+	SET ack_user_id = req_user_id;
+
+	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = enc_password;
+
+	IF user_type_enum = 'Administrator' THEN
+		SET result = '1', user_id = req_user_id, user_type = user_type_enum, user_name = 'Site Admin', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+	ELSEIF user_type_enum = 'Staff' THEN
+		SELECT '1', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM staff WHERE Staff_id = req_user_id;
+		SET user_type = user_type_enum;
+	ELSEIF user_type_enum = 'Student' THEN
+		SELECT '1', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM student WHERE Student_id = req_user_id;
+		SET user_type = user_type_enum;
+	ELSE
+		SET result = '0', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+	END IF;
 END$$
 DELIMITER ;
+
+INSERT INTO account VALUES ('0', 'admin1', 'Administrator');
+
+CALL sp_create_account('Staff', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
+CALL sp_create_account('Staff', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
+CALL sp_create_account('Staff', 'Lecturer Name 3', 'Sydney', '0400000003', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
+CALL sp_create_account('Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014', @retValue);
+CALL sp_create_account('Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014', @retValue);
+CALL sp_create_account('Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014', @retValue);
