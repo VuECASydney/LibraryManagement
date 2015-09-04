@@ -127,3 +127,26 @@ INNODB
 3. Support of Foreign Key
 
 Stored Function is not allowed to use Transaction, but Stored Procedure is allowed.
+
+--------------------------------------------------------------------------------
+
+2015-09-03 Thursday
+Meeting Time : 16:30 - 00:25
+
+Brijender Rana, Choongyeol Kim, Madahban Bhowmik, Priyank Sharma (Excuse by email)
+
+--------------------------------------------------------------------------------
+
+2015-09-03 Friday
+Class Time : 09:30 - 12:30
+
+Database schema shall be changed slightly for reservation and N:N relationship between author and book copy.
+
+Tasks for documents are allocated.
+
+Brijender - System Navigation, Project Management
+Choongyeol - Non Functional Requirements, Data Types (plus ER diagram)
+Madhaban, Manoj - Functional Requirements
+
+--------------------------------------------------------------------------------
+
