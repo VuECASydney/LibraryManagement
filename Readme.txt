@@ -142,6 +142,35 @@ Class Time : 09:30 - 12:30
 
 Database schema shall be changed slightly for reservation and N:N relationship between author and book copy.
 
+Admin can do almost everything rather than previously defined small set of operations as follows:
+
+Admin's own responsibility
+​- login
+- logout
+- create an account
+- reset a password (only for borrowers who forgot password)
+- set borrowing period
+- get borrowing period
+- functionalities for reporting
+
+Responsibilities from Librarian
+- change own password
+- search books
+- reserve books
+- renew books
+- access own account
+- update own account info except password, e.g., address or phone number ...
+
+Responsibilities from User
+- change own password
+- create categories
+- insert books
+- issue(lend) books to borrowers
+- return books (popup any fine if exists)
+- search students
+
+
+
 Tasks for documents are allocated.
 
 Brijender - System Navigation, Project Management
