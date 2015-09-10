@@ -2,13 +2,17 @@
 <html lang="en">
 
 <head>
-
+<?php
+	$role="Admin"; ?>
    
-         <title> <?php echo( $tital) ?> </title>
+     <title> <?php echo( $tital) ?> </title>
 
 
     <!-- Bootstrap Core CSS -->
-    <link href="../Css/bootstrap.min.css" rel="stylesheet">
+    <link href="../Css/bootstrap.css" rel="stylesheet">
+
+     <!-- Bootstrap Core CSS -->
+    <link href="../Css/dataTables.bootstrap.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <link href="../Css/style.css" rel="stylesheet">
@@ -25,6 +29,10 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../js/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
 
 </head>
 
@@ -148,44 +156,81 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li class="active">
-                        <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
-                    </li>
-                    <li>
-                        <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Charts</a>
-                    </li>
-                    <li>
-                        <a href="tables.html"><i class="fa fa-fw fa-table"></i> Tables</a>
-                    </li>
-                    <li>
-                        <a href="example.php"><i class="fa fa-fw fa-edit"></i> Forms</a>
-                    </li>
-                    <li>
-                        <a href="bootstrap-elements.html"><i class="fa fa-fw fa-desktop"></i> Bootstrap Elements</a>
-                    </li>
-                    <li>
-                        <a href="bootstrap-grid.html"><i class="fa fa-fw fa-wrench"></i> Bootstrap Grid</a>
-                    </li>
-                    <li>
-                        <a href="javascript:;" data-toggle="collapse" data-target="#demo"><i class="fa fa-fw fa-arrows-v"></i> Dropdown <i class="fa fa-fw fa-caret-down"></i></a>
-                        <ul id="demo" class="collapse">
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                            <li>
-                                <a href="#">Dropdown Item</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="blank-page.html"><i class="fa fa-fw fa-file"></i> Blank Page</a>
-                    </li>
-                    
+				  <?php
+
+                   if($role=="Admin" or $role=="Lib"){
+
+                    	echo("
+							<li class=\"active\">
+								<a href=\"index.html\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
+							</li>
+
+
+							<li>
+								<a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> Categories</a>
+							</li>
+
+							 <li>
+								<a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i>Author</a>
+							</li>
+							 <li>
+								<a href=\"bootstrap-grid.html\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
+							</li>
+							<li>
+								 <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#books\"><i class=\"fa fa-fw fa-arrows-v\"></i> Books <i class=\"fa fa-fw fa-caret-down\"></i></a>
+								<ul id=\"books\" class=\"collapse\">
+									<li>
+										<a href=\"#\">Books</a>
+									</li>
+									<li>
+										<a href=\"#\">Issue Books</a>
+									</li>
+									<li>
+										<a href=\"#\">Return Books</a>
+									</li>
+									<li>
+										<a href=\"#\">Reserve Books</a>
+									</li>
+								</ul>
+							</li>
+							 
+								".(($role=="Admin")?(
+										"<li>
+											<a href=\"example.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
+										</li>"
+								):"" 
+								)."
+							
+							<li>
+								<a href=\"bootstrap-elements.html\"><i class=\"fa fa-fw fa-desktop\"></i> Fines</a>
+							</li>
+						
+										".(($role=="Admin")?(
+											"<li>
+												<a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#fine\"><i class=\"fa fa-fw fa-arrows-v\"></i> Reports <i class=\"fa fa-fw fa-caret-down\"></i></a>
+												<ul id=\"fine\" class=\"collapse\">
+													<li>
+														<a href=\"#\">Fine Report</a>
+													</li>
+													<li>
+														<a href=\"#\">Books Report</a>
+													</li>
+												</ul>
+										   </li>"
+									):"" 
+								)."
+
+
+                    ");
+                   }
+                   ?>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
         </nav>
-
+        <?php
+               ini_set('display_errors',1);
+            ini_set('display_startup_errors',1);
+            error_reporting(-1);
+            ?>
         <div id="page-wrapper">
-
-     

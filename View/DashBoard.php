@@ -9,7 +9,18 @@ Date Modified :
 
 <?php
 		$tital="Home Page";
-		include("./shared/Header.php");
+		//if($role="staff")
+		//{
+			include("./shared/Header.php");
+		//}
+		//if else($role="Lib")
+		//{
+		//	include("./shared/libHeader.php");
+		//}
+		//else
+		//{
+		//	include("./shared/StudentHeader.php");
+		//}
 ?>
 
 blaaaaa
