@@ -54,46 +54,60 @@ CREATE TABLE book
 	UNIQUE INDEX idx_isbn (Isbn)
 );
 
-CREATE TABLE book_authors
+CREATE TABLE author
 (
-	Book_id			INT NOT NULL,
-	Author_name		VARCHAR(30) NOT NULL,
-	PRIMARY KEY (Book_id, Author_name),
-	CONSTRAINT fk_book_authors_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
-		ON DELETE CASCADE ON UPDATE CASCADE,
-	INDEX idx_book_author (Author_name)
+	Author_id		INT NOT NULL AUTO_INCREMENT,
+	Author_name		VARCHAR(50) NOT NULL,
+	PRIMARY KEY (Author_id),
+	INDEX idx_author_name (Author_name)
 );
 
-CREATE TABLE book_copies
+CREATE TABLE book_author
+(
+	Book_id			INT NOT NULL,
+	Author_id		INT NOT NULL,
+	PRIMARY KEY (Book_id, Author_id),
+	CONSTRAINT fk_book_author_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT fk_book_author_author_id FOREIGN KEY (Author_id) REFERENCES author (Author_id)
+		ON UPDATE CASCADE,
+	INDEX idx_book_author (Author_id)
+);
+
+CREATE TABLE book_copy
 (
 	Barcode_id		INT NOT NULL AUTO_INCREMENT,
 	Book_id			INT NOT NULL,
 	Stock_date		DATETIME DEFAULT NULL,
 	Log_id			BIGINT DEFAULT NULL,
 	PRIMARY KEY (Barcode_id),
-	CONSTRAINT fk_book_copies_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
+	CONSTRAINT fk_book_copy_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
-	INDEX idx_book_copies_book_id (Book_id),
-	INDEX idx_book_copies_log_id (Log_id)
+	INDEX idx_book_copy_book_id (Book_id),
+	INDEX idx_book_copy_log_id (Log_id)
 );
 
 CREATE TABLE account
 (
+	Virtual_id		INT NOT NULL AUTO_INCREMENT,
 	Account_id		INT NOT NULL,
-	Passwd			VARCHAR(50) NOT NULL,
+	Passwd			VARCHAR(100) NOT NULL,
 	Account_type	Enum('Staff', 'Student', 'Administrator') NOT NULL,
-	PRIMARY KEY (Account_id)
+	PRIMARY KEY (Virtual_id),
+	UNIQUE INDEX idx_account_id (Account_id)
 );
 
 CREATE TABLE staff
 (
 	Staff_id		INT NOT NULL AUTO_INCREMENT,
 	Barcode_id		BIGINT NOT NULL DEFAULT 0,
-	Name			VARCHAR(30) NOT NULL,
+	Virtual_id		INT DEFAULT NULL,
+	Name			VARCHAR(50) NOT NULL,
 	Address			VARCHAR(50) NOT NULL,
 	Phone			VARCHAR(20) NOT NULL,
 	Email			VARCHAR(50) NOT NULL,
 	PRIMARY KEY (Staff_id),
+	CONSTRAINT fk_staff_virtual_id FOREIGN KEY (Virtual_id) REFERENCES account (Virtual_id),
 	UNIQUE INDEX idx_staff_barcode_id (Barcode_id),
 	INDEX idx_staff_name (Name)
 ) AUTO_INCREMENT=5000000;
@@ -102,19 +116,21 @@ CREATE TABLE student
 (
 	Student_id		INT NOT NULL AUTO_INCREMENT,
 	Barcode_id		BIGINT NOT NULL DEFAULT 0,
-	Name			VARCHAR(30) NOT NULL,
+	Virtual_id		INT DEFAULT NULL,
+	Name			VARCHAR(50) NOT NULL,
 	Address			VARCHAR(50) NOT NULL,
 	Phone			VARCHAR(20) NOT NULL,
 	Email			VARCHAR(50) NOT NULL,
 	Enroll_year		INT NOT NULL,
 	PRIMARY KEY (Student_id),
+	CONSTRAINT fk_student_virtual_id FOREIGN KEY (Virtual_id) REFERENCES account (Virtual_id),
 	UNIQUE INDEX idx_student_barcode_id (Barcode_id),
 	INDEX idx_student_name (Name),
 	INDEX idx_year (Enroll_year)
 ) AUTO_INCREMENT=3000000;
 
 -- CHECK (Date_out < Due_date)
-CREATE TABLE book_loans_log
+CREATE TABLE book_loan_log
 (
 	Log_id			BIGINT NOT NULL AUTO_INCREMENT,
 	Barcode_id		INT NOT NULL,
@@ -123,15 +139,34 @@ CREATE TABLE book_loans_log
 	Due_date		DATETIME NOT NULL,
 	Return_date		DATETIME DEFAULT NULL,
 	PRIMARY KEY (Log_id),
-	CONSTRAINT fk_book_loans_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copies (Barcode_id)
+	CONSTRAINT fk_book_loan_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copy (Barcode_id)
 		ON UPDATE CASCADE,
-	CONSTRAINT fk_book_loans_borrower_id FOREIGN KEY (Borrower_id) REFERENCES account (Account_id)
+	CONSTRAINT fk_book_loan_borrower_id FOREIGN KEY (Borrower_id) REFERENCES account (Account_id)
 		ON UPDATE CASCADE,
 	INDEX idx_barcode_id (Barcode_id),
 	INDEX idx_borrower_id (Borrower_id)
 );
 
-ALTER TABLE book_copies ADD CONSTRAINT fk_book_copies_log_id FOREIGN KEY (Log_id) REFERENCES book_loans_log (Log_id) ON UPDATE CASCADE;
+CREATE TABLE book_reservation
+(
+	Reserve_id		BIGINT NOT NULL AUTO_INCREMENT,
+	Barcode_id		INT NOT NULL,
+	Account_id		INT NOT NULL,
+	Reserve_date	DATETIME NOT NULL,
+	Log_id			BIGINT DEFAULT NULL,
+	PRIMARY KEY (Reserve_id),
+	CONSTRAINT fk_book_reserve_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copy (Barcode_id)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_book_reserve_account_id FOREIGN KEY (Account_id) REFERENCES account (Account_id)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_book_reserve_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id)
+		ON UPDATE CASCADE,
+	INDEX idx_reserve_barcode_id (Barcode_id),
+	INDEX idx_reserve_account_id (Account_id),
+	INDEX idx_reserve_log_id (Log_id)
+);
+
+ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id) ON UPDATE CASCADE;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
