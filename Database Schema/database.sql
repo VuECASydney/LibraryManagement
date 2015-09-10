@@ -108,6 +108,7 @@ CREATE TABLE staff
 	Email			VARCHAR(50) NOT NULL,
 	PRIMARY KEY (Staff_id),
 	CONSTRAINT fk_staff_virtual_id FOREIGN KEY (Virtual_id) REFERENCES account (Virtual_id),
+	UNIQUE INDEX idx_staff_virtual_id (Virtual_id),
 	UNIQUE INDEX idx_staff_barcode_id (Barcode_id),
 	INDEX idx_staff_name (Name)
 ) AUTO_INCREMENT=5000000;
@@ -124,6 +125,7 @@ CREATE TABLE student
 	Enroll_year		INT NOT NULL,
 	PRIMARY KEY (Student_id),
 	CONSTRAINT fk_student_virtual_id FOREIGN KEY (Virtual_id) REFERENCES account (Virtual_id),
+	UNIQUE INDEX idx_student_virtual_id (Virtual_id),
 	UNIQUE INDEX idx_student_barcode_id (Barcode_id),
 	INDEX idx_student_name (Name),
 	INDEX idx_year (Enroll_year)
@@ -183,7 +185,7 @@ CREATE TABLE fine
 		ON UPDATE CASCADE,
 	INDEX idx_fine_barcode_id (Barcode_id),
 	INDEX idx_fine_borrower_id (Borrower_id),
-	INDEX idx_fine_log_id (Log_id),
+	UNIQUE INDEX idx_fine_log_id (Log_id),
 	INDEX idx_fine_payment_date (Payment_date)
 );
 
