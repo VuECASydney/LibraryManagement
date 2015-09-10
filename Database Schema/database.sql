@@ -166,6 +166,27 @@ CREATE TABLE book_reservation
 	INDEX idx_reserve_log_id (Log_id)
 );
 
+CREATE TABLE fine
+(
+	Fine_id			BIGINT NOT NULL AUTO_INCREMENT,
+	Barcode_id		INT NOT NULL,
+	Borrower_id		INT NOT NULL,
+	Log_id			BIGINT NOT NULL,
+	Amount			DECIMAL(5,2) NOT NULL,
+	Payment_date	DATETIME NOT NULL,
+	PRIMARY KEY (Fine_id),
+	CONSTRAINT fk_fine_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copy (Barcode_id)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_fine_borrower_id FOREIGN KEY (Borrower_id) REFERENCES account (Account_id)
+		ON UPDATE CASCADE,
+	CONSTRAINT fk_fine_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id)
+		ON UPDATE CASCADE,
+	INDEX idx_fine_barcode_id (Barcode_id),
+	INDEX idx_fine_borrower_id (Borrower_id),
+	INDEX idx_fine_log_id (Log_id),
+	INDEX idx_fine_payment_date (Payment_date)
+);
+
 ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id) ON UPDATE CASCADE;
 
 DELIMITER $$
