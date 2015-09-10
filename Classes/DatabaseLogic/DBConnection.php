@@ -2,6 +2,7 @@
 
 ?php
 
+class DBConnection{
 /* Database config */
 
 $db_host        = 'localhost';
@@ -23,6 +24,6 @@ $db_database    = 'banners';
 		
 		
 	}
-
+}
 
 ?>
