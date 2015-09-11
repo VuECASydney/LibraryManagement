@@ -84,7 +84,7 @@ CREATE TABLE book_copy
 	CONSTRAINT fk_book_copy_book_id FOREIGN KEY (Book_id) REFERENCES book (Book_id)
 		ON DELETE CASCADE ON UPDATE CASCADE,
 	INDEX idx_book_copy_book_id (Book_id),
-	INDEX idx_book_copy_log_id (Log_id)
+	UNIQUE INDEX idx_book_copy_log_id (Log_id)
 );
 
 CREATE TABLE account
@@ -165,7 +165,7 @@ CREATE TABLE book_reservation
 		ON UPDATE CASCADE,
 	INDEX idx_reserve_barcode_id (Barcode_id),
 	INDEX idx_reserve_account_id (Account_id),
-	INDEX idx_reserve_log_id (Log_id)
+	UNIQUE INDEX idx_reserve_log_id (Log_id)
 );
 
 CREATE TABLE fine
