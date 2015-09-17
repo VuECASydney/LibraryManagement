@@ -242,7 +242,7 @@ DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_reset_password$$
 
-CREATE FUNCTION sf_reset_password(user_id INT, enc_password VARCHAR(50)) RETURNS INT
+CREATE FUNCTION sf_reset_password(user_id INT, enc_password VARCHAR(100)) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0;
 
@@ -256,7 +256,7 @@ DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_change_password$$
 
-CREATE FUNCTION sf_change_password(user_id INT, old_password VARCHAR(50), new_password VARCHAR(50)) RETURNS INT
+CREATE FUNCTION sf_change_password(user_id INT, old_password VARCHAR(100), new_password VARCHAR(100)) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0;
 
@@ -270,7 +270,7 @@ DELIMITER ;
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_check_account$$
 
-CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(50), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(30), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
+CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(100), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
 BEGIN
 	DECLARE user_type_enum ENUM('Staff', 'Student', 'Administrator');
 	DECLARE EXIT HANDLER FOR NOT FOUND
