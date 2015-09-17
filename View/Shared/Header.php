@@ -3,7 +3,10 @@
 
 <head>
 <?php
-	$role="Admin"; ?>
+
+	$role="Admin";
+
+    ?>
    
      <title> <?php echo( $tital) ?> </title>
 
@@ -30,10 +33,17 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <script type="text/javascript" src="../js/jquery.js"></script>
+  <!--  <script type="text/javascript" src="../js/jquery.js"></script>-->
+
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="../js/highcharts.js"></script>
 
+    <script type="text/javascript" src="../js/exporting.js"></script>
 </head>
 
 <body>
@@ -162,7 +172,7 @@
 
                     	echo("
 							<li class=\"active\">
-								<a href=\"index.html\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
+								<a href=\"maindashboard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
 							</li>
 
 
@@ -171,22 +181,25 @@
 							</li>
 
 							 <li>
-								<a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i>Author</a>
+								<a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i> Author</a>
+							</li>
+                             <li>
+								<a href=\"Publisherlist.php\"><i class=\"fa fa-share-square-o\"></i> Publisher</a>
 							</li>
 							 <li>
-								<a href=\"bootstrap-grid.html\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
+								<a href=\"SectionList.php\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
 							</li>
 							<li>
 								 <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#books\"><i class=\"fa fa-fw fa-arrows-v\"></i> Books <i class=\"fa fa-fw fa-caret-down\"></i></a>
 								<ul id=\"books\" class=\"collapse\">
 									<li>
-										<a href=\"#\">Books</a>
+										<a href=\"BookList.php\">Books</a>
 									</li>
 									<li>
 										<a href=\"#\">Issue Books</a>
 									</li>
 									<li>
-										<a href=\"#\">Return Books</a>
+										<a href=\"bookreturn.php\">Return Books</a>
 									</li>
 									<li>
 										<a href=\"#\">Reserve Books</a>
@@ -196,9 +209,9 @@
 							 
 								".(($role=="Admin")?(
 										"<li>
-											<a href=\"example.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
+											<a href=\"userlist.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
 										</li>"
-								):"" 
+								):""
 								)."
 							
 							<li>
@@ -219,6 +232,29 @@
 										   </li>"
 									):"" 
 								)."
+
+
+                    ");
+                   } else{
+
+                    	echo("
+							<li class=\"active\">
+								<a href=\"myaccount.php\"><i class=\"fa fa-fw fa-dashboard\"></i> My Account</a>
+							</li>
+
+
+							<li>
+								<a href=\"myBook.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> My Books</a>
+							</li>
+
+							 <li>
+								<a href=\"myFine.php\"><i class=\"fa fa-edit\"></i> My Fine Dues</a>
+							</li>
+
+							</li>
+
+
+
 
 
                     ");

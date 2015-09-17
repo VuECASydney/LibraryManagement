@@ -7,7 +7,7 @@ Date Modified :
 
 
 <?php
-		$tital="Author List";
+		$tital="Section List";
 		include("./shared/Header.php");
 ?>
 
@@ -17,14 +17,14 @@ Date Modified :
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             Author List
+                             Section List
                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Author List
+                                <i class="fa fa-edit"></i> Section List
                             </li>
                         </ol>
                     </div>
@@ -33,15 +33,17 @@ Date Modified :
 
                 <div class="row">
                  <div class="col-lg-12">
-                    <a href="AddAuthor.php" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Add New Author</a>
+            <a href="AddSection.php" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Add New Section</a>
                  </div>
                     <div class="col-lg-12">
 
-                           <table id="tblAuthor" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
+                           <table id="tblContact" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
                                 <thead>
                                     <tr>
-                                        <th>Author Number</th>
-                                        <th>Author Name</th>
+                                        <th>Section Number</th>
+
+                                        <th>Section Name</th>
+
                                         <th>Edit  </th>
                                         <th>Delete </th>
                                     </tr>
@@ -50,7 +52,8 @@ Date Modified :
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td>abc</td>
+
+                                        <td>C </td>
 
                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
@@ -59,8 +62,9 @@ Date Modified :
 
                                     <tr>
                                         <td>2</td>
-                                        <td>xyz</td>
-                                        <
+
+                                        <td>C-4</td>
+
                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
                         <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
@@ -68,7 +72,8 @@ Date Modified :
 
                                     <tr>
                                         <td>3</td>
-                                        <td>aaa</td>
+
+                                        <td>C-5</td>
 
                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
@@ -77,7 +82,8 @@ Date Modified :
 
                                     <tr>
                                         <td>4</td>
-                                        <td>ZZZ</td>
+
+                                        <td>C-1</td>
 
                                          <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
@@ -86,7 +92,8 @@ Date Modified :
 
                                     <tr>
                                         <td>5</td>
-                                        <td>TEST</td>
+
+                                        <td>C-1</td>
 
                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
@@ -95,7 +102,8 @@ Date Modified :
 
                                     <tr>
                                        <td>6</td>
-                                        <td>BBB</td>
+
+                                        <td>C-1</td>
 
                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
@@ -104,12 +112,24 @@ Date Modified :
 
                                     <tr>
                                         <td>7</td>
-                                        <td>Java</td>
+
+                                        <td>C-1</td>
 
                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
 
                         <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
                                     </tr>
+
+                                    <tr>
+                                        <td>8</td>
+
+                                        <td>C-1</td>
+
+                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
+
+                        <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
+                                    </tr>
+
 
 
 
@@ -118,14 +138,14 @@ Date Modified :
                             </table>
                               <script type="text/javascript">
                                   $(document).ready(function () {
-                                      $('#tblAuthor').dataTable({
+                                      $('#tblContact').dataTable({
                                           "iDisplayLength": 5,
 
                                               "lengthMenu": [5,10, 25, 50, 100]
 
                                       });
                                   });
-
+                                  $('#tblContact_length').visible=false;
 
                             </script>
                     </div>

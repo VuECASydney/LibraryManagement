@@ -11,15 +11,38 @@ Date Modified :
 		$tital="Home Page";
 		include("./shared/anonymousHeader.php");
 ?>
+             <script type="text/javascript">
+                    function OnSubmitForm()
+                    {
 
-	<form  class="form-horizontal" action="dashboard.php">
+                     var username  =document.getElementById("inputEmail3").value ;
+                      var pwd  =document.getElementById("inputPassword3").value ;
+
+                      if(username=="Admin" && pwd=="Admin")
+                      {
+                        document.getElementById("myForm").action ="dashboard.php?role=Admin";
+                              // document.myform.submit();
+                      }
+                      else if (username=="lib" && pwd=="lib")
+                      {
+                        document.getElementById("myForm").action ="booklist.php?role=lib";
+                          //document.myform.submit();
+                      }
+                      else{
+
+                        document.getElementById("myForm").action ="myaccount.php?role=staff";
+                      }
+                      return true;
+                    }
+</script>
+	<form id='myForm' class="form-horizontal" onsubmit="return OnSubmitForm();">
 		  <div class="form-group">
 			<label  class="Heading" style="font-size:26px;padding-left:20px;">Vu Library Mangamement Login</label>
 		  </div>
 		  <div class="form-group">
 				<label for="inputEmail3" class="col-sm-2 control-label">Email</label>
 				<div class="col-sm-10">
-					<input type="email" class="form-control" id="inputEmail3" placeholder="Email"></input>
+					<input type="text"  class="form-control" id="inputEmail3" placeholder="User Name"></input>
 				</div>
 		  </div>
 		  <div class="form-group">

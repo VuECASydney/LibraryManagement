@@ -1,3 +1,8 @@
 
 >> for icons used in website 
 http://wet-boew.github.io/wet-boew-styleguide/v4/design/icons-en.html
+
+
+>> Dialog Box Example
+
+http://nakupanda.github.io/bootstrap3-dialog/

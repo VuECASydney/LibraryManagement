@@ -7,7 +7,7 @@ Date Modified :
 
 
 <?php
-		$tital="Category List";
+		$tital="Add Section";
 		include("./shared/Header.php");
 ?>
 
@@ -17,17 +17,17 @@ Date Modified :
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             Add Author
+                             Add Section
                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
                             </li>
                              <li>
-                                <i class="fa fa-edit"></i>  <a href="Authorlist.php">Author</a>
+                                <i class="fa fa-fw fa-wrench"></i>  <a href="Sectionlist.php">Section</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i>  Add Author
+                                <i class="fa fa-edit"></i>  Add Section
                             </li>
                         </ol>
                     </div>
@@ -42,15 +42,16 @@ Date Modified :
 
                             <div class="form-group">
 
-                                <label class="control-label col-sm-2">Author Name</label>
+                                <label class="control-label col-sm-2">Section Name</label>
 
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" id="Author Name" >
+                                    <input type="text" class="form-control" id="email" >
                                 </div>
 
 
                             </div>
-                          
+
+                            </div>
 
 
                             <button type="submit" class="btn btn-default">Submit Button</button>
