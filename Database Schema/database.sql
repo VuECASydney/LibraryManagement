@@ -194,9 +194,9 @@ ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) RE
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
 
-CREATE PROCEDURE sp_create_account(account_type Enum('Staff', 'Student'), user_name VARCHAR(30), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(50), enroll_year INT, OUT result INT)
+CREATE PROCEDURE sp_create_account(account_type Enum('Staff', 'Student'), user_name VARCHAR(50), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(100), enroll_year INT, OUT result INT)
 BEGIN
-	DECLARE user_id INT;
+	DECLARE user_id, virtual_pk_id INT;
 	DECLARE db_error INT DEFAULT 0;
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 		BEGIN
@@ -213,7 +213,11 @@ BEGIN
 
 		SET user_id = (SELECT LAST_INSERT_ID());
 		UPDATE staff SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Staff_id = user_id;
-		INSERT INTO account VALUES (user_id, enc_password, 'Staff');
+		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, 'Staff');
+
+		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
+		UPDATE staff SET Virtual_id = virtual_pk_id WHERE Staff_id = user_id;
+
 		COMMIT;
 		SET AUTOCOMMIT=1, result = 1;
 	ELSEIF account_type = 'Student' THEN
@@ -224,7 +228,11 @@ BEGIN
 
 		SET user_id = (SELECT LAST_INSERT_ID());
 		UPDATE student SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Student_id = user_id;
-		INSERT INTO account VALUES (user_id, enc_password, 'Student');
+		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, 'Student');
+
+		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
+		UPDATE student SET Virtual_id = virtual_pk_id WHERE Student_id = user_id;
+
 		COMMIT;
 		SET AUTOCOMMIT=1, result = 1;
 	END IF;
@@ -288,7 +296,7 @@ BEGIN
 END$$
 DELIMITER ;
 
-INSERT INTO account VALUES ('0', 'admin1', 'Administrator');
+INSERT INTO account (Account_id, Passwd, Account_type) VALUES ('0', 'admin1', 'Administrator');
 
 CALL sp_create_account('Staff', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
 CALL sp_create_account('Staff', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
