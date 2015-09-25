@@ -92,7 +92,7 @@ CREATE TABLE account
 	Virtual_id		INT NOT NULL AUTO_INCREMENT,
 	Account_id		INT NOT NULL,
 	Passwd			VARCHAR(100) NOT NULL,
-	Account_type	Enum('Staff', 'Student', 'Administrator') NOT NULL,
+	Account_type	Enum('Student', 'Faculty', 'Librarian', 'Admin') NOT NULL,
 	PRIMARY KEY (Virtual_id),
 	UNIQUE INDEX idx_account_id (Account_id)
 );
@@ -194,7 +194,7 @@ ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) RE
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
 
-CREATE PROCEDURE sp_create_account(account_type Enum('Staff', 'Student'), user_name VARCHAR(50), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(100), enroll_year INT, OUT result INT)
+CREATE PROCEDURE sp_create_account(account_type Enum('Student', 'Faculty', 'Librarian'), user_name VARCHAR(50), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(100), enroll_year INT, OUT result INT)
 BEGIN
 	DECLARE user_id, virtual_pk_id INT;
 	DECLARE db_error INT DEFAULT 0;
@@ -206,14 +206,14 @@ BEGIN
 
 	SET result = 0;
 
-	IF account_type = 'Staff' THEN
+	IF account_type = 'Faculty' OR account_type = 'Librarian' THEN
 		SET AUTOCOMMIT=0;
 		START TRANSACTION;
 		INSERT INTO staff (Name, Address, Phone, Email) VALUES(user_name, user_address, user_phone, user_email);
 
 		SET user_id = (SELECT LAST_INSERT_ID());
 		UPDATE staff SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Staff_id = user_id;
-		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, 'Staff');
+		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, account_type);
 
 		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
 		UPDATE staff SET Virtual_id = virtual_pk_id WHERE Staff_id = user_id;
@@ -228,7 +228,7 @@ BEGIN
 
 		SET user_id = (SELECT LAST_INSERT_ID());
 		UPDATE student SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Student_id = user_id;
-		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, 'Student');
+		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, account_type);
 
 		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
 		UPDATE student SET Virtual_id = virtual_pk_id WHERE Student_id = user_id;
@@ -272,7 +272,7 @@ DROP PROCEDURE IF EXISTS sp_check_account$$
 
 CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(100), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
 BEGIN
-	DECLARE user_type_enum ENUM('Staff', 'Student', 'Administrator');
+	DECLARE user_type_enum ENUM('Student', 'Faculty', 'Librarian', 'Admin');
 	DECLARE EXIT HANDLER FOR NOT FOUND
 	BEGIN
 		SET result = '0', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
@@ -282,9 +282,7 @@ BEGIN
 
 	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = enc_password;
 
-	IF user_type_enum = 'Administrator' THEN
-		SET result = '1', user_id = req_user_id, user_type = user_type_enum, user_name = 'Site Admin', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
-	ELSEIF user_type_enum = 'Staff' THEN
+	IF user_type_enum = 'Admin' OR user_type_enum = 'Librarian' OR user_type_enum = 'Faculty' THEN
 		SELECT '1', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM staff WHERE Staff_id = req_user_id;
 		SET user_type = user_type_enum;
 	ELSEIF user_type_enum = 'Student' THEN
@@ -296,11 +294,83 @@ BEGIN
 END$$
 DELIMITER ;
 
-INSERT INTO account (Account_id, Passwd, Account_type) VALUES ('0', 'admin1', 'Administrator');
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_publisher$$
 
-CALL sp_create_account('Staff', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
-CALL sp_create_account('Staff', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
-CALL sp_create_account('Staff', 'Lecturer Name 3', 'Sydney', '0400000003', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
+CREATE FUNCTION sf_create_publisher(user_id INT, pub_name VARCHAR(25), pub_address VARCHAR(50), pub_phone VARCHAR(20)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+
+	IF result = 1 THEN
+		INSERT INTO publisher (Name, Address, Phone) VALUES (pub_name, pub_address, pub_phone);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_section$$
+
+CREATE FUNCTION sf_create_section(user_id INT, sec_name VARCHAR(20)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+
+	IF result = 1 THEN
+		INSERT INTO section (Section_name) VALUES (sec_name);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_category$$
+
+CREATE FUNCTION sf_create_category(user_id INT, cat_name VARCHAR(50), parent_cat_id INT, sec_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+
+	IF result = 1 THEN
+		INSERT INTO category (Subject, Parent_id, Section_id) VALUES (cat_name, parent_cat_id, sec_id);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'G2bOyum7M83o';
+GRANT USAGE ON *.* TO 'admin'@'localhost';
+FLUSH PRIVILEGES;
+
+CREATE USER 'librarian'@'localhost' IDENTIFIED BY 'BAp6fana1ep4';
+GRANT USAGE ON *.* TO 'librarian'@'localhost';
+FLUSH PRIVILEGES;
+
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'YIQe8ociKePa';
+GRANT USAGE ON *.* TO 'user'@'localhost';
+FLUSH PRIVILEGES;
+
+CREATE USER 'guest'@'localhost' IDENTIFIED BY 'M8nAjojA4uh6';
+GRANT USAGE ON *.* TO 'guest'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Admin account should be created manually.
+INSERT INTO staff (Name, Address, Phone, Email) VALUES('Administrator 1', 'Sydney', '0400000000', 'admin1@vu.edu.au');
+UPDATE staff SET Barcode_id = (Staff_id * 10 + 20000000000000) WHERE Staff_id = LAST_INSERT_ID();
+INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(), 'password_e0', 'Admin');
+UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000;
+
+CALL sp_create_account('Faculty', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
+CALL sp_create_account('Faculty', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
+CALL sp_create_account('Faculty', 'Lecturer Name 3', 'Sydney', '0400000003', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
+CALL sp_create_account('Librarian', 'Librarian Name 1', 'Sydney', '0400000004', 'librarian1@vu.edu.au', 'password_e4', '0', @retValue);
 CALL sp_create_account('Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014', @retValue);
 CALL sp_create_account('Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014', @retValue);
 CALL sp_create_account('Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014', @retValue);
