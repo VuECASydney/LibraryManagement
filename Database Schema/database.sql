@@ -361,11 +361,24 @@ CREATE USER 'guest'@'localhost' IDENTIFIED BY 'M8nAjojA4uh6';
 GRANT USAGE ON *.* TO 'guest'@'localhost';
 FLUSH PRIVILEGES;
 
+-- Currently, all database account can access the whole database. Later, the priviledge will be adjusted.
+GRANT SELECT, EXECUTE, SHOW VIEW, ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, DELETE, DROP, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'admin'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'librarian'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'user'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'guest'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
 -- Admin account should be created manually.
 INSERT INTO staff (Name, Address, Phone, Email) VALUES('Administrator 1', 'Sydney', '0400000000', 'admin1@vu.edu.au');
 UPDATE staff SET Barcode_id = (Staff_id * 10 + 20000000000000) WHERE Staff_id = LAST_INSERT_ID();
 INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(), 'password_e0', 'Admin');
-UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000;
+UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000; -- The first account is assumed to be 5000000 as an auto increment value.
 
 CALL sp_create_account('Faculty', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
 CALL sp_create_account('Faculty', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
