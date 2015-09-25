@@ -133,7 +133,7 @@ Stored Function is not allowed to use Transaction, but Stored Procedure is allow
 2015-09-03 Thursday
 Meeting Time : 16:30 - 00:25
 
-Brijender Rana, Choongyeol Kim, Madahban Bhowmik, Priyank Sharma (Excuse by email)
+Brijender Rana, Choongyeol Kim, Madhaban Bhowmik, Priyank Sharma (Excuse by email)
 
 --------------------------------------------------------------------------------
 
