@@ -191,6 +191,8 @@ CREATE TABLE fine
 
 ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id) ON UPDATE CASCADE;
 
+-- Setting AUTOCOMMIT is "ONLY" allowed to stored procedure, not stored function.
+-- "AUTOCOMMIT" is set for using "transaction" as known as rollback functionality.
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
 
@@ -246,8 +248,8 @@ CREATE FUNCTION sf_reset_password(user_id INT, enc_password VARCHAR(100)) RETURN
 BEGIN
 	DECLARE result INT DEFAULT 0;
 
-	UPDATE account SET Passwd = enc_password WHERE Account_id = user_id AND Account_type <> 'Administrator';
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = enc_password AND Account_type <> 'Administrator';
+	UPDATE account SET Passwd = enc_password WHERE Account_id = user_id AND Account_type <> 'Admin';
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = enc_password AND Account_type <> 'Admin';
 
 	RETURN result;
 END$$
@@ -260,8 +262,8 @@ CREATE FUNCTION sf_change_password(user_id INT, old_password VARCHAR(100), new_p
 BEGIN
 	DECLARE result INT DEFAULT 0;
 
-	UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Administrator';
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = new_password AND Account_type <> 'Administrator';
+	UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Admin';
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = new_password AND Account_type <> 'Admin';
 
 	RETURN result;
 END$$
@@ -272,10 +274,14 @@ DROP PROCEDURE IF EXISTS sp_check_account$$
 
 CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(100), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
 BEGIN
+	-- result is 0 if login successes, otherwise login fails
+	-- 1 : no account or incorrect password
+	-- 2 : unknown account type
+	-- 3 : the number of consecutive login fail exceeds the limitation
 	DECLARE user_type_enum ENUM('Student', 'Faculty', 'Librarian', 'Admin');
 	DECLARE EXIT HANDLER FOR NOT FOUND
 	BEGIN
-		SET result = '0', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+		SET result = '1', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
 	END;
 
 	SET ack_user_id = req_user_id;
@@ -283,13 +289,13 @@ BEGIN
 	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = enc_password;
 
 	IF user_type_enum = 'Admin' OR user_type_enum = 'Librarian' OR user_type_enum = 'Faculty' THEN
-		SELECT '1', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM staff WHERE Staff_id = req_user_id;
+		SELECT '0', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM staff WHERE Staff_id = req_user_id;
 		SET user_type = user_type_enum;
 	ELSEIF user_type_enum = 'Student' THEN
-		SELECT '1', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM student WHERE Student_id = req_user_id;
+		SELECT '0', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM student WHERE Student_id = req_user_id;
 		SET user_type = user_type_enum;
 	ELSE
-		SET result = '0', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+		SET result = '2', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
 	END IF;
 END$$
 DELIMITER ;
