@@ -41,7 +41,7 @@ CREATE TABLE category
 CREATE TABLE book
 (
 	Book_id			INT NOT NULL AUTO_INCREMENT,
-	Title			VARCHAR(40) NOT NULL,
+	Title			VARCHAR(80) NOT NULL,
 	Publisher_id	INT NOT NULL,
 	Isbn			BIGINT DEFAULT NULL,
 	Category_id		INT NOT NULL,
@@ -87,6 +87,15 @@ CREATE TABLE book_copy
 	UNIQUE INDEX idx_book_copy_log_id (Log_id)
 );
 
+CREATE TABLE account_property
+(
+	Account_type	Enum('Student', 'Faculty', 'Librarian', 'Admin') NOT NULL,
+	Max_period		INT NOT NULL,			-- Max Borrowing Period (Day)
+	Max_book		INT NOT NULL,			-- Max Borrowing Books
+	Fine			DECIMAL(5,2) NOT NULL,	-- Daily Fine
+	PRIMARY KEY (Account_type)
+);
+
 CREATE TABLE account
 (
 	Virtual_id		INT NOT NULL AUTO_INCREMENT,
@@ -94,7 +103,9 @@ CREATE TABLE account
 	Passwd			VARCHAR(100) NOT NULL,
 	Account_type	Enum('Student', 'Faculty', 'Librarian', 'Admin') NOT NULL,
 	PRIMARY KEY (Virtual_id),
-	UNIQUE INDEX idx_account_id (Account_id)
+	UNIQUE INDEX idx_account_id (Account_id),
+	CONSTRAINT fk_account_type FOREIGN KEY (Account_type) REFERENCES account_property (Account_type)
+		ON UPDATE CASCADE
 );
 
 CREATE TABLE staff
@@ -131,7 +142,6 @@ CREATE TABLE student
 	INDEX idx_year (Enroll_year)
 ) AUTO_INCREMENT=3000000;
 
--- CHECK (Date_out < Due_date)
 CREATE TABLE book_loan_log
 (
 	Log_id			BIGINT NOT NULL AUTO_INCREMENT,
@@ -153,8 +163,8 @@ CREATE TABLE book_reservation
 (
 	Reserve_id		BIGINT NOT NULL AUTO_INCREMENT,
 	Barcode_id		INT NOT NULL,
-	Account_id		INT NOT NULL,
 	Reserve_date	DATETIME NOT NULL,
+	Account_id		INT NOT NULL,
 	Log_id			BIGINT DEFAULT NULL,
 	PRIMARY KEY (Reserve_id),
 	CONSTRAINT fk_book_reserve_barcode_id FOREIGN KEY (Barcode_id) REFERENCES book_copy (Barcode_id)
@@ -163,12 +173,13 @@ CREATE TABLE book_reservation
 		ON UPDATE CASCADE,
 	CONSTRAINT fk_book_reserve_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id)
 		ON UPDATE CASCADE,
-	INDEX idx_reserve_barcode_id (Barcode_id),
-	INDEX idx_reserve_account_id (Account_id),
-	UNIQUE INDEX idx_reserve_log_id (Log_id)
+	UNIQUE INDEX idx_reserve_barcode_id_date (Barcode_id, Reserve_date),
+	INDEX idx_reserve_date (Reserve_date),
+	UNIQUE INDEX idx_reserve_log_id (Log_id),
+	INDEX idx_reserve_account_id (Account_id)
 );
 
-CREATE TABLE fine
+CREATE TABLE fine_log
 (
 	Fine_id			BIGINT NOT NULL AUTO_INCREMENT,
 	Barcode_id		INT NOT NULL,
@@ -191,12 +202,51 @@ CREATE TABLE fine
 
 ALTER TABLE book_copy ADD CONSTRAINT fk_book_copy_log_id FOREIGN KEY (Log_id) REFERENCES book_loan_log (Log_id) ON UPDATE CASCADE;
 
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_get_permission1$$
+
+CREATE FUNCTION sf_get_permission1(executor_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type = 'Admin';
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_get_permission2$$
+
+CREATE FUNCTION sf_get_permission2(executor_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type IN ('Admin', 'Librarian');
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_get_permission3$$
+
+CREATE FUNCTION sf_get_permission3(executor_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type IN ('Admin', 'Librarian', 'Faculty', 'Student');
+
+	RETURN result;
+END$$
+DELIMITER ;
+
 -- Setting AUTOCOMMIT is "ONLY" allowed to stored procedure, not stored function.
 -- "AUTOCOMMIT" is set for using "transaction" as known as rollback functionality.
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
 
-CREATE PROCEDURE sp_create_account(account_type Enum('Student', 'Faculty', 'Librarian'), user_name VARCHAR(50), user_address VARCHAR(50), user_phone VARCHAR(20), user_email VARCHAR(30), enc_password VARCHAR(100), enroll_year INT, OUT result INT)
+CREATE PROCEDURE sp_create_account(executor_id INT, _account_type Enum('Student', 'Faculty', 'Librarian'), _name VARCHAR(50), _address VARCHAR(50), _phone VARCHAR(20), _email VARCHAR(30), _password VARCHAR(100), _year INT, OUT result INT)
 BEGIN
 	DECLARE user_id, virtual_pk_id INT;
 	DECLARE db_error INT DEFAULT 0;
@@ -206,50 +256,57 @@ BEGIN
 			SET AUTOCOMMIT=1;
 		END;
 
-	SET result = 0;
+	SELECT sf_get_permission1(executor_id) INTO result; -- 0 : failure, 1 : success
 
-	IF account_type = 'Faculty' OR account_type = 'Librarian' THEN
-		SET AUTOCOMMIT=0;
-		START TRANSACTION;
-		INSERT INTO staff (Name, Address, Phone, Email) VALUES(user_name, user_address, user_phone, user_email);
+	IF result = 1 THEN
+		IF _account_type = 'Faculty' OR _account_type = 'Librarian' THEN
+			SET AUTOCOMMIT=0;
+			START TRANSACTION;
+			INSERT INTO staff (Name, Address, Phone, Email) VALUES(_name, _address, _phone, _email);
 
-		SET user_id = (SELECT LAST_INSERT_ID());
-		UPDATE staff SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Staff_id = user_id;
-		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, account_type);
+			SET user_id = (SELECT LAST_INSERT_ID());
+			UPDATE staff SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Staff_id = user_id;
+			INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, _password, _account_type);
 
-		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
-		UPDATE staff SET Virtual_id = virtual_pk_id WHERE Staff_id = user_id;
+			SET virtual_pk_id = (SELECT LAST_INSERT_ID());
+			UPDATE staff SET Virtual_id = virtual_pk_id WHERE Staff_id = user_id;
 
-		COMMIT;
-		SET AUTOCOMMIT=1, result = 1;
-	ELSEIF account_type = 'Student' THEN
-		SET AUTOCOMMIT=0;
-		START TRANSACTION;
+			COMMIT;
+			SET AUTOCOMMIT=1, result = 1;
+		ELSEIF _account_type = 'Student' THEN
+			SET AUTOCOMMIT=0;
+			START TRANSACTION;
 
-		INSERT INTO student (Name, Address, Phone, Email, Enroll_year) VALUES(user_name, user_address, user_phone, user_email, enroll_year);
+			INSERT INTO student (Name, Address, Phone, Email, Enroll_year) VALUES(_name, _address, _phone, _email, _year);
 
-		SET user_id = (SELECT LAST_INSERT_ID());
-		UPDATE student SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Student_id = user_id;
-		INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, enc_password, account_type);
+			SET user_id = (SELECT LAST_INSERT_ID());
+			UPDATE student SET Barcode_id = (user_id * 10 + 20000000000000) WHERE Student_id = user_id;
+			INSERT INTO account (Account_id, Passwd, Account_type) VALUES (user_id, _password, _account_type);
 
-		SET virtual_pk_id = (SELECT LAST_INSERT_ID());
-		UPDATE student SET Virtual_id = virtual_pk_id WHERE Student_id = user_id;
+			SET virtual_pk_id = (SELECT LAST_INSERT_ID());
+			UPDATE student SET Virtual_id = virtual_pk_id WHERE Student_id = user_id;
 
-		COMMIT;
-		SET AUTOCOMMIT=1, result = 1;
+			COMMIT;
+			SET AUTOCOMMIT=1, result = 1;
+		END IF;
 	END IF;
+
 END$$
 DELIMITER ;
 
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_reset_password$$
 
-CREATE FUNCTION sf_reset_password(user_id INT, enc_password VARCHAR(100)) RETURNS INT
+CREATE FUNCTION sf_reset_password(executor_id INT, user_id INT, new_password VARCHAR(100)) RETURNS INT
 BEGIN
-	DECLARE result INT DEFAULT 0;
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	UPDATE account SET Passwd = enc_password WHERE Account_id = user_id AND Account_type <> 'Admin';
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = enc_password AND Account_type <> 'Admin';
+	SELECT sf_get_permission1(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Account_type <> 'Admin';
+		SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = BINARY(new_password) AND Account_type <> 'Admin';
+	END IF;
 
 	RETURN result;
 END$$
@@ -260,10 +317,13 @@ DROP FUNCTION IF EXISTS sf_change_password$$
 
 CREATE FUNCTION sf_change_password(user_id INT, old_password VARCHAR(100), new_password VARCHAR(100)) RETURNS INT
 BEGIN
-	DECLARE result INT DEFAULT 0;
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+	-- executor_id is same to user_id
 
-	UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Admin';
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = new_password AND Account_type <> 'Admin';
+	IF old_password <> new_password THEN
+		UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Admin';
+		SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = BINARY(new_password) AND Account_type <> 'Admin';
+	END IF;
 
 	RETURN result;
 END$$
@@ -272,30 +332,28 @@ DELIMITER ;
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_check_account$$
 
-CREATE PROCEDURE sp_check_account(req_user_id INT, enc_password VARCHAR(100), OUT ack_user_id INT, OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT user_address VARCHAR(50), OUT user_phone VARCHAR(20), OUT user_email VARCHAR(50), OUT user_year INT)
+CREATE PROCEDURE sp_check_account(req_user_id INT, _password VARCHAR(100), OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT _address VARCHAR(50), OUT _phone VARCHAR(20), OUT _email VARCHAR(50), OUT _year INT)
 BEGIN
-	-- result is 0 if login successes, otherwise login fails
+	-- result is 0 if login succeeds, otherwise login fails
 	-- 1 : no account or incorrect password
 	-- 2 : unknown account type
 	-- 3 : the number of consecutive login fail exceeds the limitation
 	DECLARE user_type_enum ENUM('Student', 'Faculty', 'Librarian', 'Admin');
 	DECLARE EXIT HANDLER FOR NOT FOUND
 	BEGIN
-		SET result = '1', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+		SET result = '1', user_id = 0, user_type = '0', user_name = 'N/A', _address = 'N/A', _phone = 'N/A', _email = 'N/A', _year = '0';
 	END;
 
-	SET ack_user_id = req_user_id;
-
-	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = enc_password;
+	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = BINARY(_password);
 
 	IF user_type_enum = 'Admin' OR user_type_enum = 'Librarian' OR user_type_enum = 'Faculty' THEN
-		SELECT '0', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM staff WHERE Staff_id = req_user_id;
+		SELECT '0', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, _address, _phone, _email, _year FROM staff WHERE Staff_id = req_user_id;
 		SET user_type = user_type_enum;
 	ELSEIF user_type_enum = 'Student' THEN
-		SELECT '0', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, user_address, user_phone, user_email, user_year FROM student WHERE Student_id = req_user_id;
+		SELECT '0', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, _address, _phone, _email, _year FROM student WHERE Student_id = req_user_id;
 		SET user_type = user_type_enum;
 	ELSE
-		SET result = '2', user_id = 0, user_type = '0', user_name = 'N/A', user_address = 'N/A', user_phone = 'N/A', user_email = 'N/A', user_year = '0';
+		SET result = '2', user_id = 0, user_type = '0', user_name = 'N/A', _address = 'N/A', _phone = 'N/A', _email = 'N/A', _year = '0';
 	END IF;
 END$$
 DELIMITER ;
@@ -303,14 +361,14 @@ DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_publisher$$
 
-CREATE FUNCTION sf_create_publisher(user_id INT, pub_name VARCHAR(25), pub_address VARCHAR(50), pub_phone VARCHAR(20)) RETURNS INT
+CREATE FUNCTION sf_create_publisher(executor_id INT, _publisher VARCHAR(25), _address VARCHAR(50), _phone VARCHAR(20)) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		INSERT INTO publisher (Name, Address, Phone) VALUES (pub_name, pub_address, pub_phone);
+		INSERT INTO publisher (Name, Address, Phone) VALUES (_publisher, _address, _phone);
 	END IF;
 
 	RETURN result;
@@ -320,14 +378,14 @@ DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_section$$
 
-CREATE FUNCTION sf_create_section(user_id INT, sec_name VARCHAR(20)) RETURNS INT
+CREATE FUNCTION sf_create_section(executor_id INT, _section VARCHAR(20)) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		INSERT INTO section (Section_name) VALUES (sec_name);
+		INSERT INTO section (Section_name) VALUES (_section);
 	END IF;
 
 	RETURN result;
@@ -337,14 +395,169 @@ DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_category$$
 
-CREATE FUNCTION sf_create_category(user_id INT, cat_name VARCHAR(50), parent_cat_id INT, sec_id INT) RETURNS INT
+CREATE FUNCTION sf_create_category(executor_id INT, _subject VARCHAR(50), _parent INT, _section INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Account_type IN ('Admin', 'Librarian');
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		INSERT INTO category (Subject, Parent_id, Section_id) VALUES (cat_name, parent_cat_id, sec_id);
+		INSERT INTO category (Subject, Parent_id, Section_id) VALUES (_subject, _parent, _section);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_author$$
+
+CREATE FUNCTION sf_create_author(executor_id INT, _author VARCHAR(50)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		INSERT INTO author (Author_name) VALUES (_author);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_book$$
+
+CREATE FUNCTION sf_create_book(executor_id INT, _title VARCHAR(80), _publisher INT, _isbn BIGINT, _category INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		INSERT INTO book (Title, Publisher_id, Isbn, Category_id) VALUES (_title, _publisher, _isbn, _category);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_book_author$$
+
+CREATE FUNCTION sf_create_book_author(executor_id INT, _book INT, _author INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		INSERT INTO book_author (Book_id, Author_id) VALUES (_book, _author);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_book_copy$$
+
+CREATE FUNCTION sf_create_book_copy(executor_id INT, _book INT, _date DATETIME) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		INSERT INTO book_copy (Book_id, Stock_date) VALUES (_book, _date);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_book_loan_log$$
+
+CREATE FUNCTION sf_create_book_loan_log(executor_id INT, user_id INT, _barcode INT, _issue_date DATETIME, _due_date DATETIME) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result;
+
+	IF result = 1 THEN
+		-- TODO : Check Maximum Books, CHECK Date_out < Due_date
+		INSERT INTO book_loan_log (Barcode_id, Borrower_id, Date_out, Due_date) VALUES (_barcode, user_id, _issue_date, _due_date);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_get_daily_fine$$
+
+CREATE FUNCTION sf_get_daily_fine(executor_id INT, user_id INT) RETURNS DECIMAL(5,2)
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+	DECLARE _fine DECIMAL(5,2) DEFAULT -1; -- Error : Unknown Account ID or Unknown Account Type
+	DECLARE user_type_enum ENUM('Student', 'Faculty', 'Librarian', 'Admin');
+	DECLARE EXIT HANDLER FOR NOT FOUND
+	BEGIN
+		-- Error : Unknown Account ID or Unknown Account Type
+		RETURN _fine;
+	END;
+
+	SELECT sf_get_permission2(executor_id) INTO result;
+
+	IF result = 1 THEN
+		-- SELECT ap.Fine INTO _fine FROM account_property AS ap WHERE ap.Account_type = (
+		-- 		SELECT ac.Account_type FROM account AS ac WHERE ac.Account_id = user_id);
+		SELECT ap.Fine INTO _fine FROM account_property AS ap, account AS ac WHERE ac.Account_id = user_id AND ac.Account_type = ap.Account_type;
+	END IF;
+
+	RETURN _fine;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_fine_log$$
+
+CREATE FUNCTION sf_create_fine_log(executor_id INT, user_id INT, _barcode INT, _log_id BIGINT, _fine DECIMAL(5,2), _date DATETIME) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result;
+
+	IF result = 1 THEN
+		-- TODO : Un-comment
+		-- SELECT COUNT(Log_id) INTO result FROM book_loan_log WHERE Log_id = _log_id AND Return_date IS NULL AND Due_date < NOW();
+
+		-- IF result = 1 THEN
+			INSERT INTO fine_log (Barcode_id, Borrower_id, Log_id, Amount, Payment_date) VALUES (_barcode, user_id, _log_id, _fine, _date);
+		-- END IF;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_create_reservation$$
+
+CREATE FUNCTION sf_create_reservation(user_id INT, _barcode INT, _date DATETIME) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+	-- executor_id is same to user_id
+	-- Check if the book is already reserved
+	SELECT COUNT(Barcode_id) INTO result FROM book_reservation WHERE Barcode_id = _barcode AND Log_id IS NULL;
+
+	IF result = 0 THEN
+		INSERT INTO book_reservation (Barcode_id, Reserve_date, Account_id) VALUES (_barcode, _date, user_id);
+		SET result = 1;
+	ELSE
+		SET result = 0;
 	END IF;
 
 	RETURN result;
@@ -380,16 +593,58 @@ FLUSH PRIVILEGES;
 GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'guest'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
+-- Account property should be created manually.
+INSERT INTO account_property (Account_type, Max_period, Max_book, Fine) VALUES ('Admin', 28, 10, 1.0);
+INSERT INTO account_property (Account_type, Max_period, Max_book, Fine) VALUES ('Librarian', 28, 10, 1.1);
+INSERT INTO account_property (Account_type, Max_period, Max_book, Fine) VALUES ('Faculty', 112, 20, 1.2);
+INSERT INTO account_property (Account_type, Max_period, Max_book, Fine) VALUES ('Student', 7, 3, 1.5);
+
 -- Admin account should be created manually.
 INSERT INTO staff (Name, Address, Phone, Email) VALUES('Administrator 1', 'Sydney', '0400000000', 'admin1@vu.edu.au');
 UPDATE staff SET Barcode_id = (Staff_id * 10 + 20000000000000) WHERE Staff_id = LAST_INSERT_ID();
 INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(), 'password_e0', 'Admin');
 UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000; -- The first account is assumed to be 5000000 as an auto increment value.
 
-CALL sp_create_account('Faculty', 'Lecturer Name 1', 'Sydney', '0400000001', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
-CALL sp_create_account('Faculty', 'Lecturer Name 2', 'Sydney', '0400000002', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
-CALL sp_create_account('Faculty', 'Lecturer Name 3', 'Sydney', '0400000003', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
-CALL sp_create_account('Librarian', 'Librarian Name 1', 'Sydney', '0400000004', 'librarian1@vu.edu.au', 'password_e4', '0', @retValue);
-CALL sp_create_account('Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014', @retValue);
-CALL sp_create_account('Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014', @retValue);
-CALL sp_create_account('Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014', @retValue);
+-- Admin's id is assumed to be 5000000
+CALL sp_create_account(5000000, 'Librarian', 'Librarian Name 1', 'Sydney', '0400000000', 'librarian1@vu.edu.au', 'password_e0', '0', @retValue);
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 1', 'Sydney', '0400000002', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 2', 'Sydney', '0400000003', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 3', 'Sydney', '0400000004', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
+CALL sp_create_account(5000000, 'Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014', @retValue);
+CALL sp_create_account(5000000, 'Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014', @retValue);
+CALL sp_create_account(5000000, 'Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014', @retValue);
+
+-- Librarian's id is assumed to be 5000001
+SELECT sf_create_section(5000001, 'C');
+SELECT sf_create_section(5000001, 'C-1');
+SELECT sf_create_section(5000001, 'C-2');
+SELECT sf_create_section(5000001, 'C-3');
+SELECT sf_create_section(5000001, 'C-4');
+SELECT sf_create_section(5000001, 'C-5');
+
+SELECT sf_create_category(5000001, 'Computer', NULL, 1);
+SELECT sf_create_category(5000001, 'Networking', 1, 2);
+SELECT sf_create_category(5000001, 'Object Oriented Programming', 1, 3);
+
+SELECT sf_create_publisher(5000001, 'McGraw-Hill', '545 kent street, CBD NSW 2000', '4544444');
+SELECT sf_create_publisher(5000001, 'WROX', '545 kent street, CBD NSW 2000', '4544444');
+SELECT sf_create_publisher(5000001, 'O Reilly', '545 kent street, CBD NSW 2000', '4544444');
+SELECT sf_create_publisher(5000001, 'Microsoft Press', '545 kent street, CBD NSW 2000', '4544444');
+SELECT sf_create_publisher(5000001, 'APress', '545 kent street, CBD NSW 2000', '4544444');
+
+SELECT sf_create_author(5000001, 'Stephen R. Schach');
+SELECT sf_create_author(5000001, 'Author 1');
+SELECT sf_create_author(5000001, 'Author 2');
+SELECT sf_create_author(5000001, 'Author 3');
+SELECT sf_create_author(5000001, 'Author 4');
+SELECT sf_create_author(5000001, 'Author 5');
+
+SELECT sf_create_book(5000001, 'Object-Oriented and Classical Software Engineering', 1, 9780071081719, 3);
+
+SELECT sf_create_book_author(5000001, 1, 1);
+
+SELECT sf_create_book_copy(5000001, 1, NOW()); -- CURRENT_TIMESTAMP
+
+SELECT sf_create_book_loan_log(5000000, 5000001, 1, NOW(), DATE_ADD(NOW(), INTERVAL +(SELECT Max_period FROM account_property WHERE Account_type = (SELECT Account_type FROM account WHERE Account_id = 5000001)) DAY));
+
+SELECT sf_create_fine_log(5000000, 5000001, 1, 1, (SELECT Fine FROM account_property WHERE Account_type = (SELECT Account_type FROM account WHERE Account_id = 5000001)), NOW());
