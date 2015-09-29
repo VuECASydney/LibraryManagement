@@ -185,3 +185,8 @@ Web Site Redirection from http to https Completed.
 
 --------------------------------------------------------------------------------
 
+2015-09-29 Tuesday
+
+Data Insert Functionalities - Almost Completed.
+
+--------------------------------------------------------------------------------
