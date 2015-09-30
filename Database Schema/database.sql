@@ -564,6 +564,104 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_section$$
+
+CREATE PROCEDURE sp_get_all_section()
+BEGIN
+	SELECT * FROM section;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_category$$
+
+CREATE PROCEDURE sp_get_all_category()
+BEGIN
+	SELECT * FROM category;
+	-- SELECT t1.*, s1.Section_name
+	-- 	FROM (SELECT c1.*, c2.Subject AS Parent_subject
+	-- 			FROM category AS c1 LEFT JOIN category AS c2
+	-- 			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
+	-- 	WHERE t1.Section_id = s1.Section_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_publisher$$
+
+CREATE PROCEDURE sp_get_all_publisher()
+BEGIN
+	SELECT * FROM publisher;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_author$$
+
+CREATE PROCEDURE sp_get_all_author()
+BEGIN
+	SELECT * FROM author;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_book$$
+
+CREATE PROCEDURE sp_get_all_book()
+BEGIN
+	SELECT * FROM book;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_search_author_by_book_id$$
+
+CREATE PROCEDURE sp_search_author_by_book_id(_book_id INT)
+BEGIN
+	-- SELECT ba.*, b1.Title, a1.Author_name FROM book_author AS ba, book AS b1, author AS a1 WHERE ba.Book_id = b1.Book_id AND ba.Author_id = a1.Author_id;
+		SELECT * FROM author WHERE Author_id IN (SELECT Author_id FROM book_author WHERE Book_id = _book_id);
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_search_book_by_author_id$$
+
+CREATE PROCEDURE sp_search_book_by_author_id(_author_id INT)
+BEGIN
+	-- SELECT ba.*, b1.Title, a1.Author_name FROM book_author AS ba, book AS b1, author AS a1 WHERE ba.Book_id = b1.Book_id AND ba.Author_id = a1.Author_id;
+		SELECT * FROM book WHERE Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id);
+		
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_book_copy$$
+
+CREATE PROCEDURE sp_get_all_book_copy()
+BEGIN
+	SELECT * FROM book_copy;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_search_book_copy_by_book_id$$
+
+CREATE PROCEDURE sp_search_book_copy_by_book_id(_book_id INT)
+BEGIN
+	SELECT * FROM book_copy WHERE Book_id = _book_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_search_book_copy_by_barcode_id$$
+
+CREATE PROCEDURE sp_search_book_copy_by_barcode_id(_barcode_id INT)
+BEGIN
+	SELECT * FROM book_copy WHERE Barcode_id = _barcode_id;
+END$$
+DELIMITER ;
+
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'G2bOyum7M83o';
 GRANT USAGE ON *.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
