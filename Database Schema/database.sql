@@ -580,10 +580,10 @@ CREATE PROCEDURE sp_get_all_category()
 BEGIN
 	SELECT * FROM category;
 	-- SELECT t1.*, s1.Section_name
-	-- 	FROM (SELECT c1.*, c2.Subject AS Parent_subject
-	-- 			FROM category AS c1 LEFT JOIN category AS c2
-	-- 			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
-	-- 	WHERE t1.Section_id = s1.Section_id;
+	-- FROM (SELECT c1.*, c2.Subject AS Parent_subject
+	--			FROM category AS c1 LEFT JOIN category AS c2
+	--			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
+	-- WHERE t1.Section_id = s1.Section_id;
 END$$
 DELIMITER ;
 
@@ -610,7 +610,9 @@ DROP PROCEDURE IF EXISTS sp_get_all_book$$
 
 CREATE PROCEDURE sp_get_all_book()
 BEGIN
-	SELECT * FROM book;
+	SELECT b1.*, p1.Name AS Publsher_name
+	FROM book AS b1, publisher AS p1
+	WHERE b1.Publisher_id = p1.Publisher_id;
 END$$
 DELIMITER ;
 
@@ -619,8 +621,9 @@ DROP PROCEDURE IF EXISTS sp_search_author_by_book_id$$
 
 CREATE PROCEDURE sp_search_author_by_book_id(_book_id INT)
 BEGIN
-	-- SELECT ba.*, b1.Title, a1.Author_name FROM book_author AS ba, book AS b1, author AS a1 WHERE ba.Book_id = b1.Book_id AND ba.Author_id = a1.Author_id;
-		SELECT * FROM author WHERE Author_id IN (SELECT Author_id FROM book_author WHERE Book_id = _book_id);
+	SELECT b1.*, p1.Name AS Publsher_name, p1.Address, p1.Phone
+	FROM book AS b1, publisher AS p1
+	WHERE b1.Book_id = _book_id AND b1.Publisher_id = p1.Publisher_id;
 END$$
 DELIMITER ;
 
@@ -629,9 +632,11 @@ DROP PROCEDURE IF EXISTS sp_search_book_by_author_id$$
 
 CREATE PROCEDURE sp_search_book_by_author_id(_author_id INT)
 BEGIN
-	-- SELECT ba.*, b1.Title, a1.Author_name FROM book_author AS ba, book AS b1, author AS a1 WHERE ba.Book_id = b1.Book_id AND ba.Author_id = a1.Author_id;
-		SELECT * FROM book WHERE Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id);
-		
+	-- Performance Issue : "IN" can't search index
+	SELECT b1.*, p1.Name AS Publsher_name, p1.Address, p1.Phone
+	FROM book AS b1, publisher AS p1
+	WHERE b1.Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id) AND
+		b1.Publisher_id = p1.Publisher_id;
 END$$
 DELIMITER ;
 
@@ -641,6 +646,15 @@ DROP PROCEDURE IF EXISTS sp_get_all_book_copy$$
 CREATE PROCEDURE sp_get_all_book_copy()
 BEGIN
 	SELECT * FROM book_copy;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_borrowed_book_copy$$
+
+CREATE PROCEDURE sp_get_all_borrowed_book_copy()
+BEGIN
+	SELECT * FROM book_copy WHERE Log_id IS NULL;
 END$$
 DELIMITER ;
 
@@ -658,7 +672,37 @@ DROP PROCEDURE IF EXISTS sp_search_book_copy_by_barcode_id$$
 
 CREATE PROCEDURE sp_search_book_copy_by_barcode_id(_barcode_id INT)
 BEGIN
-	SELECT * FROM book_copy WHERE Barcode_id = _barcode_id;
+	-- SELECT * FROM book_copy WHERE Barcode_id = _barcode_id;
+	SELECT bc.*, b1.Title
+	FROM book_copy AS bc, book AS b1
+	WHERE Barcode_id = _barcode_id AND
+		Log_id IS NOT NULL AND
+		bc.Book_id = b1.Book_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_user$$
+
+CREATE PROCEDURE sp_get_all_user()
+BEGIN
+	-- Require Enroll Year?
+	SELECT ac.Account_type, s1.Staff_id AS User_id, s1.Name, s1.Address, s1.Phone, s1.Email
+	FROM account AS ac, staff AS s1
+	WHERE s1.Staff_id = ac.Account_id
+	UNION
+	SELECT ac.Account_type, s2.Student_id AS User_id, s2.Name, s2.Address, s2.Phone, s2.Email
+	FROM account AS ac, student AS s2
+	WHERE s2.Student_id = ac.Account_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_get_all_fine$$
+
+CREATE PROCEDURE sp_get_all_fine()
+BEGIN
+	SELECT * FROM fine_log;
 END$$
 DELIMITER ;
 
