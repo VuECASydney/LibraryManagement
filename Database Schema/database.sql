@@ -209,7 +209,10 @@ CREATE FUNCTION sf_get_permission1(executor_id INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type = 'Admin';
+	SELECT COUNT(Account_id) INTO result
+	FROM account
+	WHERE Account_id = executor_id AND
+		Account_type = 'Admin';
 
 	RETURN result;
 END$$
@@ -222,7 +225,10 @@ CREATE FUNCTION sf_get_permission2(executor_id INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type IN ('Admin', 'Librarian');
+	SELECT COUNT(Account_id) INTO result
+	FROM account
+	WHERE Account_id = executor_id AND
+		Account_type IN ('Admin', 'Librarian');
 
 	RETURN result;
 END$$
@@ -235,7 +241,10 @@ CREATE FUNCTION sf_get_permission3(executor_id INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
-	SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = executor_id AND Account_type IN ('Admin', 'Librarian', 'Faculty', 'Student');
+	SELECT COUNT(Account_id) INTO result
+	FROM account
+	WHERE Account_id = executor_id AND
+		Account_type IN ('Admin', 'Librarian', 'Faculty', 'Student');
 
 	RETURN result;
 END$$
@@ -307,8 +316,15 @@ BEGIN
 	SELECT sf_get_permission1(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Account_type <> 'Admin';
-		SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = BINARY(new_password) AND Account_type <> 'Admin';
+		UPDATE account SET Passwd = new_password
+		WHERE Account_id = user_id AND
+			Account_type <> 'Admin';
+
+		SELECT COUNT(Account_id) INTO result
+		FROM account
+		WHERE Account_id = user_id AND
+			Passwd = BINARY(new_password) AND
+			Account_type <> 'Admin';
 	END IF;
 
 	RETURN result;
@@ -324,8 +340,16 @@ BEGIN
 	-- executor_id is same to user_id
 
 	IF old_password <> new_password THEN
-		UPDATE account SET Passwd = new_password WHERE Account_id = user_id AND Passwd = old_password AND Account_type <> 'Admin';
-		SELECT COUNT(Account_id) INTO result FROM account WHERE Account_id = user_id AND Passwd = BINARY(new_password) AND Account_type <> 'Admin';
+		UPDATE account SET Passwd = new_password
+		WHERE Account_id = user_id AND
+			Passwd = old_password AND
+			Account_type <> 'Admin';
+
+		SELECT COUNT(Account_id) INTO result
+		FROM account
+		WHERE Account_id = user_id AND
+			Passwd = BINARY(new_password) AND
+			Account_type <> 'Admin';
 	END IF;
 
 	RETURN result;
@@ -524,7 +548,10 @@ BEGIN
 	IF result = 1 THEN
 		-- SELECT ap.Fine INTO _fine FROM account_property AS ap WHERE ap.Account_type = (
 		-- 		SELECT ac.Account_type FROM account AS ac WHERE ac.Account_id = user_id);
-		SELECT ap.Fine INTO _fine FROM account_property AS ap, account AS ac WHERE ac.Account_id = user_id AND ac.Account_type = ap.Account_type;
+		SELECT ap.Fine INTO _fine
+		FROM account_property AS ap, account AS ac
+		WHERE ac.Account_id = user_id AND
+			ac.Account_type = ap.Account_type;
 	END IF;
 
 	RETURN _fine;
@@ -561,7 +588,10 @@ BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 	-- executor_id is same to user_id
 	-- Check if the book is already reserved
-	SELECT COUNT(Barcode_id) INTO result FROM book_reservation WHERE Barcode_id = _barcode AND Log_id IS NULL;
+	SELECT COUNT(Barcode_id) INTO result
+	FROM book_reservation
+	WHERE Barcode_id = _barcode AND
+		Log_id IS NULL;
 
 	IF result = 0 THEN
 		INSERT INTO book_reservation (Barcode_id, Reserve_date, Account_id) VALUES (_barcode, _date, user_id);
@@ -589,7 +619,8 @@ DROP PROCEDURE IF EXISTS sp_get_all_category$$
 CREATE PROCEDURE sp_get_all_category()
 BEGIN
 	SELECT t1.*, s1.Section_name
-	FROM (SELECT c1.*, c2.Subject AS Parent_subject
+	FROM (
+			SELECT c1.*, c2.Subject AS Parent_subject
 			FROM category AS c1 LEFT JOIN category AS c2
 			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
 	WHERE t1.Section_id = s1.Section_id;
@@ -619,6 +650,7 @@ DROP PROCEDURE IF EXISTS sp_get_all_book$$
 
 CREATE PROCEDURE sp_get_all_book()
 BEGIN
+	-- Performance Issue : Too many book records
 	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
 	FROM book AS b1, publisher AS p1, category AS c1
 	WHERE b1.Publisher_id = p1.Publisher_id AND
@@ -647,7 +679,10 @@ BEGIN
 	-- Performance Issue : "IN" can't search index in MySQL
 	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
 	FROM book AS b1, publisher AS p1, category AS c1
-	WHERE b1.Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id) AND
+	WHERE b1.Book_id IN (
+			SELECT Book_id
+			FROM book_author
+			WHERE Author_id = _author_id) AND
 		b1.Publisher_id = p1.Publisher_id AND
 		b1.Category_id = c1.Category_id;
 END$$
@@ -658,7 +693,10 @@ DROP PROCEDURE IF EXISTS sp_get_all_book_copy$$
 
 CREATE PROCEDURE sp_get_all_book_copy()
 BEGIN
-	SELECT * FROM book_copy;
+	-- Performance Issue : Too many book_copy records
+	SELECT bc.*, b1.Title
+	FROM book_copy AS bc, book AS b1
+	WHERE bc.Book_id = b1.Book_id;
 END$$
 DELIMITER ;
 
@@ -667,7 +705,11 @@ DROP PROCEDURE IF EXISTS sp_get_all_borrowed_book_copy$$
 
 CREATE PROCEDURE sp_get_all_borrowed_book_copy()
 BEGIN
-	SELECT * FROM book_copy WHERE Log_id IS NULL;
+	-- Performance Issue in searching Log_id
+	SELECT bc.*, b1.Title
+	FROM book_copy AS bc, book AS b1
+	WHERE Log_id IS NOT NULL AND
+		bc.Book_id = b1.Book_id;
 END$$
 DELIMITER ;
 
@@ -676,7 +718,10 @@ DROP PROCEDURE IF EXISTS sp_search_book_copy_by_book_id$$
 
 CREATE PROCEDURE sp_search_book_copy_by_book_id(_book_id INT)
 BEGIN
-	SELECT * FROM book_copy WHERE Book_id = _book_id;
+	SELECT bc.*, b1.Title
+	FROM book_copy AS bc, book AS b1
+	WHERE bc.Book_id = _book_id AND
+		bc.Book_id = b1.Book_id;
 END$$
 DELIMITER ;
 
@@ -685,11 +730,9 @@ DROP PROCEDURE IF EXISTS sp_search_book_copy_by_barcode_id$$
 
 CREATE PROCEDURE sp_search_book_copy_by_barcode_id(_barcode_id INT)
 BEGIN
-	-- SELECT * FROM book_copy WHERE Barcode_id = _barcode_id;
 	SELECT bc.*, b1.Title
 	FROM book_copy AS bc, book AS b1
 	WHERE Barcode_id = _barcode_id AND
-		Log_id IS NOT NULL AND
 		bc.Book_id = b1.Book_id;
 END$$
 DELIMITER ;
@@ -699,12 +742,11 @@ DROP PROCEDURE IF EXISTS sp_get_all_user$$
 
 CREATE PROCEDURE sp_get_all_user()
 BEGIN
-	-- Require Enroll Year?
-	SELECT ac.Account_type, s1.Staff_id AS User_id, s1.Name, s1.Address, s1.Phone, s1.Email
+	SELECT ac.Account_type, s1.Staff_id AS Account_id, s1.Name, s1.Address, s1.Phone, s1.Email, '0' AS Enroll_year
 	FROM account AS ac, staff AS s1
 	WHERE s1.Staff_id = ac.Account_id
 	UNION
-	SELECT ac.Account_type, s2.Student_id AS User_id, s2.Name, s2.Address, s2.Phone, s2.Email
+	SELECT ac.Account_type, s2.Student_id AS Account_id, s2.Name, s2.Address, s2.Phone, s2.Email, s2.Enroll_year
 	FROM account AS ac, student AS s2
 	WHERE s2.Student_id = ac.Account_id;
 END$$
@@ -799,6 +841,8 @@ SELECT sf_create_book(5000001, 'Object-Oriented and Classical Software Engineeri
 SELECT sf_create_book_author(5000001, 1, 1);
 
 SELECT sf_create_book_copy(5000001, 1, NOW()); -- CURRENT_TIMESTAMP
+SELECT sf_create_book_copy(5000001, 1, NOW());
+SELECT sf_create_book_copy(5000001, 1, NOW());
 
 SELECT sf_create_book_loan_log(5000000, 5000001, 1, NOW(), DATE_ADD(NOW(), INTERVAL +(SELECT Max_period FROM account_property WHERE Account_type = (SELECT Account_type FROM account WHERE Account_id = 5000001)) DAY));
 
