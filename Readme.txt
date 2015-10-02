@@ -131,7 +131,7 @@ Stored Function is not allowed to use Transaction, but Stored Procedure is allow
 --------------------------------------------------------------------------------
 
 2015-09-03 Thursday
-Meeting Time : 16:30 - 00:25
+Meeting Time : 16:30 - 17:25
 
 Brijender Rana, Choongyeol Kim, Madhaban Bhowmik, Priyank Sharma (Excuse by email)
 
@@ -190,3 +190,16 @@ Web Site Redirection from http to https Completed.
 Data Insert Functionalities - Almost Completed.
 
 --------------------------------------------------------------------------------
+
+2015-10-01 Thursday
+Meeting Time : 16:30 - 17:30
+
+Brijender Rana, Choongyeol Kim
+
+--------------------------------------------------------------------------------
+
+2015-10-02 Friday
+Class Time : 09:30 - 12:30
+
+--------------------------------------------------------------------------------
+

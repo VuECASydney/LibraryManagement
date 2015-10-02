@@ -578,12 +578,11 @@ DROP PROCEDURE IF EXISTS sp_get_all_category$$
 
 CREATE PROCEDURE sp_get_all_category()
 BEGIN
-	SELECT * FROM category;
-	-- SELECT t1.*, s1.Section_name
-	-- FROM (SELECT c1.*, c2.Subject AS Parent_subject
-	--			FROM category AS c1 LEFT JOIN category AS c2
-	--			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
-	-- WHERE t1.Section_id = s1.Section_id;
+	SELECT t1.*, s1.Section_name
+	FROM (SELECT c1.*, c2.Subject AS Parent_subject
+			FROM category AS c1 LEFT JOIN category AS c2
+			ON c1.Parent_id = c2.Category_id) AS t1, section AS s1
+	WHERE t1.Section_id = s1.Section_id;
 END$$
 DELIMITER ;
 
@@ -610,18 +609,19 @@ DROP PROCEDURE IF EXISTS sp_get_all_book$$
 
 CREATE PROCEDURE sp_get_all_book()
 BEGIN
-	SELECT b1.*, p1.Name AS Publsher_name
-	FROM book AS b1, publisher AS p1
-	WHERE b1.Publisher_id = p1.Publisher_id;
+	SELECT b1.*, p1.Name AS Publsher_name, c1.Subject
+	FROM book AS b1, publisher AS p1, category AS c1
+	WHERE b1.Publisher_id = p1.Publisher_id AND
+			b1.Category_id = c1.Category_id;
 END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_search_author_by_book_id$$
+DROP PROCEDURE IF EXISTS sp_search_book_by_book_id$$
 
-CREATE PROCEDURE sp_search_author_by_book_id(_book_id INT)
+CREATE PROCEDURE sp_search_book_by_book_id(_book_id INT)
 BEGIN
-	SELECT b1.*, p1.Name AS Publsher_name, p1.Address, p1.Phone
+	SELECT b1.*, p1.Name AS Publsher_name
 	FROM book AS b1, publisher AS p1
 	WHERE b1.Book_id = _book_id AND b1.Publisher_id = p1.Publisher_id;
 END$$
@@ -632,8 +632,8 @@ DROP PROCEDURE IF EXISTS sp_search_book_by_author_id$$
 
 CREATE PROCEDURE sp_search_book_by_author_id(_author_id INT)
 BEGIN
-	-- Performance Issue : "IN" can't search index
-	SELECT b1.*, p1.Name AS Publsher_name, p1.Address, p1.Phone
+	-- Performance Issue : "IN" can't search index in MySQL
+	SELECT b1.*, p1.Name AS Publsher_name
 	FROM book AS b1, publisher AS p1
 	WHERE b1.Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id) AND
 		b1.Publisher_id = p1.Publisher_id;
