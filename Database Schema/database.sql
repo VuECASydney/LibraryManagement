@@ -246,19 +246,22 @@ DELIMITER ;
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_create_account$$
 
-CREATE PROCEDURE sp_create_account(executor_id INT, _account_type Enum('Student', 'Faculty', 'Librarian'), _name VARCHAR(50), _address VARCHAR(50), _phone VARCHAR(20), _email VARCHAR(30), _password VARCHAR(100), _year INT, OUT result INT)
+CREATE PROCEDURE sp_create_account(executor_id INT, _account_type Enum('Student', 'Faculty', 'Librarian'), _name VARCHAR(50), _address VARCHAR(50), _phone VARCHAR(20), _email VARCHAR(30), _password VARCHAR(100), _year INT)
 BEGIN
 	DECLARE user_id, virtual_pk_id INT;
+	DECLARE result INT DEFAULT 0;
 	DECLARE db_error INT DEFAULT 0;
 	DECLARE EXIT HANDLER FOR SQLEXCEPTION
 		BEGIN
 			ROLLBACK;
 			SET AUTOCOMMIT=1;
+			SELECT result;
 		END;
 
 	SELECT sf_get_permission1(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
+		SET result = 0;
 		IF _account_type = 'Faculty' OR _account_type = 'Librarian' THEN
 			SET AUTOCOMMIT=0;
 			START TRANSACTION;
@@ -290,7 +293,7 @@ BEGIN
 			SET AUTOCOMMIT=1, result = 1;
 		END IF;
 	END IF;
-
+	SELECT result;
 END$$
 DELIMITER ;
 
@@ -332,28 +335,35 @@ DELIMITER ;
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_check_account$$
 
-CREATE PROCEDURE sp_check_account(req_user_id INT, _password VARCHAR(100), OUT result INT, OUT user_id INT, OUT user_type INT, OUT user_name VARCHAR(50), OUT _address VARCHAR(50), OUT _phone VARCHAR(20), OUT _email VARCHAR(50), OUT _year INT)
+CREATE PROCEDURE sp_check_account(user_id INT, _password VARCHAR(100))
 BEGIN
 	-- result is 0 if login succeeds, otherwise login fails
 	-- 1 : no account or incorrect password
 	-- 2 : unknown account type
 	-- 3 : the number of consecutive login fail exceeds the limitation
-	DECLARE user_type_enum ENUM('Student', 'Faculty', 'Librarian', 'Admin');
+	DECLARE result INT DEFAULT 0;
+	DECLARE user_type ENUM('Student', 'Faculty', 'Librarian', 'Admin');
 	DECLARE EXIT HANDLER FOR NOT FOUND
 	BEGIN
-		SET result = '1', user_id = 0, user_type = '0', user_name = 'N/A', _address = 'N/A', _phone = 'N/A', _email = 'N/A', _year = '0';
+		SET result = 1;
+		SELECT result, '0' AS Account_id, '0' AS Account_type, 'N/A' AS Name, 'N/A' AS Address, 'N/A' AS Phone, 'N/A' AS Email, '0' AS Enroll_year;
 	END;
 
-	SELECT Account_type INTO user_type_enum FROM account WHERE Account_id = req_user_id AND Passwd = BINARY(_password);
+	SELECT Account_type INTO user_type FROM account WHERE Account_id = user_id AND Passwd = BINARY(_password);
 
-	IF user_type_enum = 'Admin' OR user_type_enum = 'Librarian' OR user_type_enum = 'Faculty' THEN
-		SELECT '0', Staff_id, Name, Address, Phone, Email, 0 INTO result, user_id, user_name, _address, _phone, _email, _year FROM staff WHERE Staff_id = req_user_id;
-		SET user_type = user_type_enum;
-	ELSEIF user_type_enum = 'Student' THEN
-		SELECT '0', Student_id, Name, Address, Phone, Email, Enroll_year INTO result, user_id, user_name, _address, _phone, _email, _year FROM student WHERE Student_id = req_user_id;
-		SET user_type = user_type_enum;
+	IF user_type = 'Admin' OR user_type = 'Librarian' OR user_type = 'Faculty' THEN
+		SET result = 0;
+		SELECT result, Staff_id AS Account_id, user_type AS Account_type, Name, Address, Phone, Email, 0 AS Enroll_year
+		FROM staff
+		WHERE Staff_id = user_id;
+	ELSEIF user_type = 'Student' THEN
+		SET result = 0;
+		SELECT result, Student_id AS Account_id, user_type AS Account_type, Name, Address, Phone, Email, Enroll_year
+		FROM student
+		WHERE Student_id = user_id;
 	ELSE
-		SET result = '2', user_id = 0, user_type = '0', user_name = 'N/A', _address = 'N/A', _phone = 'N/A', _email = 'N/A', _year = '0';
+		SET result = 2;
+		SELECT result, '0' AS Account_id, '0' AS Account_type, 'N/A' AS Name, 'N/A' AS Address, 'N/A' AS Phone, 'N/A' AS Email, '0' AS Enroll_year;
 	END IF;
 END$$
 DELIMITER ;
@@ -609,7 +619,7 @@ DROP PROCEDURE IF EXISTS sp_get_all_book$$
 
 CREATE PROCEDURE sp_get_all_book()
 BEGIN
-	SELECT b1.*, p1.Name AS Publsher_name, c1.Subject
+	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
 	FROM book AS b1, publisher AS p1, category AS c1
 	WHERE b1.Publisher_id = p1.Publisher_id AND
 			b1.Category_id = c1.Category_id;
@@ -621,9 +631,11 @@ DROP PROCEDURE IF EXISTS sp_search_book_by_book_id$$
 
 CREATE PROCEDURE sp_search_book_by_book_id(_book_id INT)
 BEGIN
-	SELECT b1.*, p1.Name AS Publsher_name
-	FROM book AS b1, publisher AS p1
-	WHERE b1.Book_id = _book_id AND b1.Publisher_id = p1.Publisher_id;
+	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
+	FROM book AS b1, publisher AS p1, category AS c1
+	WHERE b1.Book_id = _book_id AND
+			b1.Publisher_id = p1.Publisher_id AND
+			b1.Category_id = c1.Category_id;
 END$$
 DELIMITER ;
 
@@ -633,10 +645,11 @@ DROP PROCEDURE IF EXISTS sp_search_book_by_author_id$$
 CREATE PROCEDURE sp_search_book_by_author_id(_author_id INT)
 BEGIN
 	-- Performance Issue : "IN" can't search index in MySQL
-	SELECT b1.*, p1.Name AS Publsher_name
-	FROM book AS b1, publisher AS p1
+	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
+	FROM book AS b1, publisher AS p1, category AS c1
 	WHERE b1.Book_id IN (SELECT Book_id FROM book_author WHERE Author_id = _author_id) AND
-		b1.Publisher_id = p1.Publisher_id;
+		b1.Publisher_id = p1.Publisher_id AND
+		b1.Category_id = c1.Category_id;
 END$$
 DELIMITER ;
 
@@ -748,13 +761,13 @@ INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(),
 UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000; -- The first account is assumed to be 5000000 as an auto increment value.
 
 -- Admin's id is assumed to be 5000000
-CALL sp_create_account(5000000, 'Librarian', 'Librarian Name 1', 'Sydney', '0400000000', 'librarian1@vu.edu.au', 'password_e0', '0', @retValue);
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 1', 'Sydney', '0400000002', 'lecturer1@vu.edu.au', 'password_e1', '0', @retValue);
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 2', 'Sydney', '0400000003', 'lecturer2@vu.edu.au', 'password_e2', '0', @retValue);
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 3', 'Sydney', '0400000004', 'lecturer3@vu.edu.au', 'password_e3', '0', @retValue);
-CALL sp_create_account(5000000, 'Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014', @retValue);
-CALL sp_create_account(5000000, 'Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014', @retValue);
-CALL sp_create_account(5000000, 'Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014', @retValue);
+CALL sp_create_account(5000000, 'Librarian', 'Librarian Name 1', 'Sydney', '0400000000', 'librarian1@vu.edu.au', 'password_e0', '0');
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 1', 'Sydney', '0400000002', 'lecturer1@vu.edu.au', 'password_e1', '0');
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 2', 'Sydney', '0400000003', 'lecturer2@vu.edu.au', 'password_e2', '0');
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 3', 'Sydney', '0400000004', 'lecturer3@vu.edu.au', 'password_e3', '0');
+CALL sp_create_account(5000000, 'Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014');
+CALL sp_create_account(5000000, 'Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014');
+CALL sp_create_account(5000000, 'Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014');
 
 -- Librarian's id is assumed to be 5000001
 SELECT sf_create_section(5000001, 'C');
