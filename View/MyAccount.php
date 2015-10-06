@@ -4,11 +4,9 @@ Date Created:21 August 2015
 Date Modified :
 
 -->
-
-
 <?php
-		$tital="Category List";
-		include("./shared/Header.php");
+		$title = 'My Account';
+		require_once './shared/Header.php';
 ?>
 
   <div class="container-fluid">
@@ -31,20 +29,20 @@ Date Modified :
                            <form class="form-horizontal" role="form">
                                <div class="form-group">
 
-                                <label class="control-label col-sm-2"> ID</label>
+                                <label class="control-label col-sm-2">ID</label>
 
                                 <div class="col-sm-10">
-                                         <p class="form-control-static">4511875</p>
+                                         <p class="form-control-static"><?php echo $user->getId(); ?></p>
                                 </div>
 
 
                             </div>
                             <div class="form-group">
 
-                                <label class="control-label col-sm-2"> Name</label>
+                                <label class="control-label col-sm-2">Name</label>
 
                                 <div class="col-sm-10">
-                                         <p class="form-control-static">Brijender Partap Rana</p>
+                                         <p class="form-control-static"><?php echo $user->getName(); ?></p>
                                 </div>
 
 
@@ -52,30 +50,30 @@ Date Modified :
 
                               <div class="form-group">
 
-                                <label class="control-label col-sm-2"> Address</label>
+                                <label class="control-label col-sm-2">Address</label>
 
                                 <div class="col-sm-10">
-                                         <p class="form-control-static">#545 Kent Street, CBD NSW 2000</p>
+                                         <p class="form-control-static"><?php echo $user->getAddress(); ?></p>
                                 </div>
 
 
                             </div>
                             <div class="form-group">
 
-                                <label class="control-label col-sm-2"> Phone</label>
+                                <label class="control-label col-sm-2">Phone</label>
 
                                 <div class="col-sm-10">
-                                         <p class="form-control-static">046611111</p>
+                                         <p class="form-control-static"><?php echo $user->getPhone(); ?></p>
                                 </div>
 
 
                             </div>
                              <div class="form-group">
 
-                                <label class="control-label col-sm-2"> Email</label>
+                                <label class="control-label col-sm-2">Email</label>
 
                                 <div class="col-sm-10">
-                                         <p class="form-control-static">test@test.com</p>
+                                         <p class="form-control-static"><?php echo $user->getEmail(); ?></p>
                                 </div>
 
 
@@ -98,5 +96,5 @@ Date Modified :
 
 
 <?php
-	include("./shared/Footer.php");
+	require_once './shared/Footer.php';
 ?>

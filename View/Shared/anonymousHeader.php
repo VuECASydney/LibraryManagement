@@ -1,11 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-   
-         <title> <?php echo( $tital) ?> </title>
-
+    <title> <?php echo($title) ?> </title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../Css/bootstrap.min.css" rel="stylesheet">
@@ -33,5 +29,3 @@
     <div id="anonymouswrapper">
 
         <div id="anonymouspage-wrapper">
-
-     

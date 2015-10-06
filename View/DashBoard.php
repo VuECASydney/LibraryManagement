@@ -1,12 +1,25 @@
-
 <!-- 
 Author : Brijender Parta Rana
 Date Created:21 August 2015
 Date Modified :
-
 -->
-         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
- <script type="text/javascript">
+<?php
+		$title="Dash Board";
+		//if($role="staff")
+		//{
+			require_once './shared/Header.php';
+		//}
+		//if else($role="Lib")
+		//{
+		//	require_once './shared/libHeader.php';
+		//}
+		//else
+		//{
+		//	require_once './shared/StudentHeader.php';
+		//}
+?>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+            <script type="text/javascript">
   $(document).ready(function () {
 
     $('#BookReport').highcharts({
@@ -67,8 +80,8 @@ Date Modified :
         }]
     });
     });
-    </script>
-         <script type="text/javascript">
+            </script>
+            <script type="text/javascript">
        $(function () {
     $('#FineDUe').highcharts({
         chart: {
@@ -135,33 +148,15 @@ Date Modified :
         }]
     });
 });
-		</script>
+            </script>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div id="BookReport" ></div>
+                </div>
+                <div class="col-lg-6">
+                    <div id="FineDUe" ></div>
+                </div>
+            </div>
 <?php
-		$tital="Home Page";
-		//if($role="staff")
-		//{
-			include("./shared/Header.php");
-		//}
-		//if else($role="Lib")
-		//{
-		//	include("./shared/libHeader.php");
-		//}
-		//else
-		//{
-		//	include("./shared/StudentHeader.php");
-		//}
-?>
-                      <div class="row">
-                            <div class="col-lg-6">
-                                            <div id="BookReport" ></div>
-                            </div>
-                            <div class="col-lg-6">
-                                            <div id="FineDUe" ></div>
-                            </div>
-                        </div>
-
-
-
-<?php
-	include("./shared/Footer.php");
+require_once './shared/Footer.php';
 ?>

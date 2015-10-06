@@ -4,11 +4,9 @@ Date Created:21 August 2015
 Date Modified :
 
 -->
-
-
 <?php
-		$tital="Category List";
-		include("./shared/Header.php");
+		$title = 'Category List';
+		require_once './shared/Header.php';
 ?>
 
   <div class="container-fluid">
@@ -292,5 +290,5 @@ Date Modified :
 
 
 <?php
-	include("./shared/Footer.php");
+	require_once './shared/Footer.php';
 ?>

@@ -357,9 +357,9 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_check_account$$
+DROP PROCEDURE IF EXISTS sp_login_account$$
 
-CREATE PROCEDURE sp_check_account(user_id INT, _password VARCHAR(100))
+CREATE PROCEDURE sp_login_account(user_id INT, _password VARCHAR(100))
 BEGIN
 	-- result is 0 if login succeeds, otherwise login fails
 	-- 1 : no account or incorrect password
@@ -787,7 +787,7 @@ FLUSH PRIVILEGES;
 GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'user'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
-GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLES, CREATE VIEW, EVENT, INDEX, INSERT, REFERENCES, TRIGGER, UPDATE, LOCK TABLES  ON `library`.* TO 'guest'@'localhost' WITH GRANT OPTION;
+GRANT EXECUTE  ON PROCEDURE `library`.`sp_login_account` TO 'guest'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Account property should be created manually.

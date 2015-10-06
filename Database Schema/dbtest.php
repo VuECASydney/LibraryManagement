@@ -5,6 +5,20 @@
 // sp_reset_password - reset user's password
 // sp_create_account - create user account
 
+require('DbInterface.php');
+/*
+$conn = new DBConn_Login();
+$conn->connect();
+
+$user_id = 5000000;
+$user_pass = 'password_e0';
+
+$conn->login($user_id, $user_pass);
+*/
+$user_id = 5000000;
+$user_pass = 'password_e0';
+ConnectionFactory::getInstance($user_id, $user_pass);
+
 function testFunc1()
 {
 	// Connection Test Code
@@ -51,6 +65,6 @@ function testFunc2()
 
 //testFunc1();
 
-testFunc2();
+//testFunc2();
 
 ?>

@@ -1,15 +1,13 @@
+<?php
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Account.php';
+redirectPageWithoutSession();
+$user = getUserInfo();
+$role = $user->getRole(); // "Admin";
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<?php
-
-	$role="Admin";
-
-    ?>
-   
-     <title> <?php echo( $tital) ?> </title>
-
+    <title> <?php echo($title) ?> </title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../Css/bootstrap.css" rel="stylesheet">
@@ -33,16 +31,13 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-  <!--  <script type="text/javascript" src="../js/jquery.js"></script>-->
+    <!--<script type="text/javascript" src="../js/jquery.js"></script>-->
 
-
-
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
-<script type="text/javascript" src="../js/highcharts.js"></script>
-
+    <script type="text/javascript" src="../js/highcharts.js"></script>
     <script type="text/javascript" src="../js/exporting.js"></script>
 </head>
 
@@ -74,7 +69,7 @@
                                         <img class="media-object" src="http://placehold.it/50x50" alt="">
                                     </span>
                                     <div class="media-body">
-                                        <h5 class="media-heading"><strong>Brijender P Rana</strong>
+                                        <h5 class="media-heading"><strong><?php echo $user->getName(); ?></strong>
                                         </h5>
                                         <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
                                         <p>Lorem ipsum dolor sit amet, consectetur...</p>
@@ -89,7 +84,7 @@
                                         <img class="media-object" src="http://placehold.it/50x50" alt="">
                                     </span>
                                     <div class="media-body">
-                                        <h5 class="media-heading"><strong>Brijender P Rana</strong>
+                                        <h5 class="media-heading"><strong><?php echo $user->getName(); ?></strong>
                                         </h5>
                                         <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
                                         <p>Lorem ipsum dolor sit amet, consectetur...</p>
@@ -104,7 +99,7 @@
                                         <img class="media-object" src="http://placehold.it/50x50" alt="">
                                     </span>
                                     <div class="media-body">
-                                        <h5 class="media-heading"><strong>Brijender P Rana</strong>
+                                        <h5 class="media-heading"><strong><?php echo $user->getName(); ?></strong>
                                         </h5>
                                         <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
                                         <p>Lorem ipsum dolor sit amet, consectetur...</p>
@@ -145,20 +140,20 @@
                     </ul>
                 </li>
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i>  Brijender P rana <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i><?php echo $user->getName(); ?><b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                            <a href="#"><i class="fa fa-fw fa-user"></i>Profile</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
+                            <a href="#"><i class="fa fa-fw fa-envelope"></i>Inbox</a>
                         </li>
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                            <a href="#"><i class="fa fa-fw fa-gear"></i>Settings</a>
                         </li>
                         <li class="divider"></li>
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                            <a href='Logout.php'><i class="fa fa-fw fa-power-off"></i>Log Out</a>
                         </li>
                     </ul>
                 </li>
@@ -168,7 +163,7 @@
                 <ul class="nav navbar-nav side-nav">
 				  <?php
 
-                   if($role=="Admin" or $role=="Lib"){
+                   if($role=="Admin" or $role=="Librarian"){
 
                     	echo("
 							<li class=\"active\">
@@ -264,9 +259,9 @@
             </div>
             <!-- /.navbar-collapse -->
         </nav>
-        <?php
-               ini_set('display_errors',1);
+<?php
+            ini_set('display_errors',1);
             ini_set('display_startup_errors',1);
             error_reporting(-1);
-            ?>
+?>
         <div id="page-wrapper">
