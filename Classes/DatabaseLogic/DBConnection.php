@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Account.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConfig.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Globel/Collection.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Collection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Section.php';
 
