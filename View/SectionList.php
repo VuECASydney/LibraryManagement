@@ -1,12 +1,12 @@
-<!--
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
-
--->
 <?php
-$title = "Section List";
-require_once './shared/Header.php';
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
+$title = 'Section List';
+require_once './Shared/Header.php';
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->
@@ -106,5 +106,5 @@ require_once './shared/Header.php';
             </div>
             <!-- /.container-fluid -->
 <?php
-include("./shared/Footer.php");
+require_once './Shared/Footer.php';
 ?>

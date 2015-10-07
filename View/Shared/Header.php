@@ -1,8 +1,14 @@
 <?php
+/**
+ * Author : Brijender Parta Rana, Choongyeol Kim
+ * Date Created : 26 August 2015
+ * Date Modified : 
+ */
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Account.php';
 redirectPageWithoutSession();
 $user = getUserInfo();
-$role = $user->getRole(); // "Admin";
+$role = $user->getRole();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,9 +48,7 @@ $role = $user->getRole(); // "Admin";
 </head>
 
 <body>
-
     <div id="wrapper">
-
         <!-- Navigation -->
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -161,100 +165,80 @@ $role = $user->getRole(); // "Admin";
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-				  <?php
-
-                   if($role=="Admin" or $role=="Librarian"){
-
+				<?php
+                    if($role=="Admin" or $role=="Librarian"){
                     	echo("
-							<li class=\"active\">
-								<a href=\"maindashboard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
-							</li>
-
-
-							<li>
-								<a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> Categories</a>
-							</li>
-
-							 <li>
-								<a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i> Author</a>
-							</li>
-                             <li>
-								<a href=\"Publisherlist.php\"><i class=\"fa fa-share-square-o\"></i> Publisher</a>
-							</li>
-							 <li>
-								<a href=\"SectionList.php\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
-							</li>
-							<li>
-								 <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#books\"><i class=\"fa fa-fw fa-arrows-v\"></i> Books <i class=\"fa fa-fw fa-caret-down\"></i></a>
-								<ul id=\"books\" class=\"collapse\">
-									<li>
-										<a href=\"BookList.php\">Books</a>
-									</li>
-									<li>
-										<a href=\"#\">Issue Books</a>
-									</li>
-									<li>
-										<a href=\"bookreturn.php\">Return Books</a>
-									</li>
-									<li>
-										<a href=\"#\">Reserve Books</a>
-									</li>
-								</ul>
-							</li>
-							 
-								".(($role=="Admin")?(
-										"<li>
-											<a href=\"userlist.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
-										</li>"
+                    <li class=\"active\">
+                        <a href=\"maindashboard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> Categories</a>
+                    </li>
+                    <li>
+                        <a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i> Author</a>
+                    </li>
+                    <li>
+                        <a href=\"Publisherlist.php\"><i class=\"fa fa-share-square-o\"></i> Publisher</a>
+                    </li>
+                    <li>
+                        <a href=\"SectionList.php\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
+                    </li>
+                    <li>
+                        <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#books\"><i class=\"fa fa-fw fa-arrows-v\"></i> Books <i class=\"fa fa-fw fa-caret-down\"></i></a>
+                        <ul id=\"books\" class=\"collapse\">
+                            <li>
+                                <a href=\"BookList.php\">Books</a>
+                            </li>
+                            <li>
+                                <a href=\"#\">Issue Books</a>
+                            </li>
+                            <li>
+                                <a href=\"bookreturn.php\">Return Books</a>
+                            </li>
+                            <li>
+                                <a href=\"#\">Reserve Books</a>
+                            </li>
+                        </ul>
+                    </li>
+                    ".(($role=="Admin")?(
+                    "<li>
+                        <a href=\"userlist.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
+                    </li>"
 								):""
 								)."
-							
-							<li>
-								<a href=\"bootstrap-elements.html\"><i class=\"fa fa-fw fa-desktop\"></i> Fines</a>
-							</li>
-						
-										".(($role=="Admin")?(
-											"<li>
-												<a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#fine\"><i class=\"fa fa-fw fa-arrows-v\"></i> Reports <i class=\"fa fa-fw fa-caret-down\"></i></a>
-												<ul id=\"fine\" class=\"collapse\">
-													<li>
-														<a href=\"#\">Fine Report</a>
-													</li>
-													<li>
-														<a href=\"#\">Books Report</a>
-													</li>
-												</ul>
-										   </li>"
+                    <li>
+                        <a href=\"bootstrap-elements.html\"><i class=\"fa fa-fw fa-desktop\"></i> Fines</a>
+                    </li>
+                    ".(($role=="Admin")?(
+                    "<li>
+                        <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#fine\"><i class=\"fa fa-fw fa-arrows-v\"></i> Reports <i class=\"fa fa-fw fa-caret-down\"></i></a>
+                        <ul id=\"fine\" class=\"collapse\">
+                            <li>
+                                <a href=\"#\">Fine Report</a>
+                            </li>
+                            <li>
+                                <a href=\"#\">Books Report</a>
+                            </li>
+                        </ul>
+                    </li>"
 									):"" 
 								)."
-
-
-                    ");
-                   } else{
-
+");
+                    } else{
                     	echo("
-							<li class=\"active\">
-								<a href=\"myaccount.php\"><i class=\"fa fa-fw fa-dashboard\"></i> My Account</a>
-							</li>
-
-
-							<li>
-								<a href=\"myBook.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> My Books</a>
-							</li>
-
-							 <li>
-								<a href=\"myFine.php\"><i class=\"fa fa-edit\"></i> My Fine Dues</a>
-							</li>
-
-							</li>
-
-
-
-
-
+                            <li class=\"active\">
+                                <a href=\"myaccount.php\"><i class=\"fa fa-fw fa-dashboard\"></i> My Account</a>
+                            </li>
+                            <li>
+                                <a href=\"myBook.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> My Books</a>
+                            </li>
+                            <li>
+                                <a href=\"myFine.php\"><i class=\"fa fa-edit\"></i> My Fine Dues</a>
+                            </li>
+                        </li>
                     ");
-                   }
-                   ?>
+                    }
+                ?>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->

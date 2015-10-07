@@ -1,14 +1,12 @@
-﻿<!--
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
-
--->
-
-
 <?php
-		$tital="Edit Book";
-		include("./shared/Header.php");
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
+	$title = 'Edit Book';
+	require_once './Shared/Header.php';
 ?>
 
   <div class="container-fluid">
@@ -298,5 +296,5 @@ Date Modified :
 
 
 <?php
-	include("./shared/Footer.php");
+	require_once './Shared/Footer.php';
 ?>

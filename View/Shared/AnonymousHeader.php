@@ -25,7 +25,5 @@
 </head>
 
 <body>
-
     <div id="anonymouswrapper">
-
         <div id="anonymouspage-wrapper">

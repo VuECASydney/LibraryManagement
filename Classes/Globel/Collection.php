@@ -1,13 +1,14 @@
-﻿<?php
-	namespace Globel;
+<?php
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 17 September 2015
+ * Date Modified : 
+ */
 
-	
-  public class Collection{
-	
+class Collection {
     private $items = array();
 
-   public function addItem($obj, $key = null) {
-
+    public function addItem($obj, $key = null) {
         if ($key == null) {
             $this->items[] = $obj;
         }
@@ -20,11 +21,10 @@
             }
         }
     }
-	
-       public function deleteItem($key) {
 
+    public function deleteItem($key) {
         if (isset($this->items[$key])) {
-            unset($this- >items[$key]);
+            unset($this->items[$key]);
         }
         else {
             throw new KeyInvalidException("Invalid key $key.");
@@ -32,7 +32,6 @@
     }
 
     public function getItem($key) {
-
         if (isset($this->items[$key])) {
             return $this->items[$key];
         }
@@ -42,22 +41,15 @@
     }
 
     public function keys() {
-
         return array_keys($this->items);
     }
 
     public function length() {
-
          return count($this->items);
     }
 
     public function keyExists($key) {
-
         return isset($this->items[$key]);
     }
-
-
-  }
-
-
+}
 ?>

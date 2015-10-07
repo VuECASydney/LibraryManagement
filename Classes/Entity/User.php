@@ -1,6 +1,4 @@
 <?php
-namespace LibraryManagement\Entity;
-
 class User
 {
 	/**

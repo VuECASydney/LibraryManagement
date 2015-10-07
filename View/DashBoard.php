@@ -1,22 +1,23 @@
-<!-- 
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
--->
 <?php
-		$title="Dash Board";
-		//if($role="staff")
-		//{
-			require_once './shared/Header.php';
-		//}
-		//if else($role="Lib")
-		//{
-		//	require_once './shared/libHeader.php';
-		//}
-		//else
-		//{
-		//	require_once './shared/StudentHeader.php';
-		//}
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
+	$title = 'Dash Board';
+	//if($role="staff")
+	//{
+		require_once './Shared/Header.php';
+	//}
+	//if else($role="Librarian")
+	//{
+	//	require_once './Shared/libHeader.php';
+	//}
+	//else
+	//{
+	//	require_once './Shared/StudentHeader.php';
+	//}
 ?>
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
             <script type="text/javascript">
@@ -154,9 +155,9 @@ Date Modified :
                     <div id="BookReport" ></div>
                 </div>
                 <div class="col-lg-6">
-                    <div id="FineDUe" ></div>
+                    <div id="FineDue" ></div>
                 </div>
             </div>
 <?php
-require_once './shared/Footer.php';
+require_once './Shared/Footer.php';
 ?>

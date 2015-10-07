@@ -1,9 +1,10 @@
-<!-- 
-Author : Choongyeol Kim
-Date Created : 7 October 2015
-Date Modified : 
--->
 <?php
+/**
+ * Author : Choongyeol Kim
+ * Date Created : 7 October 2015
+ * Date Modified : 
+ */
+
 require_once './Shared/Account.php';
 logout();
 

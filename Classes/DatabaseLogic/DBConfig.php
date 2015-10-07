@@ -1,5 +1,9 @@
 <?php
-namespace LibraryManagement\DataBaseLayer;
+/**
+ * Author : Choongyeol Kim
+ * Date Created : 7 October 2015
+ * Date Modified : 
+ */
 
 // Admin account and password
 const ADMIN_NAME = 'admin';

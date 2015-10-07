@@ -1,14 +1,12 @@
-﻿<!--
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
-
--->
-
-
 <?php
-		$tital="Books ";
-		include("./shared/Header.php");
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
+	$title = 'Books';
+	require_once './Shared/Header.php';
 ?>
      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <div class="container-fluid">
@@ -157,5 +155,5 @@ Date Modified :
 
 
 <?php
-	include("./shared/Footer.php");
+	require_once './Shared/Footer.php';
 ?>

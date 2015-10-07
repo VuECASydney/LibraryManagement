@@ -1,15 +1,14 @@
-<!-- 
-Author : Choongyeol Kim
-Date Created : 7 October 2015
-Date Modified : 
--->
 <?php
+/**
+ * Author : Choongyeol Kim
+ * Date Created : 7 October 2015
+ * Date Modified : 
+ */
+
 require_once './Shared/Account.php';
 redirectPageWithSession();
 
 require_once '../Classes/DatabaseLogic/DBConnection.php';
-
-use LibraryManagement\DataBaseLayer\DBConnection;
 
 $user = login('index.php');
 $redirect_page = getRedirectPageByRole($user->getRole());

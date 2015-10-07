@@ -1,14 +1,14 @@
-<!-- 
-Author : Choongyeol Kim
-Date Created : 7 October 2015
-Date Modified : 
--->
 <?php
+/**
+ * Author : Choongyeol Kim
+ * Date Created : 7 October 2015
+ * Date Modified : 
+ */
+
 session_start();
 const USER_INFO = 'userinfo';
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
-use LibraryManagement\Entity\User;
 
 function getRedirectPageByRole($role)
 {

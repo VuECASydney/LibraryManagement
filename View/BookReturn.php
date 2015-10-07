@@ -1,14 +1,12 @@
-﻿<!--
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
-
--->
-
-
 <?php
-		$tital="Books Return ";
-		include("./shared/Header.php");
+/**
+ * Author : Brijender Parta Rana
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
+	$title = 'Books Return';
+	require_once './Shared/Header.php';
 ?>
 
   <div class="container-fluid">
@@ -107,12 +105,6 @@ Date Modified :
 
             </div>
             <!-- /.container-fluid -->
-
-
-
-<?php
-	include("./shared/Footer.php");
-?>
 <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="edit" aria-hidden="true">
       <div class="modal-dialog">
     <div class="modal-content">
@@ -147,3 +139,6 @@ Date Modified :
   </div>
       <!-- /.modal-dialog -->
     </div>
+<?php
+	require_once './Shared/Footer.php';
+?>

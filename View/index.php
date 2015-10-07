@@ -1,10 +1,10 @@
-<!-- 
-Author : Brijender Parta Rana
-Date Created:21 August 2015
-Date Modified :
-
--->
 <?php
+/**
+ * Author : Brijender Parta Rana, Choongyeol Kim
+ * Date Created : 21 August 2015
+ * Date Modified : 
+ */
+
 require_once './Shared/Account.php';
 redirectPageWithSession();
 
@@ -14,7 +14,6 @@ require_once './Shared/AnonymousHeader.php';
             <script type="text/javascript">
                     function OnSubmitForm()
                     {
-
                      var username  =document.getElementById("inputEmail3").value ;
                       var pwd  =document.getElementById("inputPassword3").value ;
 
