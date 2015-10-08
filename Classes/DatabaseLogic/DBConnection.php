@@ -6,6 +6,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Sect
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Publisher.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Author.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Book.php';
 
 abstract class DBInterface
 {
@@ -201,6 +202,35 @@ class DBConn_Librarian extends DBConn_User
 		$this->close();
 		return $collection;
 	}
+
+	function getAllBook()
+	{
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_book()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$book = new Book();
+				$book->setBookId($obj->Book_id);
+				$book->setTitle($obj->Title);
+				$book->setPublisherId($obj->Publisher_id);
+				$book->setIsbn($obj->Isbn);
+				$book->setCategoryId($obj->Category_id);
+				$book->setPublisherName($obj->Publisher_name);
+				$book->setCategoryName($obj->Subject);
+				$collection->addItem($book, $obj->Book_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+		return $collection;
+	}
+
 }
 
 class DbConn_Admin extends DBConn_Librarian
