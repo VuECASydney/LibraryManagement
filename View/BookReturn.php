@@ -6,7 +6,7 @@
  */
 
 	$title = 'Books Return';
-	require_once './Shared/Header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 ?>
 
   <div class="container-fluid">
@@ -21,7 +21,7 @@
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
                             </li>
                              <li>
-                                <i class="fa fa-dashboard"></i>  <a href="booklist.php">Book</a>
+                                <i class="fa fa-dashboard"></i>  <a href="BookList.php">Book</a>
                             </li>
                             <li class="active">
                                 <i class="fa fa-edit"></i> Book Return
@@ -140,5 +140,5 @@
       <!-- /.modal-dialog -->
     </div>
 <?php
-	require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

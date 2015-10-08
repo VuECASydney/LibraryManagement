@@ -5,7 +5,7 @@
  * Date Modified : 
  */
 
-require_once './Shared/Account.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 logout();
 
 function logout()

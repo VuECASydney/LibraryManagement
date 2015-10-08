@@ -8,15 +8,15 @@
 	$title = 'Dash Board';
 	//if($role="staff")
 	//{
-		require_once './Shared/Header.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 	//}
 	//if else($role="Librarian")
 	//{
-	//	require_once './Shared/libHeader.php';
+	//	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/LibHeader.php';
 	//}
 	//else
 	//{
-	//	require_once './Shared/StudentHeader.php';
+	//	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/StudentHeader.php';
 	//}
 ?>
             <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -159,5 +159,5 @@
                 </div>
             </div>
 <?php
-require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

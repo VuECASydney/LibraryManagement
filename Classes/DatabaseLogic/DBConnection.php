@@ -1,5 +1,4 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Account.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConfig.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Collection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
@@ -71,7 +70,7 @@ class DBConn_Librarian extends DBConn_User
 
 	function __destruct()
 	{
-		echo '~DBConn_Librarian<br />';
+		//echo '~DBConn_Librarian<br />';
 	}
 
 	function getAllSection()
@@ -79,52 +78,17 @@ class DBConn_Librarian extends DBConn_User
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_section()");
 
-		$collection = NULL;
+		$collection = new Collection();
 		if ($result)
 		{
-			//var_dump($result);
 			//$row = $result->fetch_assoc();
 			while ($obj = $result->fetch_object())
 			{
-				echo '<br /><br />';
-				var_dump($obj);
-				if (!$collection)
-				{
-					$collection = new Collection();
-				}
-
 				$section = new Section();
 				$section->setId($obj->Section_id);
 				$section->setName($obj->Section_name);
-				$collection->addItem($obj, $obj->getId());
-				echo '<br /><br />';
+				$collection->addItem($obj, $section->getId());
 			}
-			var_dump($collection);
-			/*
-			if ($obj)
-			{
-				//var_dump($obj);
-				$retVal = $obj->result;
-				switch ($obj->result)
-				{
-					case 0:
-						$user = new User();
-						$user->setId($obj->Account_id);
-						$user->setName($obj->Name);
-						$user->setRole($obj->Account_type);
-						$user->setAddress($obj->Address);
-						$user->setPhone($obj->Phone);
-						$user->setEmail($obj->Email);
-						$user->setEnrollYear($obj->Enroll_year);
-						//echo 'Before<br /><br />'; var_dump($user); echo 'After<br /><br />';
-						break;
-					case 1:
-						break;
-					case 2:
-						break;
-				}
-			}
-			*/
 			$result->close(); // for fetch_object()
 		}
 		else

@@ -227,13 +227,13 @@ $role = $user->getRole();
                     } else{
                     	echo("
                             <li class=\"active\">
-                                <a href=\"myaccount.php\"><i class=\"fa fa-fw fa-dashboard\"></i> My Account</a>
+                                <a href=\"MyAccount.php\"><i class=\"fa fa-fw fa-dashboard\"></i> My Account</a>
                             </li>
                             <li>
-                                <a href=\"myBook.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> My Books</a>
+                                <a href=\"MyBook.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> My Books</a>
                             </li>
                             <li>
-                                <a href=\"myFine.php\"><i class=\"fa fa-edit\"></i> My Fine Dues</a>
+                                <a href=\"MyFine.php\"><i class=\"fa fa-edit\"></i> My Fine Dues</a>
                             </li>
                         </li>
                     ");

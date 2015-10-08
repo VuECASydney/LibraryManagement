@@ -5,10 +5,10 @@
  * Date Modified : 
  */
 
-require_once './Shared/Account.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithSession();
 
-require_once '../Classes/DatabaseLogic/DBConnection.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
 $user = login('index.php');
 $redirect_page = getRedirectPageByRole($user->getRole());

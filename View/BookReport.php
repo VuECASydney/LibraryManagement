@@ -6,7 +6,7 @@
  */
 
 	$title = 'Books';
-	require_once './Shared/Header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 ?>
      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
   <div class="container-fluid">
@@ -155,5 +155,5 @@
 
 
 <?php
-	require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

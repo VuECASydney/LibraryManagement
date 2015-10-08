@@ -6,7 +6,7 @@
  */
 
 		$title = 'My Account';
-		require_once './Shared/Header.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->
@@ -60,5 +60,5 @@
             </div>
             <!-- /.container-fluid -->
 <?php
-	require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

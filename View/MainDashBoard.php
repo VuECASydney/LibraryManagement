@@ -8,23 +8,23 @@
 	$title = 'Home Page';
 	//if($role="staff")
 	//{
-		require_once './Shared/Header.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 	//}
 	//if else($role="Lib")
 	//{
-	//require_once './Shared/libHeader.php';
+	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/LibHeader.php';
 	//}
 	//else
 	//{
-	//require_once './Shared/StudentHeader.php';
+	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/StudentHeader.php';
 	//}
 
 	if ($role=="Admin") {
-		require_once 'dashboard.php';
+		require_once './DashBoard.php';
 	} else if ($role=="Lib") {
-		require_once 'booklist.php';
+		require_once './BookList.php';
 	} else {
-	//require_once './shared/Header.php';
+	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 	}
-	require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

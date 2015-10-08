@@ -5,11 +5,11 @@
  * Date Modified : 
  */
 
-require_once './Shared/Account.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithSession();
 
 $title='Home Page';
-require_once './Shared/AnonymousHeader.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/AnonymousHeader.php';
 ?>
             <script type="text/javascript">
                     function OnSubmitForm()
@@ -19,17 +19,17 @@ require_once './Shared/AnonymousHeader.php';
 
                       if(username=="Admin" && pwd=="Admin")
                       {
-                        document.getElementById("myForm").action ="dashboard.php?role=Admin";
+                        document.getElementById("myForm").action ="DashBoard.php?role=Admin";
                               // document.myform.submit();
                       }
                       else if (username=="lib" && pwd=="lib")
                       {
-                        document.getElementById("myForm").action ="booklist.php?role=lib";
+                        document.getElementById("myForm").action ="BookList.php?role=lib";
                           //document.myform.submit();
                       }
                       else{
 
-                        document.getElementById("myForm").action ="myaccount.php?role=staff";
+                        document.getElementById("myForm").action ="MyAccount.php?role=staff";
                       }
                       return true;
                     }
@@ -71,5 +71,5 @@ require_once './Shared/AnonymousHeader.php';
 			</form>
 
 <?php
-require_once './Shared/Footer.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
