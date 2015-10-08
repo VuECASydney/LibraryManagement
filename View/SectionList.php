@@ -1,12 +1,22 @@
 <?php
 /**
- * Author : Brijender Parta Rana
+ * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 21 August 2015
  * Date Modified : 
  */
 
 $title = 'Section List';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
+
+$user = getUserInfo();
+$role = $user->getRole();
+$conn = DBConnection::getConnection($role);
+$collection = NULL;
+if ($conn)
+{
+	$collection = $conn->getAllSection();
+}
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->
@@ -41,54 +51,22 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.
                                 </tr>
                             </thead>
                             <tbody>
+<?php
+if ($collection)
+{
+	$iter = $collection->iterator();
+	foreach ($iter as $key => $value) {
+?>
                                 <tr>
-                                    <td>1</td>
-                                    <td>C </td>
+                                    <td><?php echo $key; ?></td>
+                                    <td><?php echo $value; ?></td>
                                     <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
                                     <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
                                 </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>C-4</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>C-5</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>C-1</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>5</td>
-                                    <td>C-1</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>6</td>
-                                    <td>C-1</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>7</td>
-                                    <td>C-1</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
-                                <tr>
-                                    <td>8</td>
-                                    <td>C-1</td>
-                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                </tr>
+<?php
+	}
+}
+?>
                             </tbody>
                         </table>
                         <script type="text/javascript">

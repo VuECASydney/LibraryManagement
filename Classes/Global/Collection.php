@@ -1,6 +1,6 @@
 <?php
 /**
- * Author : Brijender Parta Rana
+ * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 17 September 2015
  * Date Modified : 
  */
@@ -51,5 +51,9 @@ class Collection {
     public function keyExists($key) {
         return isset($this->items[$key]);
     }
+
+	public function iterator() {
+		return new ArrayIterator($this->items);
+	}
 }
 ?>

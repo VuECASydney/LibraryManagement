@@ -2,7 +2,6 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConfig.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Collection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Section.php';
 
 abstract class DBInterface
 {
@@ -84,19 +83,13 @@ class DBConn_Librarian extends DBConn_User
 			//$row = $result->fetch_assoc();
 			while ($obj = $result->fetch_object())
 			{
-				$section = new Section();
-				$section->setId($obj->Section_id);
-				$section->setName($obj->Section_name);
-				$collection->addItem($obj, $section->getId());
+				$collection->addItem($obj->Section_name, $obj->Section_id);
 			}
 			$result->close(); // for fetch_object()
 		}
-		else
-		{
-			echo 'Result NULL<br /><br />';
-		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+		return $collection;
 	}
 }
 
