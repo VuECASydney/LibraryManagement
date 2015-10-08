@@ -2,6 +2,8 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConfig.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Collection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Section.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Category.php';
 
 abstract class DBInterface
 {
@@ -83,7 +85,38 @@ class DBConn_Librarian extends DBConn_User
 			//$row = $result->fetch_assoc();
 			while ($obj = $result->fetch_object())
 			{
-				$collection->addItem($obj->Section_name, $obj->Section_id);
+				//$collection->addItem($obj->Section_name, $obj->Section_id);
+				$section = new Section();
+				$section->setId($obj->Section_id);
+				$section->setName($obj->Section_name);
+				$collection->addItem($section, $obj->Section_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+		return $collection;
+	}
+
+	function getAllCategory()
+	{
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_category()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$category = new Category();
+				$category->setId($obj->Category_id);
+				$category->setSubject($obj->Subject);
+				$category->setParentId($obj->Parent_id);
+				$category->setSectionId($obj->Section_id);
+				$category->setParentSubject($obj->Parent_subject);
+				$category->setSectionName($obj->Section_name);
+				$collection->addItem($category, $obj->Category_id);
 			}
 			$result->close(); // for fetch_object()
 		}

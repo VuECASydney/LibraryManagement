@@ -58,8 +58,8 @@ if ($collection)
 	foreach ($iter as $key => $value) {
 ?>
                                 <tr>
-                                    <td><?php echo $key; ?></td>
-                                    <td><?php echo $value; ?></td>
+                                    <td><?php echo $value->getId(); ?></td>
+                                    <td><?php echo $value->getName(); ?></td>
                                     <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
                                     <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
                                 </tr>
