@@ -5,6 +5,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Section.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Category.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Publisher.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Author.php';
 
 abstract class DBInterface
 {
@@ -142,6 +143,29 @@ class DBConn_Librarian extends DBConn_User
 				$publisher->setAddress($obj->Address);
 				$publisher->setPhone($obj->Phone);
 				$collection->addItem($publisher, $obj->Publisher_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+		return $collection;
+	}
+
+	function getAllAuthor()
+	{
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_author()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$author = new Author();
+				$author->setId($obj->Author_id);
+				$author->setName($obj->Author_name);
+				$collection->addItem($author, $obj->Author_id);
 			}
 			$result->close(); // for fetch_object()
 		}

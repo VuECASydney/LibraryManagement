@@ -18,9 +18,7 @@ if ($conn)
 	$collection = $conn->getAllPublisher();
 }
 ?>
-
-  <div class="container-fluid">
-
+            <div class="container-fluid">
                 <!-- Page Heading -->
                 <div class="row">
                     <div class="col-lg-12">
