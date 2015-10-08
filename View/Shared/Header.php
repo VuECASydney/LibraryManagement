@@ -169,16 +169,16 @@ $role = $user->getRole();
                     if($role=="Admin" or $role=="Librarian"){
                     	echo("
                     <li class=\"active\">
-                        <a href=\"maindashboard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
+                        <a href=\"MainDashBoard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
                     </li>
                     <li>
                         <a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> Categories</a>
                     </li>
                     <li>
-                        <a href=\"Authorlist.php\"><i class=\"fa fa-edit\"></i> Author</a>
+                        <a href=\"AuthorList.php\"><i class=\"fa fa-edit\"></i> Author</a>
                     </li>
                     <li>
-                        <a href=\"Publisherlist.php\"><i class=\"fa fa-share-square-o\"></i> Publisher</a>
+                        <a href=\"PublisherList.php\"><i class=\"fa fa-share-square-o\"></i> Publisher</a>
                     </li>
                     <li>
                         <a href=\"SectionList.php\"><i class=\"fa fa-fw fa-wrench\"></i>Section</a>
@@ -193,7 +193,7 @@ $role = $user->getRole();
                                 <a href=\"#\">Issue Books</a>
                             </li>
                             <li>
-                                <a href=\"bookreturn.php\">Return Books</a>
+                                <a href=\"BookReturn.php\">Return Books</a>
                             </li>
                             <li>
                                 <a href=\"#\">Reserve Books</a>
@@ -202,7 +202,7 @@ $role = $user->getRole();
                     </li>
                     ".(($role=="Admin")?(
                     "<li>
-                        <a href=\"userlist.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
+                        <a href=\"UserList.php\"><i class=\"fa fa-fw fa-edit\"></i> User</a>
                     </li>"
 								):""
 								)."

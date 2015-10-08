@@ -1,12 +1,22 @@
 <?php
 /**
- * Author : Brijender Parta Rana
+ * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 21 August 2015
  * Date Modified : 
  */
 
-	$title = 'Publisher List';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
+$title = 'Publisher List';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
+
+$user = getUserInfo();
+$role = $user->getRole();
+$conn = DBConnection::getConnection($role);
+$collection = NULL;
+if ($conn)
+{
+	$collection = $conn->getAllPublisher();
+}
 ?>
 
   <div class="container-fluid">
@@ -34,117 +44,51 @@
                     <a href="AddPublisher.php" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Add New Publisher</a>
                  </div>
                     <div class="col-lg-12">
-
-                           <table id="tblpublisher" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th>Publsiher Number</th>
-                                        <th>Publsiher Name</th>
-                                        <th>Address</th>
-                                        <th>Phone Number</th>
-                                        <th>Edit  </th>
-                                        <th>Delete </th>
+                        <table id="tblpublisher" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Publsiher Number</th>
+                                    <th>Publsiher Name</th>
+                                    <th>Address</th>
+                                    <th>Phone Number</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
                                     </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>abc</td>
-                                           <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>2</td>
-                                        <td>xyz</td>
-                                        <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>3</td>
-                                        <td>aaa</td>
-                                          <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>4</td>
-                                        <td>ZZZ</td>
-                                            <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                         <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>5</td>
-                                        <td>TEST</td>
-                                          <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                       <td>6</td>
-                                        <td>BBB</td>
-                                           <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                       <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-                                    <tr>
-                                        <td>7</td>
-                                        <td>Java</td>
-                                            <td>545 kent street, CBD NSW 2000</td>
-                                        <td>4544444</td>
-                                        <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
-
-                        <td><a href="#" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
-                                    </tr>
-
-
-
-
-                                </tbody>
-                            </table>
-                              <script type="text/javascript">
-                                  $(document).ready(function () {
-                                      $('#tblpublisher').dataTable({
-                                          "iDisplayLength": 5,
-
-                                              "lengthMenu": [5,10, 25, 50, 100]
-
-                                      });
-                                  });
-
-
-                            </script>
+                            </thead>
+                            <tbody>
+<?php
+if ($collection)
+{
+	$iter = $collection->iterator();
+	foreach ($iter as $key => $value) {
+?>
+                                <tr>
+                                    <td><?php echo $value->getId(); ?></td>
+                                    <td><?php echo $value->getName(); ?></td>
+                                    <td><?php echo $value->getAddress(); ?></td>
+                                    <td><?php echo $value->getPhone(); ?></td>
+                                    <td><a class="btn mini blue-stripe" href="{site_url()}admin/editFront/1">Edit</a></td>
+                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
+                                </tr>
+<?php
+	}
+}
+?>
+                            </tbody>
+                        </table>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#tblpublisher').dataTable({
+                                    "iDisplayLength": 5,
+                                    "lengthMenu": [5,10, 25, 50, 100]
+                                });
+                            });
+                        </script>
                     </div>
-
                 </div>
                 <!-- /.row -->
-
             </div>
             <!-- /.container-fluid -->
-
-
-
 <?php
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
