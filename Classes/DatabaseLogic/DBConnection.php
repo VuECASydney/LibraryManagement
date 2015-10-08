@@ -173,6 +173,34 @@ class DBConn_Librarian extends DBConn_User
 		$this->close();
 		return $collection;
 	}
+
+	function getAllUser()
+	{
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_user()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$user = new User();
+				$user->setId($obj->Account_id);
+				$user->setName($obj->Name);
+				$user->setRole($obj->Account_type);
+				$user->setAddress($obj->Address);
+				$user->setPhone($obj->Phone);
+				$user->setEmail($obj->Email);
+				$user->setEnrollYear($obj->Enroll_year);
+				$collection->addItem($user, $obj->Account_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+		return $collection;
+	}
 }
 
 class DbConn_Admin extends DBConn_Librarian
