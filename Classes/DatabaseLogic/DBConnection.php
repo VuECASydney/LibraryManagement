@@ -241,6 +241,11 @@ class DBConn_Librarian extends DBConn_User
 
 	function getAllBook()
 	{
+		$key = 'book';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_book()");
 
@@ -264,6 +269,8 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
@@ -440,6 +447,37 @@ class DBConn_Librarian extends DBConn_User
 		{
 			//echo $retVal . ' Success<br /><br />';
 			CacheManager::del('user');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function insertBook($bookName, $bookIsbn, $publisherId, $categoryId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("SELECT sf_create_book('$user_id', '$bookName', '$publisherId', '$bookIsbn', '$categoryId') AS ret");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('book');
 			return TRUE;
 		}
 		else

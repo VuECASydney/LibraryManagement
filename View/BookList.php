@@ -12,10 +12,11 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLog
 $user = getUserInfo();
 $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
-$collection = NULL;
+$book = NULL;
 if ($conn)
 {
-	$collection = $conn->getAllBook();
+	$book = $conn->getAllBook();
+	$category = $conn->getAllCategory();
 }
 ?>
             <div class="container-fluid">
@@ -27,7 +28,7 @@ if ($conn)
 						</h1>
                         <ol class="breadcrumb">
                             <li>
-                                <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
+                                <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
                                 <i class="fa fa-edit"></i> Books
@@ -60,11 +61,17 @@ if ($conn)
                                     <label class="control-label col-sm-2">Category Name</label>
                                     <div class="col-sm-10">
                                         <select class="form-control">
-                                            <option>Computer</option>
-                                            <option>Computer</option>
-                                            <option>Computer</option>
-                                            <option>Computer</option>
-                                            <option>Computer</option>
+<?php
+if ($category)
+{
+	$iter = $category->iterator();
+	foreach ($iter as $key => $value) {
+?>
+                                            <option value="<?php echo $value->getId(); ?>"><?php echo $value->getSubject(); ?></option>
+<?php
+	}
+}
+?>
                                         </select>
                                     </div>
                                 </div>
@@ -91,9 +98,9 @@ if ($conn)
                             </thead>
                             <tbody>
 <?php
-if ($collection)
+if ($book)
 {
-	$iter = $collection->iterator();
+	$iter = $book->iterator();
 	foreach ($iter as $key => $value) {
 ?>
                                 <tr>
@@ -126,5 +133,5 @@ if ($collection)
             </div>
             <!-- /.container-fluid -->
 <?php
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
