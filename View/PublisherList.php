@@ -76,8 +76,8 @@ if ($collection)
                         <script type="text/javascript">
                             $(document).ready(function () {
                                 $('#tblpublisher').dataTable({
-                                    "iDisplayLength": 5,
-                                    "lengthMenu": [5,10, 25, 50, 100]
+                                    "iDisplayLength": 10,
+                                    "lengthMenu": [10, 25, 50, 100]
                                 });
                             });
                         </script>

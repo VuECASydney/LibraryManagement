@@ -121,8 +121,8 @@ if ($book)
                         <script type="text/javascript">
                             $(document).ready(function () {
                                 $('#tblbook').dataTable({
-                                    "iDisplayLength": 5,
-                                    "lengthMenu": [5,10, 25, 50, 100]
+                                    "iDisplayLength": 10,
+                                    "lengthMenu": [10, 25, 50, 100]
                                 });
                             });
                             $('#tblContact_length').visible=false;
