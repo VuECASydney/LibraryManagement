@@ -23,14 +23,14 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             Category List
+                            Category List
                         </h1>
                         <ol class="breadcrumb">
                             <li>
-                                <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
+                                <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Category List
+                                <i class="fa fa-edit"></i>Category List
                             </li>
                         </ol>
                     </div>
@@ -88,5 +88,5 @@ if ($collection)
             </div>
             <!-- /.container-fluid -->
 <?php
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

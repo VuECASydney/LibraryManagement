@@ -37,12 +37,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 			<!-- <form id='myForm' class="form-horizontal" onsubmit="return OnSubmitForm();"> -->
 			<form id='myForm' class="form-horizontal" action="Login.php" method="post">
 				<div class="form-group">
-					<label class="Heading" style="font-size:26px;padding-left:20px;">Vu Library Mangamement Login</label>
+					<label class="Heading" style="font-size:26px;padding-left:20px;">VU Library Mangamement Login</label>
 				</div>
 				<div class="form-group">
 					<label for="inputEmail3" class="col-sm-2 control-label">User ID</label>
 					<div class="col-sm-10">
-						<input type="text"  class="form-control" id="inputEmail3" placeholder="User Name" name="user_id"></input>
+						<input type="text" class="form-control" id="inputEmail3" placeholder="User Name" name="user_id"></input>
 					</div>
 				</div>
 				<div class="form-group">
@@ -71,5 +71,5 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 			</form>
 
 <?php
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

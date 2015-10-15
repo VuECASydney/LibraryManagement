@@ -5,7 +5,7 @@
  * Date Modified : 
  */
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Account.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 $user = getUserInfo();
 $role = $user->getRole();
@@ -169,10 +169,10 @@ $role = $user->getRole();
                     if($role=="Admin" or $role=="Librarian"){
                     	echo("
                     <li class=\"active\">
-                        <a href=\"MainDashBoard.php\"><i class=\"fa fa-fw fa-dashboard\"></i> Dashboard</a>
+                        <a href=\"DashBoard.php\"><i class=\"fa fa-fw fa-dashboard\"></i>Dashboard</a>
                     </li>
                     <li>
-                        <a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i> Categories</a>
+                        <a href=\"CategoryList.php\"><i class=\"fa fa-fw fa-bar-chart-o\"></i>Category</a>
                     </li>
                     <li>
                         <a href=\"AuthorList.php\"><i class=\"fa fa-edit\"></i> Author</a>

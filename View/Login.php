@@ -23,6 +23,13 @@ function login($redirect_page)
 		exit();
 	}
 
+	if ($_POST["user_id"] == NULL || $_POST["user_password"] == NULL)
+	{
+		header("Location: $redirect_page");
+		exit();
+	}
+
+	// TODO : Escape String for SQL Statement
 	$user_id = $_POST["user_id"];
 	$user_pass = $_POST["user_password"];
 	$result = -1;

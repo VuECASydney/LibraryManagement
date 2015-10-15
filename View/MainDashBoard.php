@@ -1,4 +1,3 @@
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 <?php
 /**
  * Author : Brijender Parta Rana
@@ -18,7 +17,9 @@
 	//{
 	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/StudentHeader.php';
 	//}
-
+?>
+			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<?php
 	if ($role=="Admin") {
 		require_once './DashBoard.php';
 	} else if ($role=="Lib") {

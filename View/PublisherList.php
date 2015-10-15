@@ -23,20 +23,19 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             Publisher List
+                            Publisher List
                         </h1>
                         <ol class="breadcrumb">
                             <li>
-                                <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
+                                <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Publisher List
+                                <i class="fa fa-edit"></i>Publisher List
                             </li>
                         </ol>
                     </div>
                 </div>
                 <!-- /.row -->
-
                 <div class="row">
                  <div class="col-lg-12">
                     <a href="AddPublisher.php" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Add New Publisher</a>
@@ -88,5 +87,5 @@ if ($collection)
             </div>
             <!-- /.container-fluid -->
 <?php
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

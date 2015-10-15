@@ -1,6 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConfig.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Collection.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CacheManager.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Section.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Category.php';
@@ -79,6 +80,11 @@ class DBConn_Librarian extends DBConn_User
 
 	function getAllSection()
 	{
+		$key = 'section';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_section()");
 
@@ -97,11 +103,18 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
 	function getAllCategory()
 	{
+		$key = 'category';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_category()");
 
@@ -124,11 +137,18 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
 	function getAllPublisher()
 	{
+		$key = 'publisher';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+	
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_publisher()");
 
@@ -149,11 +169,18 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
 	function getAllAuthor()
 	{
+		$key = 'author';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_author()");
 
@@ -172,11 +199,18 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
 	function getAllUser()
 	{
+		$key = 'user';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
 		$this->connect();
 		$result = $this->conn->query("CALL sp_get_all_user()");
 
@@ -200,6 +234,8 @@ class DBConn_Librarian extends DBConn_User
 		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 
@@ -231,6 +267,187 @@ class DBConn_Librarian extends DBConn_User
 		return $collection;
 	}
 
+	function insertSection($sectionName)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("SELECT sf_create_section('$user_id', '$sectionName') AS ret");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('section');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function insertCategory($categoryName, $sectionId, $parentCategoryId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		if ($parentCategoryId == 0)
+		{
+			//$parentCategoryId = 'NULL';
+			$result = $this->conn->query("SELECT sf_create_category('$user_id', '$categoryName', NULL, '$sectionId') AS ret");
+		}
+		else
+		{
+			$result = $this->conn->query("SELECT sf_create_category('$user_id', '$categoryName', '$parentCategoryId', '$sectionId') AS ret");
+		}
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('category');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function insertPublisher($publisherName, $publisherAddress, $publisherPhone)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$sqlStr = "SELECT sf_create_publisher('$user_id', '$publisherName', ";
+		if ($publisherAddress == NULL)
+		{
+			$sqlStr = $sqlStr . "NULL, ";
+		}
+		else
+		{
+			$sqlStr = $sqlStr . "'$publisherAddress', ";
+		}
+
+		if ($publisherPhone == NULL)
+		{
+			$sqlStr = $sqlStr . "NULL) AS ret";
+		}
+		else
+		{
+			$sqlStr = $sqlStr . "'$publisherPhone') AS ret";
+		}
+
+		$this->connect();
+		$result = $this->conn->query($sqlStr);
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('publisher');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function insertAuthor($authorName)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("SELECT sf_create_author('$user_id', '$authorName') AS ret");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('author');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function insertUser($userType, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$userPassword', '$userYear')");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			//$retVal = $obj->result;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('user');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
 }
 
 class DbConn_Admin extends DBConn_Librarian
