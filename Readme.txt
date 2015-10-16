@@ -206,6 +206,14 @@ Class Time : 09:30 - 12:30
 2015-10-08 Thursday
 Meeting Time : 16:30 - 18:00
 
-Brijender Rana, Choongyeol Kim, Madhaban Bhowmik
+Brijender Rana, Choongyeol Kim, Madhaban Bhowmik, Priyanka Sharma
 
 --------------------------------------------------------------------------------
+Book and Book Copies implmentation ->Brijender
+Imaplement validation-> clinet Side >Brijender  
+CSS-> Brijender 
+Page page for Report-> Brijender 
+Page page for fine-> Brijender 
+Front End Implement -> Biijneder 
+
+Page page for Fine -> Brijender 
