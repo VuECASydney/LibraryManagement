@@ -214,10 +214,10 @@ $role = $user->getRole();
                         <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#fine\"><i class=\"fa fa-fw fa-arrows-v\"></i> Reports <i class=\"fa fa-fw fa-caret-down\"></i></a>
                         <ul id=\"fine\" class=\"collapse\">
                             <li>
-                                <a href=\"#\">Fine Report</a>
+                                <a href=\"FineReport.php\">Fine Report</a>
                             </li>
                             <li>
-                                <a href=\"#\">Books Report</a>
+                                <a href=\"BookReport.php\">Books Report</a>
                             </li>
                         </ul>
                     </li>"
