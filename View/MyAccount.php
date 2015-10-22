@@ -6,7 +6,7 @@
  */
 
 		$title = 'My Account';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/AnonymousHeader.php';
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->

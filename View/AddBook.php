@@ -4,8 +4,13 @@
  * Date Created : 21 August 2015
  * Date Modified : 
  */
+        $bookID=0;
 
-$title = 'Add Book';
+        if($_GET['Book_id'] != "")   {
+             $bookID=$_GET['Book_id'];
+     }
+
+$title = $bookID>0?'Edit Book':'Add Book';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
@@ -18,6 +23,12 @@ if ($conn)
 {
 	$publisher = $conn->getAllPublisher();
 	$category = $conn->getAllCategory();
+    if($bookID>0)
+    {
+
+      $book=  $conn->getBookById($bookID) ;
+
+    }
 }
 ?>
             <div class="container-fluid">
@@ -25,7 +36,7 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Add Book
+                        <?php  echo ($bookID>0  ? 'Edit Book' : 'Add Book');?>
                         </h1>
                         <ol class="breadcrumb">
                             <li>
@@ -47,13 +58,13 @@ if ($conn)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Book Name</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="bookName" placeholder="New Book Title" />
+                                    <input type="text" class="form-control" name="bookName" placeholder="<?php echo( $bookID>0?$book->getTitle():(''));?>" />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Isbn</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="bookIsbn" placeholder="Book ISBN" />
+                                    <input type="text" class="form-control" name="bookIsbn" placeholder="<?php echo(  $bookID>0?$book->getIsbn():(''));?>" />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -67,7 +78,7 @@ if ($publisher)
 	$iter = $publisher->iterator();
 	foreach ($iter as $key => $value) {
 ?>
-                                        <option value="<?php echo $value->getId(); ?>"><?php echo $value->getName(); ?></option>
+                                        <option value="<?php echo $value->getId(); ?>" <?php echo($value->getId()==$book->getPublisherId()?'selected':'')?>><?php echo $value->getName(); ?>  </option>
 <?php
 	}
 }
@@ -86,7 +97,7 @@ if ($category)
 	$iter = $category->iterator();
 	foreach ($iter as $key => $value) {
 ?>
-                                        <option value="<?php echo $value->getId(); ?>"><?php echo $value->getSubject(); ?></option>
+                                        <option value="<?php echo $value->getId(); ?>" <?php echo($value->getId()==$book->getCategoryId()?'selected':'')?>><?php echo $value->getSubject(); ?></option>
 <?php
 	}
 }
