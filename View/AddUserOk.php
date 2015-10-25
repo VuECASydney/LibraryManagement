@@ -8,21 +8,11 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 
-/*
-const ACCOUNT_ID = 'userId';
-const ACCOUNT_NAME = 'userName';
-const ACCOUNT_TYPE = 'userType';
-const ACCOUNT_ADDRESS = 'address';
-const ACCOUNT_PHONE = 'phone';
-const ACCOUNT_EMAIL = 'email';
-const ACCOUNT_ENROLL_YEAR = 'enrollYear';
-const ACCOUNT_PASSWORD = 'userPassword';
-*/
-
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
+$userYear = NULL;
 $actionType = ACTION_ADD; // Default Action
 if (isset($_POST[ACTION_TYPE]) && $_POST[ACTION_TYPE] != NULL)
 {
@@ -30,12 +20,21 @@ if (isset($_POST[ACTION_TYPE]) && $_POST[ACTION_TYPE] != NULL)
 	{
 		case ACTION_EDIT:
 			$actionType = $_POST[ACTION_TYPE];
-			// ["act"]=>"edit" ["userId"]=>"3000000" ["userName"]=>"" ["address"]=>"" ["phone"]=>"" ["email"]=>"" ["enrollYear"]=>"" ["userPassword"]=>""
+			checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_NAME]);
+			checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_ADDRESS]);
+			checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_PHONE]);
+			checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_EMAIL]);
+			if (!isset($_POST[ACCOUNT_ENROLL_YEAR])) {
+				header('Location: ' . ADD_USER_PAGE);
+				exit();
+			}
 
-			//checkNullwithRedirect(ADD_USER_PAGE, $_POST[CATEGORY_ID]);
-			//checkNullwithRedirect(ADD_USER_PAGE, $_POST[CATEGORY_NAME]);
-			//checkNullwithRedirect(ADD_USER_PAGE, $_POST[SECTION_ID]);
-			//checkNullwithRedirect(ADD_USER_PAGE, $_POST[PARENT_CATEGORY_ID]);
+			$userYear = $_POST[ACCOUNT_ENROLL_YEAR];
+			if ($userYear == NULL)
+			{
+				$userYear = 0;
+			}
+
 			editUser();
 			exit();
 			break;
@@ -50,17 +49,6 @@ if (isset($_POST[ACTION_TYPE]) && $_POST[ACTION_TYPE] != NULL)
 			break;
 	}
 }
-
-/*
-const ACCOUNT_ID = 'userId';
-const ACCOUNT_NAME = 'userName';
-const ACCOUNT_TYPE = 'userType';
-const ACCOUNT_ADDRESS = 'address';
-const ACCOUNT_PHONE = 'phone';
-const ACCOUNT_EMAIL = 'email';
-const ACCOUNT_ENROLL_YEAR = 'enrollYear';
-const ACCOUNT_PASSWORD = 'userPassword';
-*/
 
 checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_TYPE]);
 checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_NAME]);
@@ -109,6 +97,7 @@ function addUser()
 	$userPhone = $_POST[ACCOUNT_PHONE];
 	$userEmail = $_POST[ACCOUNT_EMAIL];
 	$userPassword = $_POST[ACCOUNT_PASSWORD];
+	$redirectPage = USER_LIST_PAGE;
 
 	$user = getUserInfo();
 	$role = $user->getRole();
@@ -116,37 +105,39 @@ function addUser()
 	if ($conn)
 	{
 		$result = $conn->insertUser($userType, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword);
-		header('Location: ' . USER_LIST_PAGE);
+		header("Location: $redirectPage");
 		exit();
 	}
 }
 
 function editUser()
 {
-/*
+	global $userYear;
+	var_dump($_POST);
+
 	// TODO : Escape String for SQL Statement
-	$categoryId = $_GET[CATEGORY_ID];
-	$categoryName = $_GET[CATEGORY_NAME];
-	$sectionId = $_GET[SECTION_ID];
-	$parentCategoryId = $_GET[PARENT_CATEGORY_ID];
-	$redirectPage = CATEGORY_LIST_PAGE;
+	$userId = $_POST[ACCOUNT_ID];
+	$userName = $_POST[ACCOUNT_NAME];
+	$userAddress = $_POST[ACCOUNT_ADDRESS];
+	$userPhone = $_POST[ACCOUNT_PHONE];
+	$userEmail = $_POST[ACCOUNT_EMAIL];
+
+	$userPassword = $_POST[ACCOUNT_PASSWORD];
+	$redirectPage = USER_LIST_PAGE;
 
 	$user = getUserInfo();
 	$role = $user->getRole();
 	$conn = DBConnection::getConnection($role);
 	if ($conn)
 	{
-		$result = $conn->updateCategory($categoryId, $categoryName, $sectionId, $parentCategoryId);
+		$result = $conn->updateUser($userId, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword);
 		header("Location: $redirectPage");
 		exit();
 	}
-*/
 }
 
 function delUser()
 {
-	$userId = $_POST[ACCOUNT_ID];
-
 	// TODO : Escape String for SQL Statement
 	$userId = $_POST[ACCOUNT_ID];
 	$redirectPage = USER_LIST_PAGE;

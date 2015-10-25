@@ -23,26 +23,22 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_ID]);
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_NAME]);
 			editSection();
+			exit();
 			break;
 		case ACTION_DEL:
 			$actionType = $_GET[ACTION_TYPE];
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_ID]);
 			delSection();
+			exit();
 			break;
 		case ACTION_ADD:
 		default:
-			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_NAME]);
-			addSection();
 			break;
 	}
-	exit;
 }
-else
-{
-	checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_NAME]);
-	addSection();
-	exit;
-}
+
+checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_NAME]);
+addSection();
 
 function addSection()
 {

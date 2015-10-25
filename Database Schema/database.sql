@@ -641,6 +641,67 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_update_account$$
+
+CREATE PROCEDURE sp_update_account(executor_id INT, _account_id INT, _name VARCHAR(50), _address VARCHAR(50), _phone VARCHAR(20), _email VARCHAR(30), _password VARCHAR(100), _year INT)
+BEGIN
+	DECLARE result INT DEFAULT 0;
+	DECLARE _account_type ENUM('Student', 'Faculty', 'Librarian', 'Admin');
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+		BEGIN
+			ROLLBACK;
+			SET AUTOCOMMIT=1;
+			SELECT result;
+		END;
+
+	-- _account_type Enum('Student', 'Faculty', 'Librarian')
+	SELECT sf_get_permission1(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		SET result = 0;
+		SELECT Account_type INTO _account_type FROM account WHERE Account_id = _account_id;
+
+		IF _account_type = 'Faculty' OR _account_type = 'Librarian' THEN
+			SET AUTOCOMMIT=0;
+			START TRANSACTION;
+
+			UPDATE staff
+			SET Name = _name, Address = _address, Phone = _phone, Email = _email
+			WHERE Staff_id = _account_id;
+
+			IF _password IS NOT NULL AND _password <> '' THEN
+				UPDATE account SET Passwd = _password WHERE Account_id = _account_id;
+			END IF;
+
+			COMMIT;
+			SET AUTOCOMMIT=1, result = 1;
+		ELSEIF _account_type = 'Student' THEN
+			SET AUTOCOMMIT=0;
+			START TRANSACTION;
+
+			IF _year IS NOT NULL AND _year <> '' THEN
+				UPDATE student
+				SET Name = _name, Address = _address, Phone = _phone, Email = _email, Enroll_year = _year
+				WHERE Student_id = _account_id;
+			ELSE
+				UPDATE student
+				SET Name = _name, Address = _address, Phone = _phone, Email = _email
+				WHERE Student_id = _account_id;
+			END IF;
+
+			IF _password IS NOT NULL AND _password <> '' THEN
+				UPDATE account SET Passwd = _password WHERE Account_id = _account_id;
+			END IF;
+
+			COMMIT;
+			SET AUTOCOMMIT=1, result = 1;
+		END IF;
+	END IF;
+	SELECT result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_delete_section$$
 
 CREATE FUNCTION sf_delete_section(executor_id INT, _section_id INT) RETURNS INT

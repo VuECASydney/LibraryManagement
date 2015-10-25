@@ -101,7 +101,7 @@ switch ($actionType)
                                 <div class="col-sm-10">
                                     <input type="hidden" name="<?php echo ACTION_TYPE; ?>" value="<?php echo $actionType; ?>">
                                     <input type="hidden" name="<?php echo ACCOUNT_ID; ?>" value="<?php echo $accountId; ?>">
-                                    <select class="form-control" name="<?php echo ACCOUNT_TYPE; ?>"<?php echo ($actionType == ACTION_ADD ? '': ' disabled'); ?> >
+                                    <select class="form-control" name="<?php echo ACCOUNT_TYPE; ?>"<?php echo ($actionType == ACTION_ADD ? '': ' disabled'); ?>>
                                         <option<?php echo ($accountRole == 'Student' ? ' selected': ''); ?>>Student</option>
                                         <option<?php echo ($accountRole == 'Faculty' ? ' selected': ''); ?>>Faculty</option>
 										<option<?php echo ($accountRole == 'Librarian' ? ' selected': ''); ?>>Librarian</option>

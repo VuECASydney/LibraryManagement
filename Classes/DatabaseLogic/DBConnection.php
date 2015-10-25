@@ -684,9 +684,8 @@ class DBConn_Librarian extends DBConn_User
 		$user_id = $user->getId();
 
 		$this->connect();
-		//$hash = password_hash($userPassword, PASSWORD_DEFAULT);
-		//$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
-		$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$userPassword', '$userYear')");
+		$hash = generate_hash_password($userPassword);
+		$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
 
 		if ($result)
 		{
@@ -842,6 +841,39 @@ class DBConn_Librarian extends DBConn_User
 		}
 	}
 
+	function updateUser($userId, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
+	{
+		// $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$hash = $this->generate_hash_password($userPassword);
+		$result = $this->conn->query("CALL sp_update_account('$user_id', '$userId', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->result;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('user');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
 	function deleteSection($sectionId)
 	{
 		$retVal = NULL;
@@ -933,6 +965,12 @@ class DBConn_Librarian extends DBConn_User
 
 		//echo $retVal . ' Failure<br /><br />';
 		return FALSE;
+	}
+
+	function generate_hash_password($password) {
+		//$hash = password_hash($password, PASSWORD_DEFAULT);
+		$hash = $password;
+		return $hash;
 	}
 }
 

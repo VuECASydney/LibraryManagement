@@ -24,28 +24,24 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
 			editCategory();
+			exit();
 			break;
 		case ACTION_DEL:
 			$actionType = $_GET[ACTION_TYPE];
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_ID]);
 			delCategory();
+			exit();
 			break;
 		case ACTION_ADD:
 		default:
-			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
-			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
-			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
-			addCategory();
 			break;
 	}
 }
-else
-{
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
-	addCategory();
-}
+
+checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
+checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
+checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
+addCategory();
 
 function addCategory()
 {

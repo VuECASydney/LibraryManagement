@@ -24,28 +24,24 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
 			editPublisher();
+			exit();
 			break;
 		case ACTION_DEL:
 			$actionType = $_GET[ACTION_TYPE];
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ID]);
 			delPublisher();
+			exit();
 			break;
 		case ACTION_ADD:
 		default:
-			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
-			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
-			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
-			addPublisher();
 			break;
 	}
 }
-else
-{
-	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
-	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
-	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
-	addPublisher();
-}
+
+checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
+checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
+checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
+addPublisher();
 
 function addPublisher()
 {
@@ -103,7 +99,9 @@ function delPublisher()
 		exit();
 	}
 }
-/*require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
+
+/*
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 
 const PUBLISHER_NAME = 'publisherName';
@@ -138,4 +136,5 @@ if ($conn)
 	header("Location: PublisherList.php");
 	exit();
 }
-?>              */
+*/
+?>
