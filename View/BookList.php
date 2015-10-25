@@ -110,7 +110,7 @@ if ($book)
                                     <td><?php echo $value->getPublisherName(); ?></td>
                                     <td><?php echo $value->getCategoryName(); ?></td>
                                     <td><a class="btn mini blue-stripe" href="addbook.php?Book_id=<?php echo $value->getBookId(); ?>">Edit</a></td>
-                                    <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
+                                    <td><a href="addbook.php?Book_id=<?php echo $value->getBookId();?>. & action='delete'" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
                                 </tr>
 <?php
 	}

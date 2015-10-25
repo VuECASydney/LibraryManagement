@@ -53,7 +53,7 @@ if ($conn)
                     <div class="col-lg-12">
                         <h1 class="page-header">
                            Home
-                           <?php echo($call)?>
+                         
                         </h1>
 
                     </div>

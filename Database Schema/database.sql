@@ -600,6 +600,23 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+
+CREATE  FUNCTION sf_update_piblisher(executor_id INT,_publisherId int, _publisherName varchar(25),_publisherAddress varchar(50), _publsiherPhone varchar(25)) RETURNS int(11)
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		UPDATE publisher SET Name = _publisherName,Address=_publisherAddress,Phone=_publsiherPhone WHERE Publisher_id = _publisherId;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_update_category$$
 
 CREATE FUNCTION sf_update_category(executor_id INT, _category_id INT, _subject VARCHAR(50), _parent INT, _section INT) RETURNS INT
@@ -634,6 +651,22 @@ BEGIN
 END$$
 DELIMITER ;
 
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_pubisher$$
+CREATE  FUNCTION sf_delete_pubisher(executor_id INT, _publisherId INT) RETURNS int(11)
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+	-- _subject VARCHAR(50), _parent INT, _section INT
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM Publisher WHERE Publisher_id = _publisherId;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_delete_category$$
 

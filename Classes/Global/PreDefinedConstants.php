@@ -26,6 +26,12 @@ const ACCOUNT_EMAIL = 'email';
 const ACCOUNT_ENROLL_YEAR = 'enrollYear';
 const ACCOUNT_PASSWORD = 'userPassword';
 
+const PUBLISHER_ID = 'publisherId';
+const PUBLISHER_NAME = 'publisherName';
+const PUBLISHER_ADDRESS = 'publisherAddress';
+const PUBLISHER_PHONE = 'publisherPhone';
+
+
 const SECTION_LIST_PAGE = 'SectionList.php';
 const ADD_SECTION_PAGE = 'AddSection.php';
 const OK_SECTION_PAGE = 'AddSectionOk.php';
@@ -33,6 +39,14 @@ const OK_SECTION_PAGE = 'AddSectionOk.php';
 const CATEGORY_LIST_PAGE = 'CategoryList.php';
 const ADD_CATEGORY_PAGE = 'AddCategory.php';
 const OK_CATEGORY_PAGE = 'AddCategoryOk.php';
+
+const PUBLISHER_LIST_PAGE = 'PublisherList.php';
+const ADD_PUBLISHER_PAGE = 'AddPublisher.php';
+const OK_PUBLISHER_PAGE = 'AddPublisherOk.php';
+
+const AUTHOR_LIST_PAGE = 'AuthorList.php';
+const ADD_AUTHOR_PAGE = 'AddAuthor.php';
+const OK_AUTHOR_PAGE = 'AddAuthorOk.php';
 
 const USER_LIST_PAGE = 'UserList.php';
 const ADD_USER_PAGE = 'AddUser.php';

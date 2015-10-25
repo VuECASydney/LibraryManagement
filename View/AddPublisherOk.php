@@ -4,8 +4,104 @@
  * Date Created : 15 October 2015
  * Date Modified : 
  */
+ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
+redirectPageWithoutSession();
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
+
+$actionType = ACTION_ADD; // Default Action
+if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
+{
+	switch ($_GET[ACTION_TYPE])
+	{
+		case ACTION_EDIT:
+			$actionType = $_GET[ACTION_TYPE];
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ID]);
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
+			editCategory();
+			break;
+		case ACTION_DEL:
+			$actionType = $_GET[ACTION_TYPE];
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ID]);
+			delCategory();
+			break;
+		case ACTION_ADD:
+		default:
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
+			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
+			addCategory();
+			break;
+	}
+}
+else
+{
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_NAME]);
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_ADDRESS]);
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_PHONE]);
+	addCategory();
+}
+
+function addPublisher()
+{
+	// TODO : Escape String for SQL Statement
+	$publisherName = $_GET[PUBLISHER_NAME];
+	$publisherAddress = $_GET[PUBLISHER_ADDRESS];
+	$publsiherPhone = $_GET[PUBLISHER_PHONE];
+	$redirectPage = PUBLISHER_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->insertPublisher($publisherName, $publisherAddress, $publsiherPhone);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+function editPublisher()
+{
+	// TODO : Escape String for SQL Statement
+	$publisherId = $_GET[PUBLISHER_ID];
+   	$publisherName = $_GET[PUBLISHER_NAME];
+	$publisherAddress = $_GET[PUBLISHER_ADDRESS];
+	$publsiherPhone = $_GET[PUBLISHER_PHONE];
+	$redirectPage = PUBLISHER_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->updatePublisher($publisherId, $publisherName, $publisherAddress, $publsiherPhone);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+function delPublisher()
+{
+	// TODO : Escape String for SQL Statement
+  	$publisherId = $_GET[PUBLISHER_ID];
+	$redirectPage = CATEGORY_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->deletePublisher($publisherId);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+/*require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 
 const PUBLISHER_NAME = 'publisherName';
@@ -40,4 +136,4 @@ if ($conn)
 	header("Location: PublisherList.php");
 	exit();
 }
-?>
+?>              */
