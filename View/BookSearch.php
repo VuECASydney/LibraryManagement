@@ -1,97 +1,66 @@
 <?php
 /**
- * Author : Brijender Parta Rana
+ * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 21 August 2015
  * Date Modified : 
  */
-	$title = 'Home Page';
-	//if($role="staff")
-	//{
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/AnonymousHeader.php';
-	//}
-	//if else($role="Lib")
-	//{
-	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/LibHeader.php';
-	//}
-	//else
-	//{
-	//require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/StudentHeader.php';
-	//}
 
+$title = 'Books';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/AnonymousHeader.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
-//$user = getUserInfo();
-$role = 'Guest';
+$user = getUserInfo();
+$role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $book = NULL;
 if ($conn)
 {
-    $publisher=$conn->getAllPublisher();
+	$book = $conn->getAllBook();
 	$category = $conn->getAllCategory();
-    $call="";
- if(isset($_GET['submit'])){
-            $bookName = $_GET[BOOK_NAME];
-            $publisherId = $_GET[PUBLISHER_ID];
-            $categoryId = $_GET[CATEGORY_ID];
-
-            $call="submit";
-            var_dump(debug_backtrace());
-            $book = $conn->getSearchBook($bookName,$publisherId,$categoryId);
-    }
-    else{
-             $book = $conn->getAllBook();
-               $call="first";
-    }
-
 }
 ?>
-			<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
-          <div class="container-fluid">
+            <div class="container-fluid">
                 <!-- Page Heading -->
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                           Home
-                           <?php echo($call)?>
-                        </h1>
-
+                            Books
+						</h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-edit"></i> Books
+                            </li>
+                        </ol>
                     </div>
                 </div>
                 <!-- /.row -->
-                  <fieldset class="scheduler-border">
+                <div class="col-lg-12">
+                    <a href="AddBook.php" class="confirm-delete btn mini red-stripe" role="button" data-title="johnny" data-id="1">Add New Book</a>
+                </div>
+                <fieldset class="scheduler-border">
                     <legend class="scheduler-border">Book Search</legend>
                     <div class="row">
                         <div class="col-lg-12">
-                            <form class="form-horizontal" role="form" method="get">
+                            <form class="form-horizontal" role="form">
                                 <div class="form-group">
                                     <label class="control-label col-sm-2">Book Name</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control"  name="bookName">
+                                        <input type="text" class="form-control" id="email" >
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-2">Publisher Name</label>
                                     <div class="col-sm-10">
-                                                        <select class="form-control" name="publisherId">
-                                                        <?php
-if ($publisher)
-{
-	$iter = $publisher->iterator();
-	foreach ($iter as $key => $value) {
-?>
-                                            <option value="<?php echo $value->getId(); ?>"><?php echo $value->getName(); ?></option>
-<?php
-	}
-}
-?>
-                                        </select>
+                                        <input type="text" class="form-control" id="email" >
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label col-sm-2">Category Name</label>
                                     <div class="col-sm-10">
-                                        <select class="form-control" name="categoryId">
+                                        <select class="form-control">
 <?php
 if ($category)
 {
@@ -113,7 +82,7 @@ if ($category)
                     </div>
                     <!-- /.row -->
                 </fieldset>
-            <div class="row">
+                <div class="row">
                     <div class="col-lg-12">
                         <table id="tblbook" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
                             <thead>
@@ -163,7 +132,6 @@ if ($book)
                 <!-- /.row -->
             </div>
             <!-- /.container-fluid -->
-
- <?php
+<?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>

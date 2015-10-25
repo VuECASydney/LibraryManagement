@@ -6,7 +6,7 @@
  */
 
 session_start();
-session_regenerate_id(TRUE);
+//session_regenerate_id(TRUE);
 const USER_INFO = 'userinfo';
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/User.php';

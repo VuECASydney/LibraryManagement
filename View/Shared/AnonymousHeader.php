@@ -6,9 +6,13 @@
  */
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
-redirectPageWithoutSession();
-$user = getUserInfo();
-$role = $user->getRole();
+
+if(isset($_SESSION[USER_INFO]))
+ {
+    //    redirectPageWithSession();
+        $user = getUserInfo();
+}
+//$role = $user->getRole();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,6 +27,9 @@ $role = $user->getRole();
 
     <!-- Custom CSS -->
     <link href="../Css/style.css" rel="stylesheet">
+
+     <!-- Custom CSS -->
+    <link href="../Css/styleouter.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
     <link href="../Css/plugins/morris.css" rel="stylesheet">
@@ -43,8 +50,7 @@ $role = $user->getRole();
     <script type="text/javascript" src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
-    <script type="text/javascript" src="../js/highcharts.js"></script>
-    <script type="text/javascript" src="../js/exporting.js"></script>
+
 </head>
 
 <body>
@@ -62,10 +68,45 @@ $role = $user->getRole();
                 <a class="navbar-brand" href="index.html">VU Library </a>
             </div>
 
+             <ul>
+             <?php
 
 
+             if( isset($_SESSION[USER_INFO])){
+                   echo("   <li class=\"dropdown\" style=\"float: right;margin-top: 13px;margin-right: 50px\">
+                    <a href=\"#\" class=\"dropdown-toggle\" data-toggle=\"dropdown\"><i class=\"fa fa-user\"></i>
+                    ".  ($user->getName()) ."<b class=\"care\"></b></a>
+                    <ul class=\"dropdown-menu\">
+                        <li>
+                            <a href=\"#\"><i class=\"fa fa-fw fa-user\"></i>Profile</a>
+                        </li>
+                        <li>
+                            <a href=\"#\"><i class=\"fa fa-fw fa-envelope\"></i>Inbox</a>
+                        </li>
+                        <li>
+                            <a href=\"#\"><i class=\"fa fa-fw fa-gear\"></i>Settings</a>
+                        </li>
+                        <li class=\"divider\"></li>
+                        <li>
+                            <a href=\"./Logout.php\"><i class=\"fa fa-fw fa-power-off\"></i>Log Out</a>
+                        </li>
+                    </ul>
+                </li>  ")     ;
 
-            <!-- /.navbar-collapse -->
+
+                }
+                else
+                {
+                   echo("   <li class=\"dropdown\" style=\"float: right;margin-top: 13px;margin-right: 50px\">
+                                   <a href=\"./index.php\"><i class=\"fa fa-fw fa-power-off\"></i>Log in</a>
+                        </li>");
+
+                }
+                ?>
+            </ul>
+
+
+            <!-- /.nav   bar-collapse -->
         </nav>
 <?php
             ini_set('display_errors',1);
@@ -77,9 +118,9 @@ $role = $user->getRole();
 
                 </div>
                 <nav class="main-Navigation" role="navigation">
-                    <ul id="secondary-links" class="nav menu secondary-links">
+                    <ul id="secondary-links" class="navClass menu secondary-links">
                         <li class="item-1 dropdown  mlid-13688 menu-study-with-us dropdown-standard first" id="dropdown-li-study-with-us">
-                                 <a href="/mainDashBoard.php">Book Search</a>
+                                 <a href="./mainDashBoard.php">Book Search</a>
 
                         </li>
                         <li class="item-2 dropdown  mlid-13790 menu-student-life dropdown-standard" id="dropdown-li-student-life">

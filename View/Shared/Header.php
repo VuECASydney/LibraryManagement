@@ -162,6 +162,7 @@ $role = $user->getRole();
                     </ul>
                 </li>
             </ul>
+        </nav>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
@@ -242,7 +243,7 @@ $role = $user->getRole();
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
-        </nav>
+
 <?php
             ini_set('display_errors',1);
             ini_set('display_startup_errors',1);

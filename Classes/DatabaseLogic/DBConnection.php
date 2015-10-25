@@ -8,7 +8,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Cate
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Publisher.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Author.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Book.php';
-
+ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/BookLoan.php';
+         require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/fine.php';
 abstract class DBInterface
 {
 	/* Database config */
@@ -53,7 +54,157 @@ abstract class DBInterface
 	}
 }
 
-class DBConn_User extends DBInterface
+class DBConn_Guest extends DBInterface
+{
+
+  	function __construct()
+	{
+		parent::__construct(USER_NAME, USER_PASS);
+	}
+
+	function __destruct()
+	{
+		echo '~DBConn_User<br />';
+	}
+      function getSearchBook($Book_Name,$Publisher_Id,$Category_Id)
+	{
+      	$key = 'bookSearch';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+
+	  
+		$result = $this->conn->query("CALL sp_get_Search_book('$Book_Name',$Publisher_Id,$Category_Id)");
+
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$book = new Book();
+				$book->setBookId($obj->Book_id);
+				$book->setTitle($obj->Title);
+				$book->setPublisherId($obj->Publisher_id);
+				$book->setIsbn($obj->Isbn);
+				$book->setCategoryId($obj->Category_id);
+				$book->setPublisherName($obj->Publisher_name);
+				$book->setCategoryName($obj->Subject);
+				$collection->addItem($book, $obj->Book_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+    function getAllBook()
+	{
+		$key = 'book';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_book()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$book = new Book();
+				$book->setBookId($obj->Book_id);
+				$book->setTitle($obj->Title);
+				$book->setPublisherId($obj->Publisher_id);
+				$book->setIsbn($obj->Isbn);
+				$book->setCategoryId($obj->Category_id);
+				$book->setPublisherName($obj->Publisher_name);
+				$book->setCategoryName($obj->Subject);
+				$collection->addItem($book, $obj->Book_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+    function getAllPublisher()
+	{
+		$key = 'publisher';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_publisher()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$publisher = new Publisher();
+				$publisher->setId($obj->Publisher_id);
+				$publisher->setName($obj->Name);
+				$publisher->setAddress($obj->Address);
+				$publisher->setPhone($obj->Phone);
+				$collection->addItem($publisher, $obj->Publisher_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+
+    function getAllCategory()
+	{
+		$key = 'category';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_all_category()");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$category = new Category();
+				$category->setId($obj->Category_id);
+				$category->setSubject($obj->Subject);
+				$category->setParentId($obj->Parent_id);
+				$category->setSectionId($obj->Section_id);
+				$category->setParentSubject($obj->Parent_subject);
+				$category->setSectionName($obj->Section_name);
+				$collection->addItem($category, $obj->Category_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+
+}
+class DBConn_User extends DBConn_Guest
 {
 	function __construct()
 	{
@@ -63,6 +214,83 @@ class DBConn_User extends DBInterface
 	function __destruct()
 	{
 		echo '~DBConn_User<br />';
+	}
+
+     function getFineByBorrowerid($Borrower_id)
+	{
+	    $key = 'FineLog';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_get_fine_borrower_id('$Borrower_id')");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+
+                $fine = new fine();
+
+                $fine->setFineId($obj->Fine_id);
+                $fine->setBookTitle($obj->Title);
+				$fine->setAmount($obj->Amount);
+				$fine->setDueDate($obj->due_date);
+			   	$fine->setReturnDate($obj->Return_date);
+				$fine->setPaymentDate($obj->Payment_date);
+                 $collection->addItem($fine, $obj->Fine_id);
+
+                }
+			$result->close(); // for fetch_object()
+            }
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+	  	CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+    function getBookByBorrowerid($Borrower_id)
+	{
+	    $key = 'bookLoan';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$this->connect();
+		$result = $this->conn->query("CALL sp_Get_Loan_books_By_Borrower_id('$Borrower_id')");
+
+		$collection = new Collection();
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+
+                $bookLoan = new BookLoan();
+
+                $bookLoan->setLogId($obj->Log_id);
+                $bookLoan->setBarcodeId($obj->Barcode_id);
+				$bookLoan->setTitle($obj->Title);
+				$bookLoan->setPublisherId($obj->Publisher_id);
+				$bookLoan->setIsbn($obj->Isbn);
+				$bookLoan->setCategoryId($obj->Category_id);
+				$bookLoan->setPublisherName($obj->Publisher_name);
+				$bookLoan->setCategoryName($obj->Subject);
+                $bookLoan->setDateIssue($obj->Date_out);
+				$bookLoan->setDateDue($obj->Due_date);
+				$bookLoan->setDateReturn($obj->Return_date);
+                $collection->addItem($bookLoan, $obj->Log_id);
+                }
+			$result->close(); // for fetch_object()
+            }
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+	  	CacheManager::set($key, $collection, TRUE);
+		return $collection;
 	}
 }
 
@@ -108,71 +336,6 @@ class DBConn_Librarian extends DBConn_User
 		return $collection;
 	}
 
-	function getAllCategory()
-	{
-		$key = 'category';
-		$collection = CacheManager::get($key, TRUE);
-		if ($collection)
-			return $collection;
-
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_category()");
-
-		$collection = new Collection();
-		if ($result)
-		{
-			//$row = $result->fetch_assoc();
-			while ($obj = $result->fetch_object())
-			{
-				$category = new Category();
-				$category->setId($obj->Category_id);
-				$category->setSubject($obj->Subject);
-				$category->setParentId($obj->Parent_id);
-				$category->setSectionId($obj->Section_id);
-				$category->setParentSubject($obj->Parent_subject);
-				$category->setSectionName($obj->Section_name);
-				$collection->addItem($category, $obj->Category_id);
-			}
-			$result->close(); // for fetch_object()
-		}
-		//$result->free_result(); // for fetch_assoc()
-		$this->close();
-
-		CacheManager::set($key, $collection, TRUE);
-		return $collection;
-	}
-
-	function getAllPublisher()
-	{
-		$key = 'publisher';
-		$collection = CacheManager::get($key, TRUE);
-		if ($collection)
-			return $collection;
-
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_publisher()");
-
-		$collection = new Collection();
-		if ($result)
-		{
-			//$row = $result->fetch_assoc();
-			while ($obj = $result->fetch_object())
-			{
-				$publisher = new Publisher();
-				$publisher->setId($obj->Publisher_id);
-				$publisher->setName($obj->Name);
-				$publisher->setAddress($obj->Address);
-				$publisher->setPhone($obj->Phone);
-				$collection->addItem($publisher, $obj->Publisher_id);
-			}
-			$result->close(); // for fetch_object()
-		}
-		//$result->free_result(); // for fetch_assoc()
-		$this->close();
-
-		CacheManager::set($key, $collection, TRUE);
-		return $collection;
-	}
 
 	function getAllAuthor()
 	{
@@ -580,73 +743,6 @@ class DBConn_Login extends DBInterface
 		$this->close();
 		return $user;
 	}
-    	function getAllBook()
-	{
-		$key = 'book';
-		$collection = CacheManager::get($key, TRUE);
-		if ($collection)
-			return $collection;
-
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_book()");
-
-		$collection = new Collection();
-		if ($result)
-		{
-			//$row = $result->fetch_assoc();
-			while ($obj = $result->fetch_object())
-			{
-				$book = new Book();
-				$book->setBookId($obj->Book_id);
-				$book->setTitle($obj->Title);
-				$book->setPublisherId($obj->Publisher_id);
-				$book->setIsbn($obj->Isbn);
-				$book->setCategoryId($obj->Category_id);
-				$book->setPublisherName($obj->Publisher_name);
-				$book->setCategoryName($obj->Subject);
-				$collection->addItem($book, $obj->Book_id);
-			}
-			$result->close(); // for fetch_object()
-		}
-		//$result->free_result(); // for fetch_assoc()
-		$this->close();
-
-		CacheManager::set($key, $collection, TRUE);
-		return $collection;
-	}
-    	function getAllCategory()
-	{
-		$key = 'category';
-		$collection = CacheManager::get($key, TRUE);
-		if ($collection)
-			return $collection;
-
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_category()");
-
-		$collection = new Collection();
-		if ($result)
-		{
-			//$row = $result->fetch_assoc();
-			while ($obj = $result->fetch_object())
-			{
-				$category = new Category();
-				$category->setId($obj->Category_id);
-				$category->setSubject($obj->Subject);
-				$category->setParentId($obj->Parent_id);
-				$category->setSectionId($obj->Section_id);
-				$category->setParentSubject($obj->Parent_subject);
-				$category->setSectionName($obj->Section_name);
-				$collection->addItem($category, $obj->Category_id);
-			}
-			$result->close(); // for fetch_object()
-		}
-		//$result->free_result(); // for fetch_assoc()
-		$this->close();
-
-		CacheManager::set($key, $collection, TRUE);
-		return $collection;
-	}
 
 }
 
@@ -681,7 +777,7 @@ class DBConnection
 				$conn = new DBConn_User();
 				break;
             case 'Guest':
-			  	$conn = new DBConn_Login();
+			  	$conn = new DBConn_Guest();
 				break;
 			default:
                 break;
