@@ -859,19 +859,19 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_get_Search_book$$
-CREATE  PROCEDURE sp_get_Search_book(_bookName varchar(100), _publisherId int, _categoryId int)
+DROP PROCEDURE IF EXISTS sp_get_search_book$$
+
+CREATE PROCEDURE sp_get_search_book(_bookName varchar(80), _publisherId int, _categoryId int)
 BEGIN
 	-- Performance Issue : Too many book records
 	SELECT b1.*, p1.Name AS Publisher_name, c1.Subject
 	FROM book AS b1
-    inner join publisher AS p1 on b1.Publisher_id = p1.Publisher_id
-    inner join category AS c1 on b1.Category_id = c1.Category_id
-    
-	WHERE  B1.title  like CONCAT('%', _bookName, '%') or (B1.Publisher_id = _publisherId or b1.Category_id=_categoryId)
-			;
-END
-
+		INNER JOIN publisher AS p1 ON b1.Publisher_id = p1.Publisher_id
+		INNER JOIN category AS c1 ON b1.Category_id = c1.Category_id
+	WHERE b1.Title LIKE CONCAT('%', _bookName, '%') OR
+		(b1.Publisher_id = _publisherId OR
+		b1.Category_id = _categoryId);
+END$$
 DELIMITER ;
 
 DELIMITER $$
@@ -879,30 +879,30 @@ DROP PROCEDURE IF EXISTS sp_get_fine_borrower_id$$
 
 CREATE PROCEDURE sp_get_fine_borrower_id(_borrower_id INT)
 BEGIN
-SELECT fl.*,b.Title,bll.due_date,bll.Return_date FROM fine_log as fl
-inner join book_copy as bc on BC.barcode_id=fl.Barcode_Id
-inner join book as b on b.Book_id=bc.Book_id
-inner join book_loan_log as bll on bll.Log_id=fl.Log_id
-where fl.borrower_id=_borrower_id;
-END
+	SELECT fl.*, b.Title, bll.Due_date, bll.Return_date
+	FROM fine_log as fl
+		INNER JOIN book_copy AS bc ON bc.Barcode_id = fl.Barcode_id
+		INNER JOIN book AS b ON b.Book_id = bc.Book_id
+		INNER JOIN book_loan_log AS bll ON bll.Log_id = fl.Log_id
+	WHERE fl.Borrower_id = _borrower_id;
+END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP PROCEDURE IF EXISTS sp_Get_Loan_books_By_Borrower_id$$
-CREATE  PROCEDURE sp_Get_Loan_books_By_Borrower_id(_borrower_id INT)
+DROP PROCEDURE IF EXISTS sp_get_loan_books_by_borrower_id$$
+
+CREATE PROCEDURE sp_get_loan_books_by_borrower_id(_borrower_id INT)
 BEGIN
-
-	SELECT BL.*,b1.*, p1.Name AS Publisher_name, c1.Subject FROM library.book_loan_log as BL 
-inner join library.book_copy as BC on BC.barcode_id=BL.Barcode_Id
-inner join library.book as B1 on B1.Book_id=BC.Book_id
-inner join publisher AS p1 on b1.Publisher_id = p1.Publisher_id 
-inner join category AS c1 on b1.Category_id = c1.Category_id
-	
-
-where BL.Borrower_id=_borrower_id;
-
-END
+	SELECT bl.*, b1.*, p1.Name AS Publisher_name, c1.Subject
+	FROM book_loan_log as bl
+		INNER JOIN book_copy AS bc ON bc.Barcode_id = bl.Barcode_id
+		INNER JOIN book AS b1 ON b1.Book_id = bc.Book_id
+		INNER JOIN publisher AS p1 ON b1.Publisher_id = p1.Publisher_id
+		INNER JOIN category AS c1 ON b1.Category_id = c1.Category_id
+	WHERE bl.Borrower_id = _borrower_id;
+END$$
 DELIMITER ;
+
 DELIMITER $$
 DROP PROCEDURE IF EXISTS sp_get_all_fine$$
 

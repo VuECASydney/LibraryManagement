@@ -19,6 +19,10 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 	{
 		case ACTION_EDIT:
 			$actionType = $_GET[ACTION_TYPE];
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_ID]);
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
 			editCategory();
 			break;
 		case ACTION_DEL:
@@ -34,7 +38,6 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			addCategory();
 			break;
 	}
-	exit;
 }
 else
 {
@@ -42,7 +45,6 @@ else
 	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
 	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
 	addCategory();
-	exit;
 }
 
 function addCategory()
