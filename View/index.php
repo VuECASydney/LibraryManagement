@@ -6,7 +6,7 @@
  */
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
-redirectPageWithSession();
+//redirectPageWithSession();
 
 $title='Home Page';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/AnonymousHeader.php';

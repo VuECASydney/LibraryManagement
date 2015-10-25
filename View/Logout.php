@@ -12,7 +12,10 @@ function logout()
 {
 	if (isset($_SESSION[USER_INFO]))
 	{
-		session_destroy();
+	    unset($_SESSION[USER_INFO]);
+        session_destroy();
+
+
 	}
 	header('Location: index.php');
 	exit();

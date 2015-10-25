@@ -30,13 +30,13 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             Book Report                         </h1>
+                             Fine Report                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Books
+                                <i class="fa fa-edit"></i> Fine Report
                             </li>
                         </ol>
                     </div>
@@ -44,37 +44,27 @@ if ($conn)
                 <!-- /.row -->
 
                 <fieldset class="scheduler-border">
-                    <legend class="scheduler-border">Book Search</legend>
+                    <legend class="scheduler-border">Fine Search</legend>
                     <div class="row">
                         <div class="col-lg-12">
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
-                                    <label class="control-label col-sm-2">Book Name</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="email" >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2">Publisher Name</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="email" >
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="control-label col-sm-2">Category Name</label>
+                                    <label class="control-label col-sm-2">Fine </label>
                                     <div class="col-sm-10">
                                         <select class="form-control">
-<?php
-if ($category)
-{
-	$iter = $category->iterator();
-	foreach ($iter as $key => $value) {
-?>
-                                            <option value="<?php echo $value->getId(); ?>"><?php echo $value->getSubject(); ?></option>
-<?php
-	}
-}
-?>
+                                             <option value="All">All</option>
+                                              <option value="Due to pay">Due to pay</option>
+                                               <option value="Recivied Fine">Recivied Fine</option>
+                                    </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-sm-2">Period </label>
+                                    <div class="col-sm-10">
+                                        <select class="form-control">
+                                             <option value="One month">One month</option>
+                                              <option value="Two Month">Two Month</option>
+                                               <option value="Six Month">Six Month</option>
                                         </select>
                                     </div>
                                 </div>
@@ -115,12 +105,10 @@ if ($category)
                            <table id="tblbook" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
                                 <thead>
                                     <tr>
-                                        <th>Book Number</th>
-                                        <th>Book Name</th>
-                                            <th>Publisher Name</th>
-                                        <th>Category Name</th>
-                                        <th>Total Copies</th>
-                                        <th>Copies Issue</th>
+                                        <th>Number</th>
+                                        <th>Month</th>
+                                            <th>Fine</th>
+
 
                                     </tr>
                                 </thead>
@@ -128,85 +116,45 @@ if ($category)
                                 <tbody>
                                     <tr>
                                         <td>1</td>
-                                        <td>Let Us C</td>
+                                        <td>April</td>
 
-                                         <td>Test </td>
-                                         <td>Computer </td>
+                                         <td>$200 </td>
 
-                                        <td>20 </td>
-                                         <td>5 </td>
                                     </tr>
 
                                     <tr>
                                         <td>2</td>
-                                        <td>Asp.net 4.5</td>
+                                        <td>June</td>
 
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                         <td>50 </td>
-                                         <td>5 </td>
+                                        <td>$500 </td>
+
                                     </tr>
 
                                     <tr>
                                         <td>3</td>
-                                       <td>Asp.net 4.5</td>
+                                       <td>July</td>
 
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                        <td>50 </td>
-                                         <td>5 </td>
+                                        <td>$300 </td>
+
                                     </tr>
 
                                     <tr>
                                         <td>4</td>
-                                      <td>Asp.net 4.5</td>
+                                       <td>July</td>
 
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                         <td>50 </td>
-                                         <td>5 </td>
+                                        <td>$300 </td>
+
                                     </tr>
 
                                     <tr>
                                         <td>5</td>
-                                        <td>Asp.net 4.5</td>
+                                         <td>July</td>
 
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                         <td>50 </td>
-                                         <td>5 </td>
+                                        <td>$300 </td>
+
                                     </tr>
 
-                                    <tr>
-                                       <td>6</td>
-                                       <td>Asp.net 4.5</td>
-
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                        <td>50 </td>
-                                         <td>5 </td>
-                                    </tr>
-
-                                     <tr>
-                                        <td>5</td>
-                                        <td>Asp.net 4.5</td>
-
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                         <td>50 </td>
-                                         <td>5 </td>
-                                    </tr>
-
-                                    <tr>
-                                       <td>6</td>
-                                       <td>Asp.net 4.5</td>
-                                       
-                                        <td>WROX </td>
-                                         <td>Object Orineted Programing </td>
-                                        <td>50 </td>
-                                         <td>5 </td>
-                                    </tr>
-
+                                   
 
 
                                 </tbody>

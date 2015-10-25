@@ -162,6 +162,7 @@ $role = $user->getRole();
                     </ul>
                 </li>
             </ul>
+        </nav>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
@@ -214,10 +215,10 @@ $role = $user->getRole();
                         <a href=\"javascript:;\" data-toggle=\"collapse\" data-target=\"#fine\"><i class=\"fa fa-fw fa-arrows-v\"></i> Reports <i class=\"fa fa-fw fa-caret-down\"></i></a>
                         <ul id=\"fine\" class=\"collapse\">
                             <li>
-                                <a href=\"#\">Fine Report</a>
+                                <a href=\"FineReport.php\">Fine Report</a>
                             </li>
                             <li>
-                                <a href=\"#\">Books Report</a>
+                                <a href=\"BookReport.php\">Books Report</a>
                             </li>
                         </ul>
                     </li>"
@@ -242,7 +243,7 @@ $role = $user->getRole();
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
-        </nav>
+
 <?php
             ini_set('display_errors',1);
             ini_set('display_startup_errors',1);
