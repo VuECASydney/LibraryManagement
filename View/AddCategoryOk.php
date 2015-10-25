@@ -8,10 +8,100 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 
-const CATEGORY_NAME = 'categoryName';
-const SECTION_ID = 'sectionId';
-const PARENT_CATEGORY_ID = 'parentCategoryId';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
+$actionType = ACTION_ADD; // Default Action
+if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
+{
+	switch ($_GET[ACTION_TYPE])
+	{
+		case ACTION_EDIT:
+			$actionType = $_GET[ACTION_TYPE];
+			editCategory();
+			break;
+		case ACTION_DEL:
+			$actionType = $_GET[ACTION_TYPE];
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_ID]);
+			delCategory();
+			break;
+		case ACTION_ADD:
+		default:
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
+			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
+			addCategory();
+			break;
+	}
+	exit;
+}
+else
+{
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
+	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PARENT_CATEGORY_ID]);
+	addCategory();
+	exit;
+}
+
+function addCategory()
+{
+	// TODO : Escape String for SQL Statement
+	$categoryName = $_GET[CATEGORY_NAME];
+	$sectionId = $_GET[SECTION_ID];
+	$parentCategoryId = $_GET[PARENT_CATEGORY_ID];
+	$redirectPage = CATEGORY_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->insertCategory($categoryName, $sectionId, $parentCategoryId);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+function editCategory()
+{
+	// TODO : Escape String for SQL Statement
+	$categoryId = $_GET[CATEGORY_ID];
+	$categoryName = $_GET[CATEGORY_NAME];
+	$sectionId = $_GET[SECTION_ID];
+	$parentCategoryId = $_GET[PARENT_CATEGORY_ID];
+	$redirectPage = CATEGORY_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->updateCategory($categoryId, $categoryName, $sectionId, $parentCategoryId);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+function delCategory()
+{
+	// TODO : Escape String for SQL Statement
+	$categoryId = $_GET[CATEGORY_ID];
+	$redirectPage = CATEGORY_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->deleteCategory($categoryId);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+/*
 if (!isset($_GET[CATEGORY_NAME]) || !isset($_GET[SECTION_ID]) || !isset($_GET[PARENT_CATEGORY_ID]))
 {
 	header("Location: AddCategory.php");
@@ -40,4 +130,5 @@ if ($conn)
 	header("Location: AddCategory.php");
 	exit();
 }
+*/
 ?>

@@ -432,6 +432,8 @@ class DBConn_Librarian extends DBConn_User
 		$user_id = $user->getId();
 
 		$this->connect();
+		//$hash = password_hash($userPassword, PASSWORD_DEFAULT);
+		//$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
 		$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$userPassword', '$userYear')");
 
 		if ($result)
@@ -486,6 +488,139 @@ class DBConn_Librarian extends DBConn_User
 			return FALSE;
 		}
 	}
+
+	function updateSection($sectionId, $sectionName)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("SELECT sf_update_section('$user_id', '$sectionId', '$sectionName') AS ret");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('section');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function updateCategory($categoryId, $categoryName, $sectionId, $parentCategoryId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		if ($parentCategoryId == 0)
+		{
+			//$parentCategoryId = 'NULL';
+			$result = $this->conn->query("SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', NULL, '$sectionId') AS ret");
+		}
+		else
+		{
+			$result = $this->conn->query("SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', '$parentCategoryId', '$sectionId') AS ret");
+		}
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('category');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+	function deleteSection($sectionId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		if ($sectionId != 0)
+		{
+			$this->connect();
+			$result = $this->conn->query("SELECT sf_delete_section('$user_id', '$sectionId') AS ret");
+			if ($result)
+			{
+				$obj = $result->fetch_object();
+				$retVal = $obj->ret;
+				//echo $retVal . '<br /><br />';
+				$result->close();
+			}
+			$this->close();
+
+			if ($retVal == 1)
+			{
+				//echo $retVal . ' Success<br /><br />';
+				CacheManager::del('section');
+				return TRUE;
+			}
+		}
+
+		//echo $retVal . ' Failure<br /><br />';
+		return FALSE;
+	}
+
+
+	function deleteCategory($categoryId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		if ($categoryId != 0)
+		{
+			$this->connect();
+			$result = $this->conn->query("SELECT sf_delete_category('$user_id', '$categoryId') AS ret");
+			if ($result)
+			{
+				$obj = $result->fetch_object();
+				$retVal = $obj->ret;
+				//echo $retVal . '<br /><br />';
+				$result->close();
+			}
+			$this->close();
+
+			if ($retVal == 1)
+			{
+				//echo $retVal . ' Success<br /><br />';
+				CacheManager::del('category');
+				return TRUE;
+			}
+		}
+
+		//echo $retVal . ' Failure<br /><br />';
+		return FALSE;
+	}
 }
 
 class DbConn_Admin extends DBConn_Librarian
@@ -519,6 +654,7 @@ class DBConn_Login extends DBInterface
 		$retVal = -1;
 		$this->connect();
 		$result = $this->conn->query("CALL sp_login_account('$user_id', '$user_pass')");
+		//$result = $this->conn->query("CALL sp_login_account2('$user_id')");
 		if ($result)
 		{
 			//var_dump($result);
@@ -531,6 +667,8 @@ class DBConn_Login extends DBInterface
 				switch ($obj->result)
 				{
 					case 0:
+						//$hash = $obj->Passwd;
+						//if (password_verify($user_pass, $hash)) {
 						$user = new User();
 						$user->setId($obj->Account_id);
 						$user->setName($obj->Name);
@@ -540,6 +678,7 @@ class DBConn_Login extends DBInterface
 						$user->setEmail($obj->Email);
 						$user->setEnrollYear($obj->Enroll_year);
 						//echo 'Before<br /><br />'; var_dump($user); echo 'After<br /><br />';
+						//}
 						break;
 					case 1:
 						break;

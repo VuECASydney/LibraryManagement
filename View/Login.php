@@ -34,6 +34,7 @@ function login($redirect_page)
 	$user_pass = $_POST["user_password"];
 	$result = -1;
 	$user = DBConnection::login($user_id, $user_pass, $result);
+	//$user = DBConnection::login2($user_id, $user_pass, $result); // For bcrypt hash technique
 
 	if (!$user)
 	{

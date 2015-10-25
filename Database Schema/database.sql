@@ -393,6 +393,43 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_login_account2$$
+
+CREATE PROCEDURE sp_login_account2(user_id INT)
+BEGIN
+	-- result is 0 if login succeeds, otherwise login fails
+	-- 1 : no account
+	-- 2 : unknown account type
+	-- 3 : the number of consecutive login fail exceeds the limitation
+	DECLARE _password VARCHAR(100);
+	DECLARE result INT DEFAULT 0;
+	DECLARE user_type ENUM('Student', 'Faculty', 'Librarian', 'Admin');
+	DECLARE EXIT HANDLER FOR NOT FOUND
+	BEGIN
+		SET result = 1;
+		SELECT result, NULL AS Account_id, NULL AS Account_type, NULL AS Name, NULL AS Address, NULL AS Phone, NULL AS Email, NULL AS Enroll_year, NULL AS Passwd;
+	END;
+
+	SELECT Account_type, Passwd INTO user_type, _password FROM account WHERE Account_id = user_id;
+
+	IF user_type = 'Admin' OR user_type = 'Librarian' OR user_type = 'Faculty' THEN
+		SET result = 0;
+		SELECT result, Staff_id AS Account_id, user_type AS Account_type, Name, Address, Phone, Email, 0 AS Enroll_year, _password AS Passwd
+		FROM staff
+		WHERE Staff_id = user_id;
+	ELSEIF user_type = 'Student' THEN
+		SET result = 0;
+		SELECT result, Student_id AS Account_id, user_type AS Account_type, Name, Address, Phone, Email, Enroll_year, _password AS Passwd
+		FROM student
+		WHERE Student_id = user_id;
+	ELSE
+		SET result = 2;
+		SELECT result, NULL AS Account_id, NULL AS Account_type, NULL AS Name, NULL AS Address, NULL AS Phone, NULL AS Email, NULL AS Enroll_year, NULL AS Passwd;
+	END IF;
+END$$
+DELIMITER ;
+
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_publisher$$
 
 CREATE FUNCTION sf_create_publisher(executor_id INT, _publisher VARCHAR(25), _address VARCHAR(50), _phone VARCHAR(20)) RETURNS INT
@@ -523,6 +560,75 @@ BEGIN
 	IF result = 1 THEN
 		-- TODO : Check Maximum Books, CHECK Date_out < Due_date
 		INSERT INTO book_loan_log (Barcode_id, Borrower_id, Date_out, Due_date) VALUES (_barcode, user_id, _issue_date, _due_date);
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_update_section$$
+
+CREATE FUNCTION sf_update_section(executor_id INT, _section_id INT, _section VARCHAR(20)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		UPDATE section SET Section_name = _section WHERE Section_id = _section_id;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_update_category$$
+
+CREATE FUNCTION sf_update_category(executor_id INT, _category_id INT, _subject VARCHAR(50), _parent INT, _section INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		UPDATE category SET Subject = _subject, Parent_id = _parent, Section_id =  _section WHERE Category_id = _category_id AND _category_id <> _parent;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_section$$
+
+CREATE FUNCTION sf_delete_section(executor_id INT, _section_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+	-- _subject VARCHAR(50), _parent INT, _section INT
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM section WHERE Section_id = _section_id;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_category$$
+
+CREATE FUNCTION sf_delete_category(executor_id INT, _category_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM category WHERE Category_id = _category_id;
 	END IF;
 
 	RETURN result;
@@ -788,6 +894,9 @@ GRANT SELECT, EXECUTE, SHOW VIEW, CREATE, CREATE ROUTINE, CREATE TEMPORARY TABLE
 FLUSH PRIVILEGES;
 
 GRANT EXECUTE  ON PROCEDURE `library`.`sp_login_account` TO 'guest'@'localhost';
+FLUSH PRIVILEGES;
+
+GRANT EXECUTE  ON PROCEDURE `library`.`sp_login_account2` TO 'guest'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Account property should be created manually.
