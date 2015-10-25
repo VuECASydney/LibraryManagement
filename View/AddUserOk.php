@@ -113,7 +113,6 @@ function addUser()
 function editUser()
 {
 	global $userYear;
-	var_dump($_POST);
 
 	// TODO : Escape String for SQL Statement
 	$userId = $_POST[ACCOUNT_ID];
