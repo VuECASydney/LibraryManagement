@@ -66,7 +66,7 @@ if(isset($_SESSION[USER_INFO]))
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">VU Library </a>
+                <a class="navbar-brand" href="index.php">VU Library </a>
             </div>
 
              <ul>
@@ -121,11 +121,11 @@ if(isset($_SESSION[USER_INFO]))
                 <nav class="main-Navigation" role="navigation">
                     <ul id="secondary-links" class="navClass menu secondary-links">
                         <li class="item-1 dropdown  mlid-13688 menu-study-with-us dropdown-standard first" id="dropdown-li-study-with-us">
-                                 <a href="./mainDashBoard.php">Book Search</a>
+                                 <a href="./MainDashBoard.php">Book Search</a>
 
                         </li>
                         <li class="item-2 dropdown  mlid-13790 menu-student-life dropdown-standard" id="dropdown-li-student-life">
-                                <a href="./myaccount.php">My Accounts</a>
+                                <a href="./MyAccount.php">My Accounts</a>
 
                         </li>
                         <li class="item-3 dropdown  mlid-13894 menu-research dropdown-standard" id="dropdown-li-research">

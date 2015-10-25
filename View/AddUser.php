@@ -6,24 +6,87 @@
  */
 
 $title = 'Add User';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
+$actionType = ACTION_ADD; // Default Action
+$editable = TRUE;
+$accountId = NULL;
+if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL) {
+	switch ($_GET[ACTION_TYPE]) {
+		case ACTION_EDIT:
+			checkNullwithRedirect(USER_LIST_PAGE, $_GET[ITEM_ID]);
+			$actionType = ACTION_EDIT;
+			$accountId = $_GET[ITEM_ID];
+			$title = 'Edit User';
+			break;
+		case ACTION_DEL:
+			checkNullwithRedirect(USER_LIST_PAGE, $_GET[ITEM_ID]);
+			$actionType = ACTION_DEL;
+			$accountId = $_GET[ITEM_ID];
+			$title = 'Del User';
+			$editable = FALSE;
+			break;
+		case ACTION_ADD:
+		default:
+			break;
+	}
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
+
+$user = getUserInfo();
+$role = $user->getRole();
+$conn = DBConnection::getConnection($role);
+$account = NULL;
+if ($conn)
+{
+	$account = $conn->getAllUser();
+}
+
+$instance = NULL;
+$accountName = NULL;
+$accountRole = NULL;
+$accountAddress = NULL;
+$accountPhone = NULL;
+$accountEmail = NULL;
+$accountYear = NULL;
+switch ($actionType)
+{
+	case ACTION_EDIT:
+	case ACTION_DEL:
+		$instance = $account->getItem($accountId);
+		//var_dump($instance);
+
+		$accountName = $instance->getName();
+		// Role cannot be changed
+		$accountRole = $instance->getRole();
+		$accountAddress = $instance->getAddress();
+		$accountPhone = $instance->getPhone();
+		$accountEmail = $instance->getEmail();
+		$accountYear = $instance->getEnrollYear();
+		break;
+	case ACTION_ADD:
+	default:
+		break;
+}
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Add User
+                            <?php echo "$title\n"; ?>
                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li>
-                                <i class="fa fa-fw fa-bar-chart-o"></i><a href="UserList.php">User</a>
+                                <i class="fa fa-fw fa-bar-chart-o"></i><a href="<?php echo USER_LIST_PAGE; ?>">User</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i>  Add User
+                                <i class="fa fa-edit"></i>Add User
                             </li>
                         </ol>
                     </div>
@@ -35,41 +98,43 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Student/Staff</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" name="userType">
-                                        <option>Student</option>
-                                        <option>Faculty</option>
-										<option>Librarian</option>
+                                    <input type="hidden" name="<?php echo ACTION_TYPE; ?>" value="<?php echo $actionType; ?>">
+                                    <input type="hidden" name="<?php echo ACCOUNT_ID; ?>" value="<?php echo $accountId; ?>">
+                                    <select class="form-control" name="<?php echo ACCOUNT_TYPE; ?>"<?php echo ($actionType == ACTION_ADD ? '': ' disabled'); ?> >
+                                        <option<?php echo ($accountRole == 'Student' ? ' selected': ''); ?>>Student</option>
+                                        <option<?php echo ($accountRole == 'Faculty' ? ' selected': ''); ?>>Faculty</option>
+										<option<?php echo ($accountRole == 'Librarian' ? ' selected': ''); ?>>Librarian</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Name</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="userName" />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_NAME; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Address</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="address" />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ADDRESS; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Phone Number</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="phone" />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_PHONE; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Email</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="email" />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_EMAIL; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Year</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="enrollYear" />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ENROLL_YEAR; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <fieldset class="scheduler-border">
@@ -79,7 +144,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.
                                         <div class="form-group">
                                             <label class="control-label col-sm-2">Password</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" name="userPassword" />
+                                                <input type="text" class="form-control" name="<?php echo ACCOUNT_PASSWORD; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                             </div>
                                         </div>
                                     </div>

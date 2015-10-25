@@ -98,15 +98,15 @@ switch ($actionType)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Category Name</label>
                                 <div class="col-sm-10">
-                                    <input type="hidden" name="act" value="<?php echo $actionType; ?>">
-                                    <input type="hidden" name="categoryId" value="<?php echo $categoryId; ?>">
-                                    <input type="text" class="form-control" name="categoryName" value="<?php echo $subjectName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="hidden" name="<?php echo ACTION_TYPE; ?>" value="<?php echo $actionType; ?>">
+                                    <input type="hidden" name="<?php echo CATEGORY_ID; ?>" value="<?php echo $categoryId; ?>">
+                                    <input type="text" class="form-control" name="<?php echo CATEGORY_NAME; ?>" value="<?php echo $subjectName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Section Name</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" name="sectionId"<?php echo ($editable ? '': ' disabled'); ?>>
+                                    <select class="form-control" name="<?php echo SECTION_ID; ?>"<?php echo ($editable ? '': ' disabled'); ?>>
 <?php
 if ($section)
 {
@@ -132,7 +132,7 @@ if ($section)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Parent Category</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" name="parentCategoryId"<?php echo ($editable ? '': ' disabled'); ?>>
+                                    <select class="form-control" name="<?php echo PARENT_CATEGORY_ID; ?>"<?php echo ($editable ? '': ' disabled'); ?>>
                                         <option value="0">No Parent Subject</option>
 <?php
 if ($category)

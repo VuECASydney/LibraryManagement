@@ -64,7 +64,7 @@ class DBConn_Guest extends DBInterface
 
 	function __destruct()
 	{
-		echo '~DBConn_User<br />';
+		//echo '~DBConn_User<br />';
 	}
       function getSearchBook($Book_Name,$Publisher_Id,$Category_Id)
 	{

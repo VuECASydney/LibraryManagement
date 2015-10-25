@@ -10,8 +10,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
 const PREFIX_PAREMETERS_ADD = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_ADD;
-const PREFIX_PAREMETERS_EDIT = ADD_CATEGORY_PAGE. '?' . ACTION_TYPE . '=' . ACTION_EDIT . '&' . ITEM_ID . '=';
-const PREFIX_PAREMETERS_DEL = ADD_CATEGORY_PAGE. '?' . ACTION_TYPE . '=' . ACTION_DEL . '&' . ITEM_ID . '=';
+const PREFIX_PAREMETERS_EDIT = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_EDIT . '&' . ITEM_ID . '=';
+const PREFIX_PAREMETERS_DEL = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_DEL . '&' . ITEM_ID . '=';
 
 $user = getUserInfo();
 $role = $user->getRole();
