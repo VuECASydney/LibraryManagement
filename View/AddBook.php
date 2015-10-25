@@ -2,11 +2,11 @@
 /**
  * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 21 August 2015
- * Date Modified : 
+ * Date Modified :
  */
         $bookID=0;
 
-        if($_GET['Book_id'] != "")   {
+        if(isset($_GET['Book_id']))   {
              $bookID=$_GET['Book_id'];
      }
 
@@ -23,6 +23,7 @@ if ($conn)
 {
 	$publisher = $conn->getAllPublisher();
 	$category = $conn->getAllCategory();
+
     if($bookID>0)
     {
 
@@ -58,6 +59,7 @@ if ($conn)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Book Name</label>
                                 <div class="col-sm-10">
+                                     <input type="hidden" name="bookId" value=<?php echo($bookID )?> />
                                     <input type="text" class="form-control" name="bookName" placeholder="<?php echo( $bookID>0?$book->getTitle():(''));?>" />
                                 </div>
                             </div>
@@ -78,7 +80,7 @@ if ($publisher)
 	$iter = $publisher->iterator();
 	foreach ($iter as $key => $value) {
 ?>
-                                        <option value="<?php echo $value->getId(); ?>" <?php echo($value->getId()==$book->getPublisherId()?'selected':'')?>><?php echo $value->getName(); ?>  </option>
+                                        <option value="<?php echo $value->getId(); ?>" <?php echo(($bookID>0 && $value->getId()==$book->getPublisherId())?'selected':'')?>><?php echo $value->getName(); ?>  </option>
 <?php
 	}
 }
@@ -97,7 +99,7 @@ if ($category)
 	$iter = $category->iterator();
 	foreach ($iter as $key => $value) {
 ?>
-                                        <option value="<?php echo $value->getId(); ?>" <?php echo($value->getId()==$book->getCategoryId()?'selected':'')?>><?php echo $value->getSubject(); ?></option>
+                                        <option value="<?php echo $value->getId(); ?>" <?php echo(($bookID>0 && $value->getId()==$book->getCategoryId())?'selected':'')?>><?php echo $value->getSubject(); ?></option>
 <?php
 	}
 }
