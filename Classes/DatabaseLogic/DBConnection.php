@@ -593,7 +593,7 @@ class DBConn_Librarian extends DBConn_User
 		if ($categoryId != 0)
 		{
 			$this->connect();
-			$result = $this->conn->query("SELECT sf_delete_publisher('$user_id', '$publisherId') AS ret");
+			$result = $this->conn->query("SELECT sf_delete_pubisher('$user_id', '$publisherId') AS ret");
 			if ($result)
 			{
 				$obj = $result->fetch_object();
