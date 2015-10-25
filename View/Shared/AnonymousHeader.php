@@ -7,9 +7,10 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 
+
 if(isset($_SESSION[USER_INFO]))
  {
-    //    redirectPageWithSession();
+
         $user = getUserInfo();
 }
 //$role = $user->getRole();
