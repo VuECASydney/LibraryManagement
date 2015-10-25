@@ -17,6 +17,13 @@ const SECTION_ID = 'sectionId';
 const SECTION_NAME = 'sectionName';
 const PARENT_CATEGORY_ID = 'parentCategoryId';
 
+
+const PUBLISHER_ID = 'publisherId';
+const PUBLISHER_NAME = 'publisherName';
+const PUBLISHER_ADDRESS = 'publisherAddress';
+const PUBLISHER_PHONE = 'publisherPhone';
+
+
 const SECTION_LIST_PAGE = 'SectionList.php';
 const ADD_SECTION_PAGE = 'AddSection.php';
 const OK_SECTION_PAGE = 'AddSectionOk.php';
@@ -24,4 +31,12 @@ const OK_SECTION_PAGE = 'AddSectionOk.php';
 const CATEGORY_LIST_PAGE = 'CategoryList.php';
 const ADD_CATEGORY_PAGE = 'AddCategory.php';
 const OK_CATEGORY_PAGE = 'AddCategoryOk.php';
+
+const PUBLISHER_LIST_PAGE = 'PublisherList.php';
+const ADD_PUBLISHER_PAGE = 'AddPublisher.php';
+const OK_PUBLISHER_PAGE = 'AddPublisherOk.php';
+
+const AUTHOR_LIST_PAGE = 'AuthorList.php';
+const ADD_AUTHOR_PAGE = 'AddAuthor.php';
+const OK_AUTHOR_PAGE = 'AddAuthorOk.php';
 ?>
