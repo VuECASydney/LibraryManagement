@@ -75,7 +75,7 @@ class DBConn_Guest extends DBInterface
 
 		$this->connect();
 
-	  
+
 		$result = $this->conn->query("CALL sp_get_Search_book('$Book_Name',$Publisher_Id,$Category_Id)");
 
 
@@ -654,6 +654,37 @@ class DBConn_Librarian extends DBConn_User
 
 		$this->connect();
 		$result = $this->conn->query("SELECT sf_create_book('$user_id', '$bookName', '$publisherId', '$bookIsbn', '$categoryId') AS ret");
+
+		if ($result)
+		{
+			$obj = $result->fetch_object();
+			$retVal = $obj->ret;
+			//echo $retVal . '<br /><br />';
+			$result->close();
+		}
+		$this->close();
+
+		if ($retVal == 1)
+		{
+			//echo $retVal . ' Success<br /><br />';
+			CacheManager::del('book');
+			return TRUE;
+		}
+		else
+		{
+			//echo $retVal . ' Failure<br /><br />';
+			return FALSE;
+		}
+	}
+
+    function editBook($bookId, $publisherId, $categoryId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		$this->connect();
+		$result = $this->conn->query("SELECT sf_edit_book('$user_id','$bookId',  '$publisherId',  '$categoryId') AS ret");
 
 		if ($result)
 		{

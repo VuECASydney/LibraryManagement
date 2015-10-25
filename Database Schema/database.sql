@@ -461,6 +461,22 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DROP FUNCTION IF EXISTS sf_edit_book$$
+
+CREATE ` FUNCTION sf_edit_book(executor_id INT,book_id int, _publisher INT, _category INT) RETURNS int(11)
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		update book as b set  b.Publisher_id=_publisher, b.Category_id=_category where b.Book_id=book_id ;
+	END IF;
+
+	RETURN result;
+END
+DELIMITER ;
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_book$$
 
 CREATE FUNCTION sf_create_book(executor_id INT, _title VARCHAR(80), _publisher INT, _isbn BIGINT, _category INT) RETURNS INT
