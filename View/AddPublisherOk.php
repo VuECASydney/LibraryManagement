@@ -4,7 +4,8 @@
  * Date Created : 15 October 2015
  * Date Modified : 
  */
- require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
 redirectPageWithoutSession();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
@@ -22,28 +23,28 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
-			editCategory();
+			editPublisher();
 			break;
 		case ACTION_DEL:
 			$actionType = $_GET[ACTION_TYPE];
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ID]);
-			delCategory();
+			delPublisher();
 			break;
 		case ACTION_ADD:
 		default:
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
 			checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
-			addCategory();
+			addPublisher();
 			break;
 	}
 }
 else
 {
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_NAME]);
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_ADDRESS]);
-	checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[PUBLISHER_PHONE]);
-	addCategory();
+	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_NAME]);
+	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_ADDRESS]);
+	checkNullwithRedirect(ADD_PUBLISHER_PAGE, $_GET[PUBLISHER_PHONE]);
+	addPublisher();
 }
 
 function addPublisher()
@@ -89,13 +90,14 @@ function delPublisher()
 {
 	// TODO : Escape String for SQL Statement
   	$publisherId = $_GET[PUBLISHER_ID];
-	$redirectPage = CATEGORY_LIST_PAGE;
+	$redirectPage = PUBLISHER_LIST_PAGE;
 
 	$user = getUserInfo();
 	$role = $user->getRole();
 	$conn = DBConnection::getConnection($role);
 	if ($conn)
 	{
+		//var_dump($_POST);
 		$result = $conn->deletePublisher($publisherId);
 		header("Location: $redirectPage");
 		exit();

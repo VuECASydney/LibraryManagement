@@ -584,13 +584,13 @@ class DBConn_Librarian extends DBConn_User
 		}
 	}
 
-    	function deletePublisher($publisherId)
+	function deletePublisher($publisherId)
 	{
 		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
 
-		if ($categoryId != 0)
+		if ($publisherId != 0)
 		{
 			$this->connect();
 			$result = $this->conn->query("SELECT sf_delete_pubisher('$user_id', '$publisherId') AS ret");
@@ -614,6 +614,7 @@ class DBConn_Librarian extends DBConn_User
 		//echo $retVal . ' Failure<br /><br />';
 		return FALSE;
 	}
+
 	function updatePublisher($publisherId, $publisherName, $publisherAddress, $publsiherPhone)
 	{
 		$retVal = NULL;
@@ -895,6 +896,37 @@ class DBConn_Librarian extends DBConn_User
 			{
 				//echo $retVal . ' Success<br /><br />';
 				CacheManager::del('category');
+				return TRUE;
+			}
+		}
+
+		//echo $retVal . ' Failure<br /><br />';
+		return FALSE;
+	}
+
+	function deleteUser($accountId)
+	{
+		$retVal = NULL;
+		$user = getUserInfo();
+		$user_id = $user->getId();
+
+		if ($accountId != 0)
+		{
+			$this->connect();
+			$result = $this->conn->query("SELECT sf_delete_account('$user_id', '$accountId') AS ret");
+			if ($result)
+			{
+				$obj = $result->fetch_object();
+				$retVal = $obj->ret;
+				//echo $retVal . '<br /><br />';
+				$result->close();
+			}
+			$this->close();
+
+			if ($retVal == 1)
+			{
+				//echo $retVal . ' Success<br /><br />';
+				CacheManager::del('user');
 				return TRUE;
 			}
 		}

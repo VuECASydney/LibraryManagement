@@ -51,6 +51,7 @@ $accountAddress = NULL;
 $accountPhone = NULL;
 $accountEmail = NULL;
 $accountYear = NULL;
+
 switch ($actionType)
 {
 	case ACTION_EDIT:
@@ -110,31 +111,31 @@ switch ($actionType)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Name</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_NAME; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_NAME; ?>" value="<?php echo $accountName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Address</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ADDRESS; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ADDRESS; ?>" value="<?php echo $accountAddress; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Phone Number</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_PHONE; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_PHONE; ?>" value="<?php echo $accountPhone; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Email</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_EMAIL; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_EMAIL; ?>" value="<?php echo $accountEmail; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Year</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ENROLL_YEAR; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="text" class="form-control" name="<?php echo ACCOUNT_ENROLL_YEAR; ?>" value="<?php echo $accountYear; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <fieldset class="scheduler-border">

@@ -41,7 +41,7 @@ if (isset($_POST[ACTION_TYPE]) && $_POST[ACTION_TYPE] != NULL)
 			break;
 		case ACTION_DEL:
 			$actionType = $_POST[ACTION_TYPE];
-			//checkNullwithRedirect(ADD_USER_PAGE, $_POST[CATEGORY_ID]);
+			checkNullwithRedirect(ADD_USER_PAGE, $_POST[ACCOUNT_ID]);
 			delUser();
 			exit();
 			break;
@@ -102,25 +102,6 @@ function addUser()
 {
 	global $userYear;
 
-// ["act"]=>"add" ["userId"]=> "" ["userType"]=>"Student" ["userName"]=>"" ["address"]=>"" ["phone"]=>"" ["email"]=> "" ["enrollYear"]=>"" ["userPassword"]=>""
-/*
-	// TODO : Escape String for SQL Statement
-	$categoryName = $_GET[CATEGORY_NAME];
-	$sectionId = $_GET[SECTION_ID];
-	$parentCategoryId = $_GET[PARENT_CATEGORY_ID];
-	$redirectPage = CATEGORY_LIST_PAGE;
-
-	$user = getUserInfo();
-	$role = $user->getRole();
-	$conn = DBConnection::getConnection($role);
-	if ($conn)
-	{
-		$result = $conn->insertCategory($categoryName, $sectionId, $parentCategoryId);
-		header("Location: $redirectPage");
-		exit();
-	}
-*/
-
 	// TODO : Escape String for SQL Statement
 	$userType = $_POST[ACCOUNT_TYPE];
 	$userName = $_POST[ACCOUNT_NAME];
@@ -164,21 +145,21 @@ function editUser()
 
 function delUser()
 {
-/*
+	$userId = $_POST[ACCOUNT_ID];
+
 	// TODO : Escape String for SQL Statement
-	$categoryId = $_GET[CATEGORY_ID];
-	$redirectPage = CATEGORY_LIST_PAGE;
+	$userId = $_POST[ACCOUNT_ID];
+	$redirectPage = USER_LIST_PAGE;
 
 	$user = getUserInfo();
 	$role = $user->getRole();
 	$conn = DBConnection::getConnection($role);
 	if ($conn)
 	{
-		$result = $conn->deleteCategory($categoryId);
+		$result = $conn->deleteUser($userId);
 		header("Location: $redirectPage");
 		exit();
 	}
-*/
 }
 
 /*
