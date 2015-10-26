@@ -8,8 +8,9 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Cate
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Publisher.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Author.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Book.php';
- require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/BookLoan.php';
-         require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/fine.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/BookLoan.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Fine.php';
+
 abstract class DBInterface
 {
 	/* Database config */
@@ -56,8 +57,7 @@ abstract class DBInterface
 
 class DBConn_Guest extends DBInterface
 {
-
-  	function __construct()
+	function __construct()
 	{
 		parent::__construct(USER_NAME, USER_PASS);
 	}
@@ -66,20 +66,18 @@ class DBConn_Guest extends DBInterface
 	{
 		//echo '~DBConn_User<br />';
 	}
-      function getSearchBook($Book_Name,$Publisher_Id,$Category_Id)
+
+	function getSearchBook($Book_Name, $Publisher_Id, $Category_Id)
 	{
-      	$key = 'bookSearch';
+		$key = 'bookSearch';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
+		$collection = new Collection();
 		$this->connect();
 
-
-		$result = $this->conn->query("CALL sp_get_Search_book('$Book_Name',$Publisher_Id,$Category_Id)");
-
-
-		$collection = new Collection();
+		$result = $this->conn->query("CALL sp_get_search_book('$Book_Name', $Publisher_Id, $Category_Id)");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -103,17 +101,18 @@ class DBConn_Guest extends DBInterface
 		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
-    function getAllBook()
+
+	function getAllBook()
 	{
 		$key = 'book';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_book()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_book()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -137,17 +136,18 @@ class DBConn_Guest extends DBInterface
 		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
-    function getAllPublisher()
+
+	function getAllPublisher()
 	{
 		$key = 'publisher';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_publisher()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_publisher()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -169,17 +169,17 @@ class DBConn_Guest extends DBInterface
 		return $collection;
 	}
 
-    function getAllCategory()
+	function getAllCategory()
 	{
 		$key = 'category';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_category()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_category()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -202,8 +202,8 @@ class DBConn_Guest extends DBInterface
 		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
-
 }
+
 class DBConn_User extends DBConn_Guest
 {
 	function __construct()
@@ -213,83 +213,79 @@ class DBConn_User extends DBConn_Guest
 
 	function __destruct()
 	{
-		echo '~DBConn_User<br />';
+		//echo '~DBConn_User<br />';
 	}
 
-     function getFineByBorrowerid($Borrower_id)
+	function getFineByBorrowerid($Borrower_id)
 	{
-	    $key = 'FineLog';
+		$key = 'FineLog';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_fine_borrower_id('$Borrower_id')");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_fine_borrower_id('$Borrower_id')");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
 			while ($obj = $result->fetch_object())
 			{
-
-                $fine = new fine();
-
-                $fine->setFineId($obj->Fine_id);
-                $fine->setBookTitle($obj->Title);
+				$fine = new Fine();
+				$fine->setFineId($obj->Fine_id);
+				$fine->setBookTitle($obj->Title);
 				$fine->setAmount($obj->Amount);
 				$fine->setDueDate($obj->due_date);
-			   	$fine->setReturnDate($obj->Return_date);
+				$fine->setReturnDate($obj->Return_date);
 				$fine->setPaymentDate($obj->Payment_date);
-                 $collection->addItem($fine, $obj->Fine_id);
-
-                }
+				$collection->addItem($fine, $obj->Fine_id);
+			}
 			$result->close(); // for fetch_object()
-            }
+		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
 
-	  	CacheManager::set($key, $collection, TRUE);
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
-    function getBookByBorrowerid($Borrower_id)
+
+	function getBookByBorrowerid($Borrower_id)
 	{
-	    $key = 'bookLoan';
+		$key = 'bookLoan';
 		$collection = CacheManager::get($key, TRUE);
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_Get_Loan_books_By_Borrower_id('$Borrower_id')");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_Get_Loan_books_By_Borrower_id('$Borrower_id')");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
 			while ($obj = $result->fetch_object())
 			{
-
-                $bookLoan = new BookLoan();
-
-                $bookLoan->setLogId($obj->Log_id);
-                $bookLoan->setBarcodeId($obj->Barcode_id);
+				$bookLoan = new BookLoan();
+				$bookLoan->setLogId($obj->Log_id);
+				$bookLoan->setBarcodeId($obj->Barcode_id);
 				$bookLoan->setTitle($obj->Title);
 				$bookLoan->setPublisherId($obj->Publisher_id);
 				$bookLoan->setIsbn($obj->Isbn);
 				$bookLoan->setCategoryId($obj->Category_id);
 				$bookLoan->setPublisherName($obj->Publisher_name);
 				$bookLoan->setCategoryName($obj->Subject);
-                $bookLoan->setDateIssue($obj->Date_out);
+				$bookLoan->setDateIssue($obj->Date_out);
 				$bookLoan->setDateDue($obj->Due_date);
 				$bookLoan->setDateReturn($obj->Return_date);
-                $collection->addItem($bookLoan, $obj->Log_id);
-                }
+				$collection->addItem($bookLoan, $obj->Log_id);
+			}
 			$result->close(); // for fetch_object()
-            }
+		}
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
 
-	  	CacheManager::set($key, $collection, TRUE);
+		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
 }
@@ -313,10 +309,10 @@ class DBConn_Librarian extends DBConn_User
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_section()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_section()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -336,7 +332,6 @@ class DBConn_Librarian extends DBConn_User
 		return $collection;
 	}
 
-
 	function getAllAuthor()
 	{
 		$key = 'author';
@@ -344,10 +339,10 @@ class DBConn_Librarian extends DBConn_User
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_author()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_author()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -374,10 +369,10 @@ class DBConn_Librarian extends DBConn_User
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_user()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_user()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -409,10 +404,10 @@ class DBConn_Librarian extends DBConn_User
 		if ($collection)
 			return $collection;
 
-		$this->connect();
-		$result = $this->conn->query("CALL sp_get_all_book()");
-
 		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_book()");
 		if ($result)
 		{
 			//$row = $result->fetch_assoc();
@@ -436,102 +431,54 @@ class DBConn_Librarian extends DBConn_User
 		CacheManager::set($key, $collection, TRUE);
 		return $collection;
 	}
-    function getBookById($Bood_Id)
+
+	function getBookById($Bood_Id)
 	{
-        $book = new Book();
+		$book = new Book();
 
 		$this->connect();
 		$result = $this->conn->query("CALL sp_search_book_by_book_id('$Bood_Id')");
 
+		$obj = $result->fetch_object();
 
-			    $obj = $result->fetch_object();
+		$book->setBookId($obj->Book_id);
+		$book->setTitle($obj->Title);
+		$book->setPublisherId($obj->Publisher_id);
+		$book->setIsbn($obj->Isbn);
+		$book->setCategoryId($obj->Category_id);
+		$book->setPublisherName($obj->Publisher_name);
+		$book->setCategoryName($obj->Subject);
 
-
-				$book->setBookId($obj->Book_id);
-				$book->setTitle($obj->Title);
-				$book->setPublisherId($obj->Publisher_id);
-				$book->setIsbn($obj->Isbn);
-				$book->setCategoryId($obj->Category_id);
-				$book->setPublisherName($obj->Publisher_name);
-				$book->setCategoryName($obj->Subject);
-
-
-			$result->close(); // for fetch_object()
+		$result->close(); // for fetch_object()
 
 		//$result->free_result(); // for fetch_assoc()
 		$this->close();
 
-	   return $book;
+		return $book;
 	}
+
 	function insertSection($sectionName)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_create_section('$user_id', '$sectionName') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('section');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_create_section('$user_id', '$sectionName') AS result";
+		return $this->query1('section', $sql);
 	}
-
 
 	function insertCategory($categoryName, $sectionId, $parentCategoryId)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
+		$sql = "";
 		if ($parentCategoryId == 0)
-		{
-			//$parentCategoryId = 'NULL';
-			$result = $this->conn->query("SELECT sf_create_category('$user_id', '$categoryName', NULL, '$sectionId') AS ret");
+		{	//$parentCategoryId = NULL;
+			$sql = "SELECT sf_create_category('$user_id', '$categoryName', NULL, '$sectionId') AS result";
 		}
 		else
 		{
-			$result = $this->conn->query("SELECT sf_create_category('$user_id', '$categoryName', '$parentCategoryId', '$sectionId') AS ret");
+			$sql = "SELECT sf_create_category('$user_id', '$categoryName', '$parentCategoryId', '$sectionId') AS result";
 		}
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('category');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		return $this->query1('category', $sql);
 	}
 
 	function insertPublisher($publisherName, $publisherAddress, $publisherPhone)
@@ -586,272 +533,131 @@ class DBConn_Librarian extends DBConn_User
 
 	function deletePublisher($publisherId)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		if ($publisherId != 0)
-		{
-			$this->connect();
-			$result = $this->conn->query("SELECT sf_delete_pubisher('$user_id', '$publisherId') AS ret");
-			if ($result)
-			{
-				$obj = $result->fetch_object();
-				$retVal = $obj->ret;
-				//echo $retVal . '<br /><br />';
-				$result->close();
-			}
-			$this->close();
-
-			if ($retVal == 1)
-			{
-				//echo $retVal . ' Success<br /><br />';
-				CacheManager::del('publisher');
-				return TRUE;
-			}
-		}
-
-		//echo $retVal . ' Failure<br /><br />';
-		return FALSE;
+		$sql = "SELECT sf_delete_pubisher('$user_id', '$publisherId') AS result";
+		return $this->query1('publisher', $sql);
 	}
 
 	function updatePublisher($publisherId, $publisherName, $publisherAddress, $publsiherPhone)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_update_piblisher('$user_id', '$publisherId', '$publisherName','$publisherAddress', '$publsiherPhone') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('publisher');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_update_piblisher('$user_id', '$publisherId', '$publisherName','$publisherAddress', '$publsiherPhone') AS result";
+		return $this->query1('publisher', $sql);
 	}
 
 	function insertAuthor($authorName)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_create_author('$user_id', '$authorName') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('author');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_create_author('$user_id', '$authorName') AS result";
+		return $this->query1('author', $sql);
 	}
 
 	function insertUser($userType, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$hash = generate_hash_password($userPassword);
-		$result = $this->conn->query("CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			//$retVal = $obj->result;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('user');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$hash = $this->generate_hash_password($userPassword);
+		$sql = "CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
+		return $this->query1('user', $sql);
 	}
 
 	function insertBook($bookName, $bookIsbn, $publisherId, $categoryId)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_create_book('$user_id', '$bookName', '$publisherId', '$bookIsbn', '$categoryId') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('book');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_create_book('$user_id', '$bookName', '$publisherId', '$bookIsbn', '$categoryId') AS result";
+		return $this->query1('book', $sql);
 	}
 
     function editBook($bookId, $publisherId, $categoryId)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_edit_book('$user_id','$bookId',  '$publisherId',  '$categoryId') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('book');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_edit_book('$user_id', '$bookId', '$publisherId', '$categoryId') AS result";
+		return $this->query1('book', $sql);
 	}
 
 	function updateSection($sectionId, $sectionName)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
-		$result = $this->conn->query("SELECT sf_update_section('$user_id', '$sectionId', '$sectionName') AS ret");
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('section');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		$sql = "SELECT sf_update_section('$user_id', '$sectionId', '$sectionName') AS result";
+		return $this->query1('section', $sql);
 	}
 
 	function updateCategory($categoryId, $categoryName, $sectionId, $parentCategoryId)
 	{
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
-
-		$this->connect();
+		$sql = "";
 		if ($parentCategoryId == 0)
-		{
-			//$parentCategoryId = 'NULL';
-			$result = $this->conn->query("SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', NULL, '$sectionId') AS ret");
+		{	//$parentCategoryId = NULL;
+			$sql = "SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', NULL, '$sectionId') AS result";
 		}
 		else
 		{
-			$result = $this->conn->query("SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', '$parentCategoryId', '$sectionId') AS ret");
+			$sql = "SELECT sf_update_category('$user_id', '$categoryId', '$categoryName', '$parentCategoryId', '$sectionId') AS result";
 		}
-
-		if ($result)
-		{
-			$obj = $result->fetch_object();
-			$retVal = $obj->ret;
-			//echo $retVal . '<br /><br />';
-			$result->close();
-		}
-		$this->close();
-
-		if ($retVal == 1)
-		{
-			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('category');
-			return TRUE;
-		}
-		else
-		{
-			//echo $retVal . ' Failure<br /><br />';
-			return FALSE;
-		}
+		return $this->query1('category', $sql);
 	}
 
 	function updateUser($userId, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
 	{
-		// $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword
-		$retVal = NULL;
 		$user = getUserInfo();
 		$user_id = $user->getId();
+		$hash = $this->generate_hash_password($userPassword);
+		$sql = "CALL sp_update_account('$user_id', '$userId', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
+		return $this->query1('user', $sql);
+	}
+
+	function deleteSection($sectionId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_section('$user_id', '$sectionId') AS result";
+		return $this->query1('section', $sql);
+	}
+
+	function deleteCategory($categoryId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_category('$user_id', '$categoryId') AS result";
+		return $this->query1('category', $sql);
+	}
+
+	function deleteUser($accountId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_account('$user_id', '$accountId') AS result";
+		return $this->query1('user', $sql);
+	}
+
+	function updateAuthor($authorId, $authorName)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_update_author('$user_id', '$authorId', '$authorName') AS result";
+		return $this->query1('author', $sql);
+	}
+
+	function deleteAuthor($authorId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_author('$user_id', '$authorId') AS result";
+		return $this->query1('author', $sql);
+	}
+
+	function query1($index, $sqlString) {
+		$retVal = NULL;
 
 		$this->connect();
-		$hash = $this->generate_hash_password($userPassword);
-		$result = $this->conn->query("CALL sp_update_account('$user_id', '$userId', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')");
-
+		$result = $this->conn->query($sqlString);
 		if ($result)
 		{
 			$obj = $result->fetch_object();
@@ -864,7 +670,7 @@ class DBConn_Librarian extends DBConn_User
 		if ($retVal == 1)
 		{
 			//echo $retVal . ' Success<br /><br />';
-			CacheManager::del('user');
+			CacheManager::del($index);
 			return TRUE;
 		}
 		else
@@ -872,99 +678,6 @@ class DBConn_Librarian extends DBConn_User
 			//echo $retVal . ' Failure<br /><br />';
 			return FALSE;
 		}
-	}
-
-	function deleteSection($sectionId)
-	{
-		$retVal = NULL;
-		$user = getUserInfo();
-		$user_id = $user->getId();
-
-		if ($sectionId != 0)
-		{
-			$this->connect();
-			$result = $this->conn->query("SELECT sf_delete_section('$user_id', '$sectionId') AS ret");
-			if ($result)
-			{
-				$obj = $result->fetch_object();
-				$retVal = $obj->ret;
-				//echo $retVal . '<br /><br />';
-				$result->close();
-			}
-			$this->close();
-
-			if ($retVal == 1)
-			{
-				//echo $retVal . ' Success<br /><br />';
-				CacheManager::del('section');
-				return TRUE;
-			}
-		}
-
-		//echo $retVal . ' Failure<br /><br />';
-		return FALSE;
-	}
-
-	function deleteCategory($categoryId)
-	{
-		$retVal = NULL;
-		$user = getUserInfo();
-		$user_id = $user->getId();
-
-		if ($categoryId != 0)
-		{
-			$this->connect();
-			$result = $this->conn->query("SELECT sf_delete_category('$user_id', '$categoryId') AS ret");
-			if ($result)
-			{
-				$obj = $result->fetch_object();
-				$retVal = $obj->ret;
-				//echo $retVal . '<br /><br />';
-				$result->close();
-			}
-			$this->close();
-
-			if ($retVal == 1)
-			{
-				//echo $retVal . ' Success<br /><br />';
-				CacheManager::del('category');
-				return TRUE;
-			}
-		}
-
-		//echo $retVal . ' Failure<br /><br />';
-		return FALSE;
-	}
-
-	function deleteUser($accountId)
-	{
-		$retVal = NULL;
-		$user = getUserInfo();
-		$user_id = $user->getId();
-
-		if ($accountId != 0)
-		{
-			$this->connect();
-			$result = $this->conn->query("SELECT sf_delete_account('$user_id', '$accountId') AS ret");
-			if ($result)
-			{
-				$obj = $result->fetch_object();
-				$retVal = $obj->ret;
-				//echo $retVal . '<br /><br />';
-				$result->close();
-			}
-			$this->close();
-
-			if ($retVal == 1)
-			{
-				//echo $retVal . ' Success<br /><br />';
-				CacheManager::del('user');
-				return TRUE;
-			}
-		}
-
-		//echo $retVal . ' Failure<br /><br />';
-		return FALSE;
 	}
 
 	function generate_hash_password($password) {
@@ -983,7 +696,7 @@ class DbConn_Admin extends DBConn_Librarian
 
 	function __destruct()
 	{
-		echo '~DbConn_Admin<br />';
+		//echo '~DbConn_Admin<br />';
 	}
 }
 
@@ -1095,7 +808,7 @@ class DBConnection
 		$conn->login($user_id, $user_pass, $result, $user);
 		if (!is_null($user))
 		{
-			var_dump($user);
+			//var_dump($user);
 			switch ($user->type)
 			{
 				case 'Admin':

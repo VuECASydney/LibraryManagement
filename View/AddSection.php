@@ -60,7 +60,6 @@ switch ($actionType)
 	default:
 		break;
 }
-
 ?>
             <div class="container-fluid">
                 <!-- Page Heading -->
@@ -89,9 +88,9 @@ switch ($actionType)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Section Name</label>
                                 <div class="col-sm-10">
-                                    <input type="hidden" name="act" value="<?php echo $actionType; ?>">
-                                    <input type="hidden" name="sectionId" value="<?php echo $sectionId; ?>">
-                                    <input type="text" class="form-control" name="sectionName" value="<?php echo $sectionName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
+                                    <input type="hidden" name="<?php echo ACTION_TYPE; ?>" value="<?php echo $actionType; ?>">
+                                    <input type="hidden" name="<?php echo SECTION_ID; ?>" value="<?php echo $sectionId; ?>">
+                                    <input type="text" class="form-control" name="<?php echo SECTION_NAME; ?>" value="<?php echo $sectionName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-default">Submit Button</button>

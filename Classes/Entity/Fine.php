@@ -1,11 +1,11 @@
 <?php
 /**
- * Author : Choongyeol Kim
- * Date Created : 8 October 2015
+ * Author : Brijender Parta Rana
+ * Date Created : 25 October 2015
  * Date Modified : 
  */
 
-class fine
+class Fine
 {
 	private $fineId;
 

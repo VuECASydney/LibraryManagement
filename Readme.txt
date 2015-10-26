@@ -1,4 +1,4 @@
-﻿README.txt
+README.txt
 
 2015-08-19
 

@@ -11,7 +11,6 @@ redirectPageWithoutSession();
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
-var_dump($_GET);
 
 $actionType = ACTION_ADD; // Default Action
 if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
@@ -19,14 +18,14 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 	switch ($_GET[ACTION_TYPE])
 	{
 		case ACTION_EDIT:
-			$actionType = $_GET[ACTION_TYPE];
+			$actionType = ACTION_EDIT;
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_ID]);
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_NAME]);
 			editSection();
 			exit();
 			break;
 		case ACTION_DEL:
-			$actionType = $_GET[ACTION_TYPE];
+			$actionType = ACTION_DEL;
 			checkNullwithRedirect(ADD_SECTION_PAGE, $_GET[SECTION_ID]);
 			delSection();
 			exit();

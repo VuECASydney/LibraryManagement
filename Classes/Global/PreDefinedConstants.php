@@ -31,6 +31,8 @@ const PUBLISHER_NAME = 'publisherName';
 const PUBLISHER_ADDRESS = 'publisherAddress';
 const PUBLISHER_PHONE = 'publisherPhone';
 
+const AUTHOR_ID = 'authorId';
+const AUTHOR_NAME = 'authorName';
 
 const SECTION_LIST_PAGE = 'SectionList.php';
 const ADD_SECTION_PAGE = 'AddSection.php';

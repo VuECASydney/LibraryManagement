@@ -602,6 +602,25 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DROP FUNCTION IF EXISTS sf_update_author$$
+
+CREATE FUNCTION sf_update_author(executor_id INT, _author_id INT, _author VARCHAR(20)) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		UPDATE author
+		SET Author_name = _author
+		WHERE Author_id = _author_id;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_update_piblisher$$
 
 CREATE FUNCTION sf_update_piblisher(executor_id INT, _publisherId INT, _publisherName VARCHAR(25), _publisherAddress VARCHAR(50), _publsiherPhone VARCHAR(25)) RETURNS INT
@@ -630,10 +649,16 @@ BEGIN
 	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		UPDATE category
-		SET Subject = _subject, Parent_id = _parent, Section_id =  _section
-		WHERE Category_id = _category_id AND
-				_category_id <> _parent;
+		IF _parent IS NOT NULL THEN
+			UPDATE category
+			SET Subject = _subject, Parent_id = _parent, Section_id =  _section
+			WHERE Category_id = _category_id AND
+					_category_id <> _parent;
+		ELSE
+			UPDATE category
+			SET Subject = _subject, Parent_id = _parent, Section_id =  _section
+			WHERE Category_id = _category_id;
+		END IF;
 	END IF;
 
 	RETURN result;
@@ -712,6 +737,23 @@ BEGIN
 
 	IF result = 1 THEN
 		DELETE FROM section WHERE Section_id = _section_id;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_author$$
+
+CREATE FUNCTION sf_delete_author(executor_id INT, _author_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM author WHERE Author_id = _author_id;
 	END IF;
 
 	RETURN result;
