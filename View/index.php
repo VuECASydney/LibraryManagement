@@ -42,13 +42,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 				<div class="form-group">
 					<label for="inputEmail3" class="col-sm-2 control-label">User ID</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="inputEmail3" placeholder="User Name" name="user_id"></input>
+						<input type="text" class="form-control"  name="user_id"></input>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="inputPassword3" class="col-sm-2 control-label">Password</label>
 					<div class="col-sm-10">
-						<input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="user_password"></input>
+						<input type="password" class="form-control" placeholder="Password" name="user_password"></input>
 					</div>
 				</div>
 					<div class="form-group">
@@ -63,6 +63,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 						</div>
 					</div>
 				</div>
+                 <!-- #messages is where the messages are placed inside -->
+                <div class="form-group">
+                    <div class="col-md-9 col-md-offset-3">
+                        <div id="messages"></div>
+                    </div>
+                </div>
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-default">Sign in</button>
@@ -73,3 +79,33 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#myForm').bootstrapValidator({
+        container: '#messages',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            user_id: {
+                validators: {
+                    notEmpty: {
+                        message: 'The User Id is required and cannot be empty'
+                    }
+                }
+            } ,
+            user_password: {
+                validators: {
+                    notEmpty: {
+                        message: 'The email address is required and cannot be empty'
+                    }
+                }
+            }
+
+         }
+
+    });
+});
+</script>

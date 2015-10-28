@@ -94,7 +94,7 @@ switch ($actionType)
                 <!-- /.row -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <form class="form-horizontal" role="form" action="<?php echo OK_CATEGORY_PAGE; ?>" method="get">
+                        <form class="form-horizontal" id='categoryform' role="form" action="<?php echo OK_CATEGORY_PAGE; ?>" method="get">
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Category Name</label>
                                 <div class="col-sm-10">
@@ -148,6 +148,12 @@ if ($category)
                                     </select>
                                 </div>
                             </div>
+                             <!-- #messages is where the messages are placed inside -->
+                                <div class="form-group">
+                                    <div class="col-md-9 col-md-offset-3">
+                                        <div id="messages"></div>
+                                    </div>
+                                </div>
                             <button type="submit" class="btn btn-default">Submit Button</button>
                             <button type="reset" class="btn btn-default">Reset Button</button>
                         </form>
@@ -159,3 +165,27 @@ if ($category)
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#categoryform').bootstrapValidator({
+        container: '#messages',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            categoryName: {
+                validators: {
+                    notEmpty: {
+                        message: 'The Category Name is required and cannot be empty'
+                    }
+                }
+            }
+
+         }
+
+    });
+});
+</script>

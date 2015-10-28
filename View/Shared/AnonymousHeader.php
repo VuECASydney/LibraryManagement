@@ -52,6 +52,8 @@ if(isset($_SESSION[USER_INFO]))
     <script type="text/javascript" src="../js/jquery.dataTables.js"></script>
     <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
 
+    <link rel="stylesheet" href="../Css/bootstrapValidator.min.css"/>
+  <script type="text/javascript" src="../js/bootstrapValidator.min.js"> </script>
 </head>
 
 <body>
