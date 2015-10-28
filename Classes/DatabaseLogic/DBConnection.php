@@ -535,7 +535,7 @@ class DBConn_Librarian extends DBConn_User
 	{
 		$user = getUserInfo();
 		$user_id = $user->getId();
-		$sql = "SELECT sf_delete_pubisher('$user_id', '$publisherId') AS result";
+		$sql = "SELECT sf_delete_publisher('$user_id', '$publisherId') AS result";
 		return $this->query1('publisher', $sql);
 	}
 
@@ -543,7 +543,7 @@ class DBConn_Librarian extends DBConn_User
 	{
 		$user = getUserInfo();
 		$user_id = $user->getId();
-		$sql = "SELECT sf_update_piblisher('$user_id', '$publisherId', '$publisherName','$publisherAddress', '$publsiherPhone') AS result";
+		$sql = "SELECT sf_update_publisher('$user_id', '$publisherId', '$publisherName','$publisherAddress', '$publsiherPhone') AS result";
 		return $this->query1('publisher', $sql);
 	}
 
@@ -572,11 +572,11 @@ class DBConn_Librarian extends DBConn_User
 		return $this->query1('book', $sql);
 	}
 
-    function editBook($bookId, $publisherId, $categoryId)
+	function updateBook($bookId, $bookName, $bookIsbn, $publisherId, $categoryId)
 	{
 		$user = getUserInfo();
 		$user_id = $user->getId();
-		$sql = "SELECT sf_edit_book('$user_id', '$bookId', '$publisherId', '$categoryId') AS result";
+		$sql = "SELECT sf_update_book('$user_id', '$bookId', '$bookName', '$publisherId', '$bookIsbn', '$categoryId') AS result";
 		return $this->query1('book', $sql);
 	}
 
@@ -651,6 +651,14 @@ class DBConn_Librarian extends DBConn_User
 		$user_id = $user->getId();
 		$sql = "SELECT sf_delete_author('$user_id', '$authorId') AS result";
 		return $this->query1('author', $sql);
+	}
+
+	function deleteBook($bookId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_book('$user_id', '$bookId') AS result";
+		return $this->query1('book', $sql);
 	}
 
 	function query1($index, $sqlString) {

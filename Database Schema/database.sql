@@ -498,21 +498,23 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP FUNCTION IF EXISTS sf_edit_book$$
+DROP FUNCTION IF EXISTS sf_update_book$$
 
-CREATE ` FUNCTION sf_edit_book(executor_id INT,book_id int, _publisher INT, _category INT) RETURNS int(11)
+CREATE FUNCTION sf_update_book(executor_id INT, _book_id INT, _title VARCHAR(80), _publisher INT, _isbn BIGINT, _category INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
 	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
 
 	IF result = 1 THEN
-		update book as b set  b.Publisher_id=_publisher, b.Category_id=_category where b.Book_id=book_id ;
+		UPDATE book SET Title = _title, Publisher_id = _publisher, Isbn = _isbn, Category_id = _category
+		WHERE Book_id = _book_id;
 	END IF;
 
 	RETURN result;
-END
+END$$
 DELIMITER ;
+
 DELIMITER $$
 DROP FUNCTION IF EXISTS sf_create_book$$
 
@@ -621,9 +623,9 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP FUNCTION IF EXISTS sf_update_piblisher$$
+DROP FUNCTION IF EXISTS sf_update_publisher$$
 
-CREATE FUNCTION sf_update_piblisher(executor_id INT, _publisherId INT, _publisherName VARCHAR(25), _publisherAddress VARCHAR(50), _publsiherPhone VARCHAR(25)) RETURNS INT
+CREATE FUNCTION sf_update_publisher(executor_id INT, _publisherId INT, _publisherName VARCHAR(25), _publisherAddress VARCHAR(50), _publsiherPhone VARCHAR(25)) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
@@ -761,9 +763,9 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
-DROP FUNCTION IF EXISTS sf_delete_pubisher$$
+DROP FUNCTION IF EXISTS sf_delete_publisher$$
 
-CREATE FUNCTION sf_delete_pubisher(executor_id INT, _publisherId INT) RETURNS INT
+CREATE FUNCTION sf_delete_publisher(executor_id INT, _publisherId INT) RETURNS INT
 BEGIN
 	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
 
@@ -771,6 +773,23 @@ BEGIN
 
 	IF result = 1 THEN
 		DELETE FROM publisher WHERE Publisher_id = _publisherId;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_book$$
+
+CREATE FUNCTION sf_delete_book(executor_id INT, _book_id INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM book WHERE Book_id = _book_id;
 	END IF;
 
 	RETURN result;

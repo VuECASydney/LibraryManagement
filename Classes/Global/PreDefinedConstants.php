@@ -35,6 +35,10 @@ const PUBLISHER_PHONE = 'publisherPhone';
 const AUTHOR_ID = 'authorId';
 const AUTHOR_NAME = 'authorName';
 
+const BOOK_ID = 'bookId';
+const BOOK_NAME = 'bookName';
+const BOOK_ISBN = 'bookIsbn';
+
 const SECTION_LIST_PAGE = 'SectionList.php';
 const ADD_SECTION_PAGE = 'AddSection.php';
 const OK_SECTION_PAGE = 'AddSectionOk.php';

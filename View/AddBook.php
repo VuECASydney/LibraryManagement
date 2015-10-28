@@ -2,19 +2,37 @@
 /**
  * Author : Brijender Parta Rana, Choongyeol Kim
  * Date Created : 21 August 2015
- * Date Modified :
+ * Date Modified : 
  */
-        $bookID=0;
-        $delete="";
 
-        if(isset($_GET['Book_id']))   {
-             $bookID=$_GET['Book_id'];
-     }
+$title = 'Add Book';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/CommonFunctions.php';
 
-     if(isset($_GET['action']))   {
-             $delete=$_GET['action'];
-        }
-$title =$delete='delete' && $bookID>0?'delete':($bookID>0?'Edit Book':'Add Book');
+$actionType = ACTION_ADD; // Default Action
+$editable = TRUE;
+$bookId = NULL;
+if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL) {
+	switch ($_GET[ACTION_TYPE]) {
+		case ACTION_EDIT:
+			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[ITEM_ID]);
+			$actionType = ACTION_EDIT;
+			$bookId = $_GET[ITEM_ID];
+			$title = 'Edit Book';
+			break;
+		case ACTION_DEL:
+			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[ITEM_ID]);
+			$actionType = ACTION_DEL;
+			$bookId = $_GET[ITEM_ID];
+			$title = 'Del Book';
+			$editable = FALSE;
+			break;
+		case ACTION_ADD:
+		default:
+			break;
+	}
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
@@ -23,18 +41,37 @@ $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $publisher = NULL;
 $category = NULL;
+$instance = NULL;
+$bookName = NULL;
+$bookIsbn = NULL;
+$publisherName = NULL;
+$categoryName = NULL;
+$publisherId = NULL;
+$categoryId = NULL;
+$publisherId = NULL;
+$categoryId = NULL;
+
 if ($conn)
 {
 	$publisher = $conn->getAllPublisher();
 	$category = $conn->getAllCategory();
 
-    if($bookID>0)
-    {
-
-      $book=  $conn->getBookById($bookID) ;
-
-
-    }
+	switch ($actionType)
+	{
+		case ACTION_EDIT:
+		case ACTION_DEL:
+			$instance = $conn->getBookById($bookId);
+			$bookName = $instance->getTitle();
+			$bookIsbn = $instance->getIsbn();
+			$publisherName = $instance->getPublisherName();
+			$publisherId = $instance->getPublisherId();
+			$categoryName = $instance->getCategoryName();
+			$categoryId = $instance->getCategoryId();
+			break;
+		case ACTION_ADD:
+		default:
+			break;
+	}
 }
 ?>
             <div class="container-fluid">
@@ -42,14 +79,14 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                        <?php  echo ($delete='delete' && $bookID>0?'Delete':($bookID>0?'Edit Book':'Add Book'));?>
+                            <?php echo "$title\n"; ?>
                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                              <li>
-                                <i class="fa fa-fw fa-bar-chart-o"></i><a href="BookList.php">Book</a>
+                                <i class="fa fa-fw fa-bar-chart-o"></i><a href="<?php echo BOOK_LIST_PAGE; ?>">Book</a>
                             </li>
                             <li class="active">
                                 <i class="fa fa-edit"></i>Add Book
@@ -60,32 +97,33 @@ if ($conn)
                 <!-- /.row -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <form class="form-horizontal" id="BookForm" role="form" action="AddBookOk.php <?php echo(  $delete='delete' && $bookID>0?'Delete':'')?>" method="get">
+                        <form class="form-horizontal" id="BookForm" role="form" action="<?php echo OK_BOOK_PAGE; ?>" method="get">
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Book Name</label>
                                 <div class="col-sm-10">
-                                     <input type="hidden" name="bookId" value=<?php echo($bookID )?> />
-                                    <input type="text" class="form-control" name="bookName" placeholder="<?php echo( $bookID>0?$book->getTitle():(''));?>" />
+                                    <input type="hidden" name="<?php echo ACTION_TYPE; ?>" value="<?php echo $actionType; ?>">
+                                    <input type="hidden" name="<?php echo BOOK_ID; ?>" value="<?php echo $bookId; ?>" />
+                                    <input type="text" class="form-control" name="<?php echo BOOK_NAME; ?>" value="<?php echo $bookName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Isbn</label>
                                 <div class="col-sm-10">
-                                    <input type="text" class="form-control" name="bookIsbn" placeholder="<?php echo(  $bookID>0?$book->getIsbn():(''));?>" />
+                                    <input type="text" class="form-control" name="<?php echo BOOK_ISBN; ?>" value="<?php echo $bookIsbn; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Publisher Name</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" name="publisherId">
-
+                                    <select class="form-control" name="<?php echo PUBLISHER_ID; ?>"<?php echo ($editable ? '': ' disabled'); ?>>
 <?php
 if ($publisher)
 {
 	$iter = $publisher->iterator();
 	foreach ($iter as $key => $value) {
+		$id = $value->getId();
 ?>
-                                        <option value="<?php echo $value->getId(); ?>" <?php echo(($bookID>0 && $value->getId()==$book->getPublisherId())?'selected':'')?>><?php echo $value->getName(); ?>  </option>
+                                        <option value="<?php echo $id; ?>"<?php echo ($id == $publisherId ? ' selected' : ''); ?>><?php echo $value->getName(); ?></option>
 <?php
 	}
 }
@@ -96,15 +134,15 @@ if ($publisher)
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Category Name</label>
                                 <div class="col-sm-10">
-                                    <select class="form-control" name="categoryId">
-
+                                    <select class="form-control" name="<?php echo CATEGORY_ID; ?>"<?php echo ($editable ? '': ' disabled'); ?>>
 <?php
 if ($category)
 {
 	$iter = $category->iterator();
 	foreach ($iter as $key => $value) {
+		$id = $value->getId();
 ?>
-                                        <option value="<?php echo $value->getId(); ?>" <?php echo(($bookID>0 && $value->getId()==$book->getCategoryId())?'selected':'')?>><?php echo $value->getSubject(); ?></option>
+                                        <option value="<?php echo $id; ?>"<?php echo($id == $categoryId ? ' selected' : ''); ?>><?php echo $value->getSubject(); ?></option>
 <?php
 	}
 }
@@ -118,7 +156,7 @@ if ($category)
                                         <div id="messages"></div>
                                     </div>
                                 </div>
-                            <button type="submit"  class="btn btn-default"> <?php  echo ($delete='delete' && $bookID>0?'Delete':'Submit Button');?></button>
+                            <button type="submit" class="btn btn-default">Submit Button</button>
                             <button type="reset" class="btn btn-default">Reset Button</button>
                         </form>
                     </div>

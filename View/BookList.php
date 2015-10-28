@@ -112,15 +112,16 @@ if ($book)
 {
 	$iter = $book->iterator();
 	foreach ($iter as $key => $value) {
+		$id = $value->getBookId();
 ?>
                                 <tr>
-                                    <td><?php echo $value->getBookId(); ?></td>
+                                    <td><?php echo $id; ?></td>
                                     <td><?php echo $value->getTitle(); ?></td>
                                     <td><?php echo $value->getIsbn(); ?></td>
                                     <td><?php echo $value->getPublisherName(); ?></td>
                                     <td><?php echo $value->getCategoryName(); ?></td>
-                                    <td><a class="btn mini blue-stripe" href="addbook.php?Book_id=<?php echo $value->getBookId(); ?>">Edit</a></td>
-                                    <td><a href="addbook.php?Book_id=<?php echo $value->getBookId();?>. & action='delete'" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
+                                    <td><a href="<?php echo PREFIX_PAREMETERS_EDIT . $id; ?>" class="btn mini blue-stripe">Edit</a></td>
+                                    <td><a href="<?php echo PREFIX_PAREMETERS_DEL . $id; ?>" class="confirm-delete btn_delete mini red-stripe" role="button" data-title="johnny" data-id="1">Delete</a></td>
                                 </tr>
 <?php
 	}

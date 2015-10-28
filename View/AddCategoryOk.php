@@ -18,7 +18,7 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 	switch ($_GET[ACTION_TYPE])
 	{
 		case ACTION_EDIT:
-			$actionType = $_GET[ACTION_TYPE];
+			$actionType = ACTION_EDIT;
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_ID]);
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_NAME]);
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[SECTION_ID]);
@@ -27,7 +27,7 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			exit();
 			break;
 		case ACTION_DEL:
-			$actionType = $_GET[ACTION_TYPE];
+			$actionType = ACTION_DEL;
 			checkNullwithRedirect(ADD_CATEGORY_PAGE, $_GET[CATEGORY_ID]);
 			delCategory();
 			exit();
