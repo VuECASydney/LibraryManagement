@@ -45,6 +45,9 @@ $role = $user->getRole();
     <script type="text/javascript" src="../js/dataTables.bootstrap.js"></script>
     <script type="text/javascript" src="../js/highcharts.js"></script>
     <script type="text/javascript" src="../js/exporting.js"></script>
+
+      <link rel="stylesheet" href="../Css/bootstrapValidator.min.css"/>
+  <script type="text/javascript" src="../js/bootstrapValidator.min.js"> </script>
 </head>
 
 <body>

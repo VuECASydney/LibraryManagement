@@ -60,7 +60,7 @@ if ($conn)
                 <!-- /.row -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <form class="form-horizontal" role="form" action="AddBookOk.php <?php echo( <?php  echo ($delete='delete' && $bookID>0?'Delete':'')?>" method="get">
+                        <form class="form-horizontal" id="BookForm" role="form" action="AddBookOk.php <?php echo(  $delete='delete' && $bookID>0?'Delete':'')?>" method="get">
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Book Name</label>
                                 <div class="col-sm-10">
@@ -112,6 +112,12 @@ if ($category)
                                     </select>
                                 </div>
                             </div>
+                            <!-- #messages is where the messages are placed inside -->
+                                <div class="form-group">
+                                    <div class="col-md-9 col-md-offset-3">
+                                        <div id="messages"></div>
+                                    </div>
+                                </div>
                             <button type="submit"  class="btn btn-default"> <?php  echo ($delete='delete' && $bookID>0?'Delete':'Submit Button');?></button>
                             <button type="reset" class="btn btn-default">Reset Button</button>
                         </form>
@@ -266,3 +272,34 @@ if ($category)
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#BookForm').bootstrapValidator({
+        container: '#messages',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            bookName: {
+                validators: {
+                    notEmpty: {
+                        message: 'The book Name is required and cannot be empty'
+                    }
+                }
+            },
+             bookIsbn: {
+                validators: {
+                    notEmpty: {
+                        message: 'The book Isbn is required and cannot be empty'
+                    }
+                }
+            }
+
+         }
+
+    });
+});
+</script>

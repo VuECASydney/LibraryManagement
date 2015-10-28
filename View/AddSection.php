@@ -84,7 +84,7 @@ switch ($actionType)
                 <!-- /.row -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <form class="form-horizontal" role="form" action="<?php echo OK_SECTION_PAGE; ?>" method="get">
+                        <form class="form-horizontal" id='formSection' role="form" action="<?php echo OK_SECTION_PAGE; ?>" method="get">
                             <div class="form-group">
                                 <label class="control-label col-sm-2">Section Name</label>
                                 <div class="col-sm-10">
@@ -93,6 +93,12 @@ switch ($actionType)
                                     <input type="text" class="form-control" name="<?php echo SECTION_NAME; ?>" value="<?php echo $sectionName; ?>"<?php echo ($editable ? '': ' disabled'); ?> />
                                 </div>
                             </div>
+                             <!-- #messages is where the messages are placed inside -->
+                                <div class="form-group">
+                                    <div class="col-md-9 col-md-offset-3">
+                                        <div id="messages"></div>
+                                    </div>
+                                </div>
                             <button type="submit" class="btn btn-default">Submit Button</button>
                             <button type="reset" class="btn btn-default">Reset Button</button>
                         </form>
@@ -104,3 +110,26 @@ switch ($actionType)
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Footer.php';
 ?>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#formSection').bootstrapValidator({
+        container: '#messages',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            sectionName: {
+                validators: {
+                    notEmpty: {
+                        message: 'The Author Name is required and cannot be empty'
+                    }
+                }
+            }
+
+         }
+
+    });
+});
+</script>
