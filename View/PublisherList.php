@@ -9,18 +9,16 @@ $title = 'Publisher List';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
-
-
 const PREFIX_PAREMETERS_ADD = ADD_PUBLISHER_PAGE . '?' . ACTION_TYPE . '=' . ACTION_ADD;
 const PREFIX_PAREMETERS_EDIT = ADD_PUBLISHER_PAGE. '?' . ACTION_TYPE . '=' . ACTION_EDIT . '&' . ITEM_ID . '=';
 const PREFIX_PAREMETERS_DEL = ADD_PUBLISHER_PAGE. '?' . ACTION_TYPE . '=' . ACTION_DEL . '&' . ITEM_ID . '=';
-
+const PREFIX_PAREMETERS_VIEW_ALL = PUBLISHER_LIST_PAGE . '?' . ACTION_TYPE . '=' . ACTION_VIEW_ALL;
 
 $user = getUserInfo();
 $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $collection = NULL;
-if ($conn)
+if ($conn && isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] = ACTION_VIEW_ALL)
 {
 	$collection = $conn->getAllPublisher();
 }
@@ -37,7 +35,7 @@ if ($conn)
                                 <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i>Publisher List
+                                <i class="fa fa-edit"></i><a href="<?php echo PREFIX_PAREMETERS_VIEW_ALL; ?>">View All Publisher</a>
                             </li>
                         </ol>
                     </div>

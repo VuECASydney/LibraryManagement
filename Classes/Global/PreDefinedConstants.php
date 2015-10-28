@@ -6,6 +6,7 @@
  */
 
 const ACTION_TYPE = 'act';
+const ACTION_VIEW_ALL = 'viewall';
 const ACTION_ADD = 'add';
 const ACTION_EDIT = 'edit';
 const ACTION_DEL = 'del';
@@ -53,4 +54,8 @@ const OK_AUTHOR_PAGE = 'AddAuthorOk.php';
 const USER_LIST_PAGE = 'UserList.php';
 const ADD_USER_PAGE = 'AddUser.php';
 const OK_USER_PAGE = 'AddUserOk.php';
+
+const BOOK_LIST_PAGE = 'BookList.php';
+const ADD_BOOK_PAGE = 'AddBook.php';
+const OK_BOOK_PAGE = 'AddBookOk.php';
 ?>

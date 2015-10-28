@@ -5,18 +5,27 @@
  * Date Modified : 
  */
 
-$title = 'Books';
+$title = 'Book List';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreDefinedConstants.php';
+const PREFIX_PAREMETERS_ADD = ADD_BOOK_PAGE . '?' . ACTION_TYPE . '=' . ACTION_ADD;
+const PREFIX_PAREMETERS_EDIT = ADD_BOOK_PAGE . '?' . ACTION_TYPE . '=' . ACTION_EDIT . '&' . ITEM_ID . '=';
+const PREFIX_PAREMETERS_DEL = ADD_BOOK_PAGE . '?' . ACTION_TYPE . '=' . ACTION_DEL . '&' . ITEM_ID . '=';
+const PREFIX_PAREMETERS_VIEW_ALL = BOOK_LIST_PAGE . '?' . ACTION_TYPE . '=' . ACTION_VIEW_ALL;
 
 $user = getUserInfo();
 $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $book = NULL;
+$category = NULL;
 if ($conn)
 {
-	$book = $conn->getAllBook();
 	$category = $conn->getAllCategory();
+	if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] = ACTION_VIEW_ALL)
+	{
+		$book = $conn->getAllBook();
+	}
 }
 ?>
             <div class="container-fluid">
@@ -24,14 +33,14 @@ if ($conn)
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Books
+                            Book List
 						</h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Books
+                                <i class="fa fa-edit"></i><a href="<?php echo PREFIX_PAREMETERS_VIEW_ALL; ?>">View All Book</a>
                             </li>
                         </ol>
                     </div>
@@ -61,6 +70,7 @@ if ($conn)
                                     <label class="control-label col-sm-2">Category Name</label>
                                     <div class="col-sm-10">
                                         <select class="form-control">
+                                            <option value="0">No Category Selected</option>
 <?php
 if ($category)
 {

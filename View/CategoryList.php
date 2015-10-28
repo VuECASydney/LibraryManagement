@@ -12,12 +12,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/PreD
 const PREFIX_PAREMETERS_ADD = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_ADD;
 const PREFIX_PAREMETERS_EDIT = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_EDIT . '&' . ITEM_ID . '=';
 const PREFIX_PAREMETERS_DEL = ADD_CATEGORY_PAGE . '?' . ACTION_TYPE . '=' . ACTION_DEL . '&' . ITEM_ID . '=';
+const PREFIX_PAREMETERS_VIEW_ALL = CATEGORY_LIST_PAGE . '?' . ACTION_TYPE . '=' . ACTION_VIEW_ALL;
 
 $user = getUserInfo();
 $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $collection = NULL;
-if ($conn)
+if ($conn && isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] = ACTION_VIEW_ALL)
 {
 	$collection = $conn->getAllCategory();
 }
@@ -34,7 +35,7 @@ if ($conn)
                                 <i class="fa fa-dashboard"></i><a href="DashBoard.php">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i>Category List
+                                <i class="fa fa-edit"></i><a href="<?php echo PREFIX_PAREMETERS_VIEW_ALL; ?>">View All Category</a>
                             </li>
                         </ol>
                     </div>
