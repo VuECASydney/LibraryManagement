@@ -18,7 +18,7 @@ $user = getUserInfo();
 $role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $collection = NULL;
-if ($conn && isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] = ACTION_VIEW_ALL)
+if ($conn && isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] == ACTION_VIEW_ALL)
 {
 	$collection = $conn->getAllUser();
 }

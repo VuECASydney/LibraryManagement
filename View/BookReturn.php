@@ -45,7 +45,7 @@ if ($conn)
                         <div class="col-lg-12">
                             <form class="form-horizontal" role="form">
                                 <div class="form-group">
-                                    <label class="control-label col-sm-2">Book Copy Bar Code</label>
+                                    <label class="control-label col-sm-2">Book Barcode</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" id="email" placeholder="12345678" >
                                     </div>

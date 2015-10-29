@@ -10,6 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Auth
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Book.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/BookLoan.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Fine.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/BookCopy.php';
 
 abstract class DBInterface
 {
@@ -65,6 +66,75 @@ class DBConn_Guest extends DBInterface
 	function __destruct()
 	{
 		//echo '~DBConn_User<br />';
+	}
+
+	function getBookCopyByBookId($bookId)
+	{
+		$key = 'copySearch';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_search_book_copy_by_book_id('$bookId')");
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$bookCopy = new BookCopy();
+				$bookCopy->setBarcodeId($obj->Barcode_id);
+				$bookCopy->setBookId($obj->Book_id);
+				$bookCopy->setStockDate($obj->Stock_date);
+				$bookCopy->setLogId($obj->Log_id);
+				$bookCopy->setTitle($obj->Title);
+				//$bookCopy->setReturnDate($obj->?????);
+				$collection->addItem($bookCopy, $obj->Barcode_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+
+	function getBookByBookId($bookId)
+	{
+		$key = 'bookSearch';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_search_book_by_book_id('$bookId')");
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$book = new Book();
+				$book->setBookId($obj->Book_id);
+				$book->setTitle($obj->Title);
+				$book->setPublisherId($obj->Publisher_id);
+				$book->setIsbn($obj->Isbn);
+				$book->setCategoryId($obj->Category_id);
+				$book->setPublisherName($obj->Publisher_name);
+				$book->setCategoryName($obj->Subject);
+				$collection->addItem($book, $obj->Book_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
 	}
 
 	function getSearchBook($Book_Name, $Publisher_Id, $Category_Id)
@@ -127,6 +197,39 @@ class DBConn_Guest extends DBInterface
 				$book->setPublisherName($obj->Publisher_name);
 				$book->setCategoryName($obj->Subject);
 				$collection->addItem($book, $obj->Book_id);
+			}
+			$result->close(); // for fetch_object()
+		}
+		//$result->free_result(); // for fetch_assoc()
+		$this->close();
+
+		CacheManager::set($key, $collection, TRUE);
+		return $collection;
+	}
+
+	function getAllBookCopy()
+	{
+		$key = 'copy';
+		$collection = CacheManager::get($key, TRUE);
+		if ($collection)
+			return $collection;
+
+		$collection = new Collection();
+		$this->connect();
+
+		$result = $this->conn->query("CALL sp_get_all_book_copy()");
+		if ($result)
+		{
+			//$row = $result->fetch_assoc();
+			while ($obj = $result->fetch_object())
+			{
+				$bookCopy = new BookCopy();
+				$bookCopy->setBarcodeId($obj->Barcode_id);
+				$bookCopy->setBookId($obj->Book_id);
+				$bookCopy->setStockDate($obj->Stock_date);
+				$bookCopy->setLogId($obj->Log_id);
+				$bookCopy->setTitle($obj->Title);
+				$collection->addItem($bookCopy, $obj->Barcode_id);
 			}
 			$result->close(); // for fetch_object()
 		}
@@ -214,6 +317,12 @@ class DBConn_User extends DBConn_Guest
 	function __destruct()
 	{
 		//echo '~DBConn_User<br />';
+	}
+
+	function generate_hash_password($password) {
+		$hash = password_hash($password, PASSWORD_DEFAULT);
+		//$hash = $password;
+		return $hash;
 	}
 
 	function getFineByBorrowerid($Borrower_id)
@@ -555,13 +664,12 @@ class DBConn_Librarian extends DBConn_User
 		return $this->query1('author', $sql);
 	}
 
-	function insertUser($userType, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
+	function insertBookCopy($bookId, $date)
 	{
 		$user = getUserInfo();
 		$user_id = $user->getId();
-		$hash = $this->generate_hash_password($userPassword);
-		$sql = "CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
-		return $this->query1('user', $sql);
+		$sql = "SELECT sf_create_book_copy('$user_id', '$bookId', '$date') AS result";
+		return $this->query1('book', $sql);
 	}
 
 	function insertBook($bookName, $bookIsbn, $publisherId, $categoryId)
@@ -604,15 +712,6 @@ class DBConn_Librarian extends DBConn_User
 		return $this->query1('category', $sql);
 	}
 
-	function updateUser($userId, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
-	{
-		$user = getUserInfo();
-		$user_id = $user->getId();
-		$hash = $this->generate_hash_password($userPassword);
-		$sql = "CALL sp_update_account('$user_id', '$userId', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
-		return $this->query1('user', $sql);
-	}
-
 	function deleteSection($sectionId)
 	{
 		$user = getUserInfo();
@@ -627,14 +726,6 @@ class DBConn_Librarian extends DBConn_User
 		$user_id = $user->getId();
 		$sql = "SELECT sf_delete_category('$user_id', '$categoryId') AS result";
 		return $this->query1('category', $sql);
-	}
-
-	function deleteUser($accountId)
-	{
-		$user = getUserInfo();
-		$user_id = $user->getId();
-		$sql = "SELECT sf_delete_account('$user_id', '$accountId') AS result";
-		return $this->query1('user', $sql);
 	}
 
 	function updateAuthor($authorId, $authorName)
@@ -653,12 +744,44 @@ class DBConn_Librarian extends DBConn_User
 		return $this->query1('author', $sql);
 	}
 
+	function deleteBookCopy($barcodeId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_book_copy('$user_id', '$barcodeId') AS result";
+		return $this->query1('book', $sql);
+	}
+
 	function deleteBook($bookId)
 	{
 		$user = getUserInfo();
 		$user_id = $user->getId();
 		$sql = "SELECT sf_delete_book('$user_id', '$bookId') AS result";
 		return $this->query1('book', $sql);
+	}
+
+	function issueBook($userId, $barcodeId)
+	{
+		return NULL;
+/*
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		date_default_timezone_set('Australia/Sydney');
+		$date = date();
+		$sql = "SELECT sf_create_book_loan_log('$user_id', '$userId', '$barcodeId')";
+		return $this->query1('book', $sql);
+*/
+	}
+
+	function returnBook($barcodeId)
+	{
+		return NULL;
+/*
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sp_return_book_copy('$user_id', '$barcodeId')";
+		return $this->query1('book', $sql);
+*/
 	}
 
 	function query1($index, $sqlString) {
@@ -687,12 +810,6 @@ class DBConn_Librarian extends DBConn_User
 			return FALSE;
 		}
 	}
-
-	function generate_hash_password($password) {
-		//$hash = password_hash($password, PASSWORD_DEFAULT);
-		$hash = $password;
-		return $hash;
-	}
 }
 
 class DbConn_Admin extends DBConn_Librarian
@@ -705,6 +822,32 @@ class DbConn_Admin extends DBConn_Librarian
 	function __destruct()
 	{
 		//echo '~DbConn_Admin<br />';
+	}
+
+	function insertUser($userType, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$hash = $this->generate_hash_password($userPassword);
+		$sql = "CALL sp_create_account('$user_id', '$userType', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
+		return $this->query1('user', $sql);
+	}
+
+	function updateUser($userId, $userName, $userAddress, $userPhone, $userEmail, $userYear, $userPassword)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$hash = $this->generate_hash_password($userPassword);
+		$sql = "CALL sp_update_account('$user_id', '$userId', '$userName', '$userAddress', '$userPhone', '$userEmail', '$hash', '$userYear')";
+		return $this->query1('user', $sql);
+	}
+
+	function deleteUser($accountId)
+	{
+		$user = getUserInfo();
+		$user_id = $user->getId();
+		$sql = "SELECT sf_delete_account('$user_id', '$accountId') AS result";
+		return $this->query1('user', $sql);
 	}
 }
 
@@ -725,8 +868,8 @@ class DBConn_Login extends DBInterface
 		$user = NULL;
 		$retVal = -1;
 		$this->connect();
-		$result = $this->conn->query("CALL sp_login_account('$user_id', '$user_pass')");
-		//$result = $this->conn->query("CALL sp_login_account2('$user_id')");
+		//$result = $this->conn->query("CALL sp_login_account('$user_id', '$user_pass')");
+		$result = $this->conn->query("CALL sp_login_account2('$user_id')");
 		if ($result)
 		{
 			//var_dump($result);
@@ -739,8 +882,8 @@ class DBConn_Login extends DBInterface
 				switch ($obj->result)
 				{
 					case 0:
-						//$hash = $obj->Passwd;
-						//if (password_verify($user_pass, $hash)) {
+						$hash = $obj->Passwd;
+						if (password_verify($user_pass, $hash)) {
 						$user = new User();
 						$user->setId($obj->Account_id);
 						$user->setName($obj->Name);
@@ -750,7 +893,7 @@ class DBConn_Login extends DBInterface
 						$user->setEmail($obj->Email);
 						$user->setEnrollYear($obj->Enroll_year);
 						//echo 'Before<br /><br />'; var_dump($user); echo 'After<br /><br />';
-						//}
+						}
 						break;
 					case 1:
 						break;
@@ -785,8 +928,7 @@ class DBConnection
 		switch ($role)
 		{
 			case 'Admin':
-				//$conn = new DBConn_Admin();
-				$conn = new DBConn_Librarian();
+				$conn = new DBConn_Admin();
 				break;
 			case 'Librarian':
 				$conn = new DBConn_Librarian();
@@ -802,7 +944,6 @@ class DBConnection
 				break;
 			default:
                 break;
-
 		}
 		return $conn;
 	}

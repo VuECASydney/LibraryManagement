@@ -32,14 +32,24 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL) {
 	}
 }
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Entity/Account.php';
+redirectPageWithoutSession();
+$user = getUserInfo();
+$role = $user->getRole();
+if ($role != 'Admin')
+{
+	header('Location: ' . USER_LIST_PAGE);
+	exit();
+}
+
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Header.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/DatabaseLogic/DBConnection.php';
 
-$user = getUserInfo();
-$role = $user->getRole();
+//$user = getUserInfo();
+//$role = $user->getRole();
 $conn = DBConnection::getConnection($role);
 $account = NULL;
-if ($conn)
+if ($conn && $role == 'Admin')
 {
 	$account = $conn->getAllUser();
 }

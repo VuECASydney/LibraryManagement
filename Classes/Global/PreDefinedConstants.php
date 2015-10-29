@@ -7,6 +7,12 @@
 
 const ACTION_TYPE = 'act';
 const ACTION_VIEW_ALL = 'viewall';
+const ACTION_SEARCH = 'search';
+const ACTION_ADD_BOOK_COPY = 'addCopy';
+const ACTION_DEL_BOOK_COPY = 'delCopy';
+const ACTION_VIEW_BOOK_COPY = 'viewCopy';
+const ACTION_ISSUE_BOOK_COPY = 'issueCopy';
+const ACTION_RETURN_BOOK_COPY = 'returnCopy';
 const ACTION_ADD = 'add';
 const ACTION_EDIT = 'edit';
 const ACTION_DEL = 'del';
@@ -38,6 +44,8 @@ const AUTHOR_NAME = 'authorName';
 const BOOK_ID = 'bookId';
 const BOOK_NAME = 'bookName';
 const BOOK_ISBN = 'bookIsbn';
+const BOOK_BARCODE = 'bookBarcode';
+const BOOK_COPY_STOCK_DATE = 'stockDate';
 
 const SECTION_LIST_PAGE = 'SectionList.php';
 const ADD_SECTION_PAGE = 'AddSection.php';
@@ -62,4 +70,12 @@ const OK_USER_PAGE = 'AddUserOk.php';
 const BOOK_LIST_PAGE = 'BookList.php';
 const ADD_BOOK_PAGE = 'AddBook.php';
 const OK_BOOK_PAGE = 'AddBookOk.php';
+
+const COPY_LIST_PAGE = 'CopyList.php';
+const ADD_COPY_PAGE = 'AddCopy.php';
+const OK_COPY_PAGE = 'AddCopyOk.php';
+
+const ISSUE_BOOK_PAGE = 'IssueBook.php';
+const OK_ISSUE_BOOK_PAGE = 'IssueBookOk.php';
+const RETURN_BOOK_PAGE = 'ReturnBook.php';
 ?>

@@ -37,7 +37,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/View/Shared/Anonymo
 			<!-- <form id='myForm' class="form-horizontal" onsubmit="return OnSubmitForm();"> -->
 			<form id='myForm' class="form-horizontal" action="Login.php" method="post">
 				<div class="form-group">
-					<label class="Heading" style="font-size:26px;padding-left:20px;">VU Library Mangamement Login</label>
+					<label class="Heading" style="font-size:26px;padding-left:20px;">VU Library Management Login</label>
 				</div>
 				<div class="form-group">
 					<label for="inputEmail3" class="col-sm-2 control-label">User ID</label>

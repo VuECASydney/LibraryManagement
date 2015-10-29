@@ -12,8 +12,25 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/LibraryManagement/Classes/Global/Comm
 $actionType = ACTION_ADD; // Default Action
 $editable = TRUE;
 $bookId = NULL;
+$bookBarcodeId = NULL;
 if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL) {
 	switch ($_GET[ACTION_TYPE]) {
+		case ACTION_ADD_BOOK_COPY:
+			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[ITEM_ID]);
+			$actionType = ACTION_ADD_BOOK_COPY;
+			$bookId = $_GET[ITEM_ID];
+			$title = 'Add Book Copy';
+			$editable = FALSE;
+			break;
+		case ACTION_DEL_BOOK_COPY:
+			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[ITEM_ID]);
+			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[BOOK_BARCODE]);
+			$actionType = ACTION_DEL_BOOK_COPY;
+			$bookId = $_GET[ITEM_ID];
+			$bookBarcodeId = $_GET[BOOK_BARCODE];
+			$title = 'Del Book Copy';
+			$editable = FALSE;
+			break;
 		case ACTION_EDIT:
 			checkNullwithRedirect(BOOK_LIST_PAGE, $_GET[ITEM_ID]);
 			$actionType = ACTION_EDIT;
@@ -60,6 +77,8 @@ if ($conn)
 	{
 		case ACTION_EDIT:
 		case ACTION_DEL:
+		case ACTION_ADD_BOOK_COPY:
+		case ACTION_DEL_BOOK_COPY:
 			$instance = $conn->getBookById($bookId);
 			$bookName = $instance->getTitle();
 			$bookIsbn = $instance->getIsbn();
@@ -150,110 +169,24 @@ if ($category)
                                     </select>
                                 </div>
                             </div>
-                            <!-- #messages is where the messages are placed inside -->
-                                <div class="form-group">
-                                    <div class="col-md-9 col-md-offset-3">
-                                        <div id="messages"></div>
-                                    </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-sm-2">Barcode Number</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="<?php echo BOOK_BARCODE; ?>" value="<?php echo $bookBarcodeId; ?>" readonly />
                                 </div>
+                            </div>
+                            <!-- #messages is where the messages are placed inside -->
+                            <div class="form-group">
+                                <div class="col-md-9 col-md-offset-3">
+                                    <div id="messages"></div>
+                                </div>
+                            </div>
                             <button type="submit" class="btn btn-default">Submit Button</button>
                             <button type="reset" class="btn btn-default">Reset Button</button>
                         </form>
                     </div>
                 </div>
-                <fieldset class="scheduler-border">
-                    <legend class="scheduler-border">Book Copies</legend>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <table id="tblbookcopies" class="table table-striped table-hover table-users" cellspacing="0" style="width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th>Book Copy Number</th>
-                                        <th>Stock Date</th>
-                                        <th>Available</th>
-                                        <th>Edit</th>
-                                        <th>Delete</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Not Avaible</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td>Avaible</td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Hold</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Not Avaible</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td>Avaible</td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Hold</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Not Avaible</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td>Avaible</td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                    <tr>
-                                        <td>12345678</td>
-                                        <td>20/09/2015</td>
-                                        <td><span class="label label-warning">Hold</span></td>
-                                        <td><a href="#" class="btn mini blue-stripe"   role="button" data-id="1" data-title="Edit" data-toggle="modal" data-target="#edit">Edit</a></td>
-                                        <td><a href="#" class="confirm-delete btn_delete mini red-stripe" role="button"  data-id="1" data-title="Delete" data-toggle="modal" data-target="#delete">Delete</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <script type="text/javascript">
-                                $(document).ready(function () {
-                                    $('#tblbookcopies').dataTable({
-                                        "iDisplayLength": 5,
-                                        "lengthMenu": [5,10, 25, 50, 100]
-                                    });
-                                });
-                                $('#tblContact_length').visible=false;
-                            </script>
-                        </div>
-                    </div>
-                    <!-- /.row -->
-                </fieldset>
                 <!-- /.row -->
             </div>
             <!-- /.container-fluid -->

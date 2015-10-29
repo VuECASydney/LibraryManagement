@@ -1,14 +1,14 @@
-<?php /**
+<?php
+/**
  * Author : Brijender Parta Rana
  * Date Created : 21 August 2015
  * Date Modified :
  */
- ?>
-
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title> <?php echo($title) ?> </title>
+    <title>My Account</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="../Css/bootstrap.css" rel="stylesheet">
@@ -146,11 +146,11 @@
                 <nav class="main-Navigation" role="navigation">
                     <ul id="secondary-links" class="navClass menu secondary-links">
                         <li class="item-1 dropdown  mlid-13688 menu-study-with-us dropdown-standard first" id="dropdown-li-study-with-us">
-                                 <a href="./mainDashBoard.php">Book Search</a>
+                                 <a href="./MainDashBoard.php">Book Search</a>
 
                         </li>
                         <li class="item-2 dropdown  mlid-13790 menu-student-life dropdown-standard" id="dropdown-li-student-life">
-                                <a href="./myaccount.php">My Accounts</a>
+                                <a href="./MyAccount.php">My Accounts</a>
 
                         </li>
                         <li class="item-3 dropdown  mlid-13894 menu-research dropdown-standard" id="dropdown-li-research">
@@ -174,19 +174,15 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                             My Account
+                            My Account
                         </h1>
                     </div>
                 </div>
                 <!-- /.row -->
                 <ul class="nav nav-tabs">
-                      <li class="active"><a href="#myaccount"  data-toggle="tab">My Account</a></li>
-                      <li >
-                        <a  href="#books"  data-toggle="tab">My Books    </a>
-
-                      </li>
-                      <li><a href="#fines"  data-toggle="tab">My Fines</a></li>
-
+                      <li class="active"><a href="#myaccount" data-toggle="tab">My Account</a></li>
+                      <li><a  href="#books" data-toggle="tab">My Books</a></li>
+                      <li><a href="#fines" data-toggle="tab">My Fines</a></li>
                 </ul>
                  <div class="tab-content">
                         <div id="myaccount" class="tab-pane fade in active">
@@ -225,8 +221,8 @@
                                             <p class="form-control-static"><?php echo $user->getEmail(); ?></p>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-default">Submit Button</button>
-                                    <button type="reset" class="btn btn-default">Reset Button</button>
+                                    <!-- <button type="submit" class="btn btn-default">Submit Button</button> -->
+                                    <!-- <button type="reset" class="btn btn-default">Reset Button</button> -->
                                 </form>
                             </div>
                         </div>

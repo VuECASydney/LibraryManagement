@@ -33,6 +33,18 @@ if (isset($_GET[ACTION_TYPE]) && $_GET[ACTION_TYPE] != NULL)
 			delBook();
 			exit();
 			break;
+		case ACTION_ADD_BOOK_COPY:
+			$actionType = ACTION_ADD_BOOK_COPY;
+			checkNullwithRedirect(ADD_BOOK_PAGE, $_GET[BOOK_ID]);
+			addBookCopy();
+			exit();
+			break;
+		case ACTION_DEL_BOOK_COPY:
+			$actionType = ACTION_DEL_BOOK_COPY;
+			checkNullwithRedirect(ADD_BOOK_PAGE, $_GET[BOOK_BARCODE]);
+			delBookCopy();
+			exit();
+			break;
 		case ACTION_ADD:
 		default:
 			break;
@@ -103,6 +115,42 @@ function delBook()
 	}
 }
 
+function addBookCopy()
+{
+	date_default_timezone_set('Australia/Sydney');
+	$date = date("Y-m-d H:i:s");
+
+	// TODO : Escape String for SQL Statement
+	$bookId = $_GET[BOOK_ID];
+	$redirectPage = BOOK_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->insertBookCopy($bookId, $date);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
+
+function delBookCopy()
+{
+	// TODO : Escape String for SQL Statement
+	$barcodeId = $_GET[BOOK_BARCODE];
+	$redirectPage = BOOK_LIST_PAGE;
+
+	$user = getUserInfo();
+	$role = $user->getRole();
+	$conn = DBConnection::getConnection($role);
+	if ($conn)
+	{
+		$result = $conn->deleteBookCopy($barcodeId);
+		header("Location: $redirectPage");
+		exit();
+	}
+}
 
 /*
 const BOOK_NAME = 'bookName';

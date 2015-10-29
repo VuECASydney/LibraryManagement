@@ -797,6 +797,23 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DROP FUNCTION IF EXISTS sf_delete_book_copy$$
+
+CREATE FUNCTION sf_delete_book_copy(executor_id INT, _barcode INT) RETURNS INT
+BEGIN
+	DECLARE result INT DEFAULT 0; -- 0 : failure, 1 : success
+
+	SELECT sf_get_permission2(executor_id) INTO result; -- 0 : failure, 1 : success
+
+	IF result = 1 THEN
+		DELETE FROM book_copy WHERE Barcode_id = _barcode;
+	END IF;
+
+	RETURN result;
+END$$
+DELIMITER ;
+
+DELIMITER $$
 DROP FUNCTION IF EXISTS sf_delete_category$$
 
 CREATE FUNCTION sf_delete_category(executor_id INT, _category_id INT) RETURNS INT
@@ -1151,7 +1168,7 @@ INSERT INTO account_property (Account_type, Max_period, Max_book, Fine) VALUES (
 -- Admin account should be created manually.
 INSERT INTO staff (Name, Address, Phone, Email) VALUES('Administrator 1', 'Sydney', '0400000000', 'admin1@vu.edu.au');
 UPDATE staff SET Barcode_id = (Staff_id * 10 + 20000000000000) WHERE Staff_id = LAST_INSERT_ID();
-INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(), 'password_e0', 'Admin');
+INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(), '$2y$10$JoauymzJbnreuLb/y5YoaeF7Cmvt6JvjhDoOHgSJljc4dAM5yF6Ta', 'Admin'); -- password_e0
 UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000; -- The first account is assumed to be 5000000 as an auto increment value.
 
 -- Admin's id is assumed to be 5000000
