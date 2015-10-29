@@ -1172,13 +1172,13 @@ INSERT INTO account (Account_id, Passwd, Account_type) VALUES (LAST_INSERT_ID(),
 UPDATE staff SET Virtual_id = LAST_INSERT_ID() WHERE Staff_id = 5000000; -- The first account is assumed to be 5000000 as an auto increment value.
 
 -- Admin's id is assumed to be 5000000
-CALL sp_create_account(5000000, 'Librarian', 'Librarian Name 1', 'Sydney', '0400000000', 'librarian1@vu.edu.au', 'password_e0', '0');
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 1', 'Sydney', '0400000002', 'lecturer1@vu.edu.au', 'password_e1', '0');
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 2', 'Sydney', '0400000003', 'lecturer2@vu.edu.au', 'password_e2', '0');
-CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 3', 'Sydney', '0400000004', 'lecturer3@vu.edu.au', 'password_e3', '0');
-CALL sp_create_account(5000000, 'Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', 'password_s1', '2014');
-CALL sp_create_account(5000000, 'Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', 'password_s2', '2014');
-CALL sp_create_account(5000000, 'Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', 'password_s3', '2014');
+CALL sp_create_account(5000000, 'Librarian', 'Librarian Name 1', 'Sydney', '0400000000', 'librarian1@vu.edu.au', '$2y$10$Zlaip7Dpnm05aYBe91B8VuAclW7qe7EJR9C3byJ2bhj09KqcgShhu', '0'); -- password_e0
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 1', 'Sydney', '0400000002', 'lecturer1@vu.edu.au', '$2y$10$/BrxeAfabqLfea5tdG1giOx/IOtCJAgGFQ4YUDuODc8/vUY/Au87e', '0'); -- password_e1
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 2', 'Sydney', '0400000003', 'lecturer2@vu.edu.au', '$2y$10$WFAvi8Sg.Ch88uyvQTKOC.IGhfWrgysOM9JMcQvdwXrUnzckrnkaq', '0'); -- password_e2
+CALL sp_create_account(5000000, 'Faculty', 'Lecturer Name 3', 'Sydney', '0400000004', 'lecturer3@vu.edu.au', '$2y$10$ruHxE9NPWnmrj8AYSVQOTOxntC4.oLISrebcK/3WxXeldByQMWmmK', '0'); -- password_e3
+CALL sp_create_account(5000000, 'Student', 'Student Name 1', 'Sydney', '0410000001', 'student1@vu.edu.au', '$2y$10$xrmfeGp8tNN6sFQF1Yd0U.C55X6Uuwj2e97A4iQm7ssxpRbMDKhNW', '2014'); -- password_s1
+CALL sp_create_account(5000000, 'Student', 'Student Name 2', 'Sydney', '0410000002', 'student2@vu.edu.au', '$2y$10$TUgbbu3YhfoCidU.H1TX/..Phve.wCvzZAjLcspE.o6y4sDVTLFE6', '2014'); -- password_s2
+CALL sp_create_account(5000000, 'Student', 'Student Name 3', 'Sydney', '0410000003', 'student3@vu.edu.au', '$2y$10$SL1/I/W5uSIBisHVYWhl7.9YOe66v2lKltmnTP3dlJ7SXzUoZMlWS', '2014'); -- password_s3
 
 -- Librarian's id is assumed to be 5000001
 SELECT sf_create_section(5000001, 'C');
